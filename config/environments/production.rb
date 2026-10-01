@@ -43,8 +43,13 @@ Rails.application.configure do
   # Don't log any deprecations.
   config.active_support.report_deprecations = false
 
-  # Replace the default in-process memory cache store with a durable alternative.
-  # config.cache_store = :mem_cache_store
+  # Add Redis cache store:
+  config.cache_store = :redis_cache_store, {
+    url: ENV.fetch("REDIS_URL"),
+    ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE }, # If using TLS (e.g., Heroku Redis, AWS ElastiCache)
+    pool_size: ENV.fetch("RAILS_MAX_THREADS") { 5 }.to_i,
+    pool_timeout: 5
+  }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
