@@ -120,6 +120,7 @@ jobs:
 
   system-test:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     services:
       postgres:
