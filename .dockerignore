@@ -1,0 +1,31 @@
+# Git and CI
+.git
+.github
+.gitattributes
+
+# Local environment and secrets
+.env*
+config/master.key
+.bundle
+
+# Logs, temp files and local storage
+log/*
+!log/.keep
+tmp/*
+!tmp/.keep
+storage/*
+!storage/.keep
+
+# Dependencies and tooling not needed in the image
+node_modules
+coverage
+vendor/bundle
+
+# Tests and docs
+spec
+test
+PLAN.md
+README.md
+.rspec
+.rubocop.yml
+.ruby-lsp
