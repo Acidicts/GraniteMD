@@ -9,8 +9,16 @@ gem "propshaft"
 # Use postgre-sql as the database for Active Record and redis for caching
 gem "pg"
 gem "redis"
+
+# Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
+gem "importmap-rails"
+# Hotwire's SPA-like page accelerator   [https://turbo.hotwired.dev]
+# Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
+gem "turbo-rails"
+gem "stimulus-rails"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
+gem "erb", ">= 6.0.4"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
@@ -18,4 +26,31 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
+
+  # Audits gems for known security defects (use config/bundler-audit.yml to ignore issues)
+  gem "bundler-audit", require: false
+
+  # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
+  gem "brakeman", ">= 8.0.6", require: false
+
+  # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
+  gem "rubocop-rails-omakase", require: false
+
+  # ERB template linting [https://github.com/Shopify/erb-lint]
+  gem "erb_lint", require: false
+end
+
+group :development do
+  gem "web-console"
+  gem "annotaterb"
+
+  gem "faker"
+  gem "ruby-lsp", require: false
+  gem "ruby-lsp-rails", require: false
+end
+
+group :test do
+  # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
+  gem "capybara"
+  gem "selenium-webdriver"
 end
