@@ -12,6 +12,8 @@ CI.run do
   step "Tests: Seeds", "RAILS_ENV=test bin/rails db:seed:replant"
   step "Tests: Rails", "bin/rails test"
 
+  step "Tests: RSpec", "bin/rails spec"
+
   # Optional: Run system tests
   # step "Tests: System", "bin/rails test:system"
 

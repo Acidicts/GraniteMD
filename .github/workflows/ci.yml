@@ -79,44 +79,80 @@ jobs:
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
-  test:
+  rspec:
+    name: RSpec (shard ${{ matrix.shard }}/${{ strategy.job-total }})
     runs-on: ubuntu-latest
-
+    strategy:
+      # Don't cancel remaining shards when one fails — we want to see all
+      # failures in a single run rather than a slow loop of retries.
+      fail-fast: false
+      matrix:
+        # Bumping this number adds more parallel runners. Keep it in sync
+        # with SHARD_TOTAL below.
+        shard: [1, 2, 3, 4, 5, 6, 7, 8]
     services:
       postgres:
-        image: postgres:17
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
         ports:
           - 5432:5432
-        env:
-          POSTGRES_USER: coder
-          POSTGRES_PASSWORD: coder
-        options: --health-cmd "pg_isready -U coder" --health-interval 10s --health-timeout 5s --health-retries 5
+      # https://docs.github.com/en/actions/tutorials/use-containerized-services/create-redis-service-containers
       redis:
-        image: valkey/valkey:8
+        image: redis:latest
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
         ports:
           - 6379:6379
-        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y libvips-dev
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          bundler-cache: true
-
-      - name: Run tests
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup-ruby
+      - uses: ./.github/actions/setup-node
+      - uses: ./.github/actions/setup-db
+      - name: Build Assets
+        run: yarn build && yarn build:css
+      - name: Run RSpec
         env:
+          ${{ insert }}: ${{ secrets }}
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/bank_test
+          REDIS_URL: redis://localhost:6379
           RAILS_ENV: test
-          POSTGRES_USER: coder
-          POSTGRES_PASSWORD: coder
-          POSTGRES_HOST: localhost
-          POSTGRES_PORT: 5432
-          REDIS_URL: redis://localhost:6379/0
-        run: bin/rails db:prepare && bin/rails test
+          CC_TEST_REPORTER_ID: "1" # Force SimpleCov to generate a JSON report
+          SHARD_INDEX: ${{ matrix.shard }}
+          SHARD_TOTAL: 8
+        # Deterministic round-robin split of spec files across shards. We
+        # sort the file list first so each runner computes the same ordering,
+        # then `awk` keeps only the files whose 1-based index mod SHARD_TOTAL
+        # maps to this shard. With 143 spec files over 8 shards, each shard
+        # runs ~18 files. This is simple and doesn't require extra gems;
+        # upgrade to a balancer (ci-queue, knapsack_pro) later if shards
+        # drift apart in wall time.
+        run: |
+          specs=$(find spec -name '*_spec.rb' | sort | awk -v i="$SHARD_INDEX" -v n="$SHARD_TOTAL" 'NR % n == (i - 1) % n { print }')
+          echo "Running $(echo "$specs" | wc -l) spec files on shard $SHARD_INDEX/$SHARD_TOTAL"
+          seed=$RANDOM
+          cmd="bundle exec rspec --seed $seed --tag '~skip' $(echo $specs | tr '\n' ' ')"
+          echo "To reproduce locally, run:"
+          echo "  RAILS_ENV=test bundle exec rails db:drop db:create db:schema:load && \\"
+          echo "  $cmd"
+          eval "$cmd"
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v7
+        with:
+          # Each shard generates its own coverage file; name them uniquely
+          # so the upload action doesn't clash. Merging into a single report
+          # can be done in a downstream job if needed.
+          name: simplecov-report-shard-${{ matrix.shard }}
+          path: coverage/coverage.json
 
   system-test:
     runs-on: ubuntu-latest
@@ -173,7 +209,7 @@ jobs:
 
   build:
     name: Build & Push Docker Image
-    needs: [scan_ruby, scan_js, lint, test, system-test]
+    needs: [scan_ruby, scan_js, lint, rspec, system-test]
     # Only push on main branch, not on pull requests
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
