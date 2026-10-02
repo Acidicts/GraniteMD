@@ -37,7 +37,7 @@ runs:
     - name: Load DB schema
       shell: bash
       env:
-        DATABASE_URL: postgres://postgres:postgres@localhost:5432/bank_test
+        DATABASE_URL: postgres://postgres:postgres@localhost:5432/granite_test
         PGHOST: localhost
         PGUSER: postgres
         PGPASSWORD: postgres
@@ -52,10 +52,10 @@ runs:
         set -euo pipefail
         if [ "${{ steps.schema-cache.outputs.cache-hit }}" = "true" ] && [ -s /tmp/schema.sql ]; then
           echo "Restoring cached schema dump..."
-          createdb bank_test
-          psql -d bank_test -v ON_ERROR_STOP=1 -f /tmp/schema.sql > /dev/null
+          createdb granite_test
+          psql -d granite_test -v ON_ERROR_STOP=1 -f /tmp/schema.sql > /dev/null
         else
           echo "Cache miss; loading schema via Rails..."
           bundle exec rails db:create db:schema:load
-          pg_dump --no-owner --no-privileges --no-comments bank_test > /tmp/schema.sql
+          pg_dump --no-owner --no-privileges --no-comments granite_test > /tmp/schema.sql
         fi
