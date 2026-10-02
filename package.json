@@ -1,0 +1,17 @@
+{
+  "name": "@acidicts/granite-md",
+  "version": "0.0.0",
+  "description": "Granite MD — a self-hosted markdown knowledge base built with Rails.",
+  "private": true,
+  "directories": {
+    "lib": "lib",
+    "test": "spec"
+  },
+  "scripts": {
+    "test": "i=${SHARD_INDEX:-1}; n=${SHARD_TOTAL:-1}; specs=$(find spec -name '*_spec.rb' | sort | awk -v i=\"$i\" -v n=\"$n\" 'NR % n == (i - 1) % n { print }'); count=$(printf '%s\\n' \"$specs\" | grep -c . || true); if [ \"$count\" -eq 0 ]; then echo \"rspec shard $i/$n: no spec files assigned\"; else echo \"rspec shard $i/$n: running $count spec files\"; bundle exec rspec --tag '~skip' $specs; fi",
+    "test:all": "bundle exec rspec --tag '~skip'",
+    "test:prepare": "RAILS_ENV=test bin/rails db:prepare"
+  },
+  "author": "",
+  "license": "ISC"
+}

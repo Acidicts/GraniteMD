@@ -21,4 +21,5 @@ Things you may want to cover:
 
 * Deployment instructions
 
-* ...
+### Credits
+- RSpec Shard code and .github/actions/setup-[db/ruby] in ci.yml from [hackclub/hcb](https://github.com/hackclub/hcb)
