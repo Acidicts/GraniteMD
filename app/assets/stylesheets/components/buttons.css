@@ -1,0 +1,113 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.12s, border-color 0.12s, color 0.12s;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+/* Primary */
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+.btn-primary:disabled {
+  background: var(--border);
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+/* Secondary */
+.btn-secondary {
+  border-color: var(--muted);
+  color: var(--text);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--selection);
+}
+.btn-secondary:disabled {
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+/* Tertiary */
+.btn-tertiary {
+  color: var(--accent);
+}
+.btn-tertiary:hover:not(:disabled) {
+  background: var(--selection);
+  text-decoration: underline;
+}
+.btn-tertiary:disabled {
+  color: var(--muted);
+}
+
+/* Danger / Destructive */
+.btn-danger {
+  border-color: var(--danger-text);
+  color: var(--danger-text);
+}
+.btn-danger:hover:not(:disabled) {
+  background: var(--danger-tint);
+}
+.btn-danger:disabled {
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+/* Nav */
+
+.btn-nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 5px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  margin: 0;
+  transition: background-color 0.12s, border-color 0.12s, color 0.12s;
+}
+.btn-nav:hover:not(:disabled) {
+  background: var(--selection);
+}
+.btn-primary:disabled {
+  background: var(--border);
+  border-color: var(--border);
+  color: var(--muted);
+}

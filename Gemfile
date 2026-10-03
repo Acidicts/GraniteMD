@@ -38,9 +38,13 @@ end
 group :development do
   gem "web-console"
   gem "annotaterb"
+  gem "rails_live_reload"
 
-  gem "ruby-lsp", require: false
+  gem "ruby-lsp", ">= 0.18.0", require: false
   gem "ruby-lsp-rails", require: false
+
+  gem "rubocop", require: false
+  gem "htmlbeautifier", require: false         # ERB formatter
 end
 
 group :test do
@@ -48,3 +52,5 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+gem "bcrypt", "~> 3.1"

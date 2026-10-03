@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Granitemd" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Granitemd">
+    <meta name="mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+    
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
+
+    <%= stylesheet_link_tag "layouts/home", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "components/buttons", "data-turbo-track": "reload" %>
+
+    <%= javascript_importmap_tags %>
+  </head>
+  <header>
+    <nav class="nav-bar">
+      <div class="nav-left">
+        <%= link_to home_path do %>
+          <div class="nav-logo">
+              <%= logo_svg(width: 32, height: 32) %>
+          </div>
+        <% end %>
+        <div class="nav-links">
+          <%= link_to "About", home_about_path, class: "btn-nav" %>
+          <%= link_to "Team", home_team_path,   class: "btn-nav" %>
+          <%= link_to "FAQ", home_faq_path,     class: "btn-nav" %>
+        </div>
+      </div>
+      <div class="nav-right"></div>
+    </nav>
+  </header>
+  <body>
+    <%= yield %>
+  </body>
+</html>

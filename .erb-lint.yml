@@ -1,0 +1,3 @@
+# .erb-lint.yml
+---
+EnableDefaultLinters: true
