@@ -4,21 +4,29 @@ gem "dotenv"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem "rails", "~> 8.1.3"
+
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
+
 # Use postgre-sql as the database for Active Record and redis for caching
 gem "pg"
 gem "redis"
 
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 gem "importmap-rails"
+
 # Hotwire's SPA-like page accelerator   [https://turbo.hotwired.dev]
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "turbo-rails"
 gem "stimulus-rails"
+
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 gem "erb", ">= 6.0.4"
+
+# Image
+gem "ruby-vips"
+gem "image_processing", "~> 1.2"
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
@@ -44,7 +52,7 @@ group :development do
   gem "ruby-lsp-rails", require: false
 
   gem "rubocop", require: false
-  gem "htmlbeautifier", require: false         # ERB formatter
+  gem "htmlbeautifier", require: false
 end
 
 group :test do

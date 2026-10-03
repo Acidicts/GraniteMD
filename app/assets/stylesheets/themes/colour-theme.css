@@ -1,6 +1,7 @@
 :root {
     --bg: #f6f3f2;
     --surface: #ebe6e4;
+    --surface-2: #e0d9d6;
     --border: #d8d0cd;
     --text: #2a2525;
     --muted: #6f6665;
@@ -17,6 +18,7 @@
     :root {
         --bg: #171414;
         --surface: #211c1c;
+        --surface-2: #2a2424;
         --border: #352e2e;
         --text: #ebe6e4;
         --muted: #9a908e;

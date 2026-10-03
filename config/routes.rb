@@ -4,6 +4,8 @@ Rails.application.routes.draw do
   get "/about", to: "home#about", as: "home_about"
   get "/team", to: "home#team", as: "home_team"
 
+  get "/dashboard", to: "dashboard#index", as: "dashboard"
+
   resources :workspaces
 
   resource :session

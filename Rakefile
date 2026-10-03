@@ -4,3 +4,6 @@
 require_relative "config/application"
 
 Rails.application.load_tasks
+
+# Rails only auto-loads lib/tasks ending in .rake, so require the .rb task file here.
+require_relative "lib/tasks/auto_annotate_rake"

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Granitemd" %></title>
+    <title><%= content_for(:title) || "GraniteMD" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Granitemd">
+    <meta name="application-name" content="GraniteMD">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -38,7 +38,21 @@
           <%= link_to "FAQ", home_faq_path,     class: "btn-nav" %>
         </div>
       </div>
-      <div class="nav-right"></div>
+      <div class="nav-right">
+        <%= link_to dashboard_path, class: "btn-dashboard" do %>
+          <%= dashboard_icon(width: 32, height: 32) %>
+        <% end %>
+        <div class="profile-pill">
+          <% if current_user&.pfp_image&.attached? %>
+            <div class="pfp-image">
+              <%= current_user.pfp_image %>
+            </div>
+          <% elsif %>
+            <%= profile_svg(width: 32, height: 32,  color: "var(--accent)", background: "#00000000") %>
+          <% end %>
+          <span class="animated-underline"><%= current_user&.name || "User" %></span>
+        </div>
+      </div>
     </nav>
   </header>
   <body>

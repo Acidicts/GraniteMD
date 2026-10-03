@@ -1,23 +1,39 @@
 @import url("../themes/colour-theme.css");
+@import url("../animations/text.css");
 
 body {
+    margin: 0;
     color: var(--text);
     background: var(--bg);
     font-family: "Roboto Mono", monospace;
 }
 
-.nav-bar {
-    overflow-x: hidden;
-    background-color: var(--surface);
-    margin: -5px 0 0;
-    padding: 10px 2px;
+header {
+    margin: 0;
+    padding: 0;
 }
 
+/* Nav Bar */
+.nav-bar {
+    display: flex;
+    flex-direction: row;
+
+    width: 100%;
+    overflow-x: hidden;
+    background-color: var(--surface);
+    margin: 0;
+    padding: 10px 2px;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+
+/* Nav Left - Logo + Nav Links */
 .nav-bar .nav-left {
     display: flex;
     flex-direction: row;
     align-items: flex-end;
     justify-content: flex-start;
+    margin-left: 15px;
 }
 
 .nav-bar .nav-left .nav-logo {
@@ -34,4 +50,54 @@ body {
     justify-content: space-evenly;
     gap: 10px;
     margin: -0.25rem 0 0.25rem 15px;
+}
+
+/* Nav Right - Dashboard + Profile */
+.nav-bar .nav-right {
+    display: flex;
+    flex-direction: row;
+    margin-right: 15px;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-pill {
+    display: flex;
+    background-color: var(--surface-2);
+    padding: 4px 6px 4px 4px;
+    border-radius: 6px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.4s ease-in;
+}
+
+.profile-pill:hover {
+    box-shadow: 0 0px 6px rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+}
+
+.nav-bar .nav-right .btn-dashboard {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+    margin-bottom: -2px;
+    color: var(--accent);
+    margin-right: 4px;
+}
+
+.nav-bar .nav-right .btn-dashboard svg {
+    transition: color ease 0.4s;
+}
+
+.nav-bar .nav-right .btn-dashboard:hover svg,
+.nav-bar .nav-right .btn-dashboard:focus-visible svg {
+    color: var(--accent-hover);
+}
+
+.nav-bar .nav-right .pfp-image {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
 }

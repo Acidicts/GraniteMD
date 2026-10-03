@@ -1,0 +1,13 @@
+.animated-underline {
+  display: inline-block;
+  position: relative;
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-size: 0% 2px;
+  background-position: 0 100%;
+  transition: background-size 0.3s ease;
+}
+
+.animated-underline:hover {
+  background-size: 100% 2px;
+}
