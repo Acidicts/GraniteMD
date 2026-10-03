@@ -1,4 +1,5 @@
 @import url("../themes/colour-theme.css");
+@import url("../themes/misc.css");
 @import url("../animations/text.css");
 
 body {
@@ -20,7 +21,7 @@ header {
 
     width: 100%;
     overflow-x: hidden;
-    background-color: var(--surface);
+    background-color: var(--surface-1);
     margin: 0;
     padding: 10px 2px;
     justify-content: space-between;
@@ -52,6 +53,46 @@ header {
     margin: -0.25rem 0 0.25rem 15px;
 }
 
+.nav-right .profile-pill-links {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+
+    transform: translateX(-5%) translateY(10%);
+
+    background: var(--surface-2);
+    border-radius: 32px;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+
+    width: fit-content;
+    padding: 2px;
+}
+
+.nav-right .profile-pill-links a {
+    text-decoration: none;
+    color: var(--muted);
+    padding: 8px 16px;
+    border-radius: 0;
+    transition: background-color 0.12s, color 0.12s;
+}
+
+.nav-right .profile-pill-links a:first-child {
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+}
+
+.nav-right .profile-pill-links a:last-child {
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+}
+
+.nav-right .profile-pill-links a:hover,
+.nav-right .profile-pill-links a:focus-visible {
+    text-decoration: none;
+    color: var(--text);
+    background: var(--selection);
+}
+
 /* Nav Right - Dashboard + Profile */
 .nav-bar .nav-right {
     display: flex;
@@ -59,22 +100,6 @@ header {
     margin-right: 15px;
     align-items: center;
     justify-content: center;
-}
-
-.profile-pill {
-    display: flex;
-    background-color: var(--surface-2);
-    padding: 4px 6px 4px 4px;
-    border-radius: 6px;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    transition: all 0.4s ease-in;
-}
-
-.profile-pill:hover {
-    box-shadow: 0 0px 6px rgba(255, 255, 255, 0.3);
-    cursor: pointer;
 }
 
 .nav-bar .nav-right .btn-dashboard {

@@ -1,9 +1,9 @@
 require 'rails_helper'
 
-RSpec.describe "Dashboards", type: :request do
-  describe "GET /index" do
+RSpec.describe "Users", type: :request do
+  describe "GET /edit" do
     it "returns http success" do
-      get "/dashboard/index"
+      get "/user/edit"
       expect(response).to have_http_status(:success)
     end
   end

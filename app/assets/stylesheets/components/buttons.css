@@ -83,7 +83,6 @@
 }
 
 /* Nav */
-
 .btn-nav {
   display: inline-flex;
   align-items: center;
@@ -107,6 +106,39 @@
   background: var(--selection);
 }
 .btn-primary:disabled {
+  background: var(--border);
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+/* Login */
+
+.btn-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 24px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.12s, border-color 0.12s, color 0.12s;
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+}
+.btn-login:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+.btn-login:disabled {
   background: var(--border);
   border-color: var(--border);
   color: var(--muted);

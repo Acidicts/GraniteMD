@@ -1,0 +1,44 @@
+<%= stylesheet_link_tag "components/forms" %>
+<%= stylesheet_link_tag "pages/dashboard/users/new" %>
+
+<div class="signup-card">
+    <h1 class="signup-heading"><%= logo_svg(width: 32, height: 32) %><span style="width:16px"></span>Granite-MD</h1>
+    <p class="description">Create Your Account</p>
+    <%= form_with model: @user, url: signup_path, class: "form" do |f| %>
+        <div class="form-group">
+            <div class="form-grid">
+                <div class="form-group">
+                    <%= f.label :first_name, class: "label" %>
+                    <%= f.text_field :first_name, class: "field input" %>
+                </div>
+                <div class="form-group">
+                    <%= f.label :last_name, class: "label" %>
+                    <%= f.text_field :last_name, class: "field input" %>
+                </div>
+            </div>
+            <div class="form-group">
+                <%= f.label :username, class: "label" %>
+                <%= f.text_field :username, class: "field input" %>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="form-group">
+                <%= f.label :email_address, class: "label" %>
+                <%= f.email_field :email_address, class: "field input" %>
+            </div>
+            <div class="form-group">
+                <%= f.label :password, class: "label" %>
+                <%= f.password_field :password, class: "field input" %>
+                <%= f.label "At least 8 Characters", class: "hint" %>
+            </div>
+            <div class="form-group">
+                <%= f.label :password_confirmation, class: "label" %>
+                <%= f.password_field :password_confirmation, class: "field input" %>
+            </div>
+        </div>
+        <div class="form-actions">
+            <%= f.submit class: "btn btn-primary submit" %>
+            <p class="hint">Already have an account <%= link_to "Sign In", login_path, class: "form-link" %>
+        </div>
+    <% end %>
+</div>

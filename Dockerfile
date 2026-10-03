@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 
-ARG RUBY_VERSION=3.4.7
+ARG RUBY_VERSION=4.0.7
 
 FROM ruby:${RUBY_VERSION}-slim AS base
 
@@ -14,6 +14,7 @@ RUN apt-get update -qq && \
       libffi-dev \
       libpq-dev \
       libyaml-dev \
+      libvips \
       pkg-config && \
     rm -rf /var/lib/apt/lists/*
 

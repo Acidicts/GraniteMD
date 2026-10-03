@@ -14,14 +14,23 @@
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag :app %>
+    
+    <%= stylesheet_link_tag "layouts/application", "layouts/shared", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "components/buttons", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
   <body>
-    <div class="nav">
-
-    </div>
+    <nav class="nav">
+      <%= link_to "Workspaces", dashboard_path, class: "btn-nav" %>
+      <%= link_to "Settings", dashboard_path, class: "btn-nav" %>
+      <div data-controller="layouts--profile-pill" data-action="click->layouts--profile-pill#clicked click@window->layouts--profile-pill#close">
+        <%= render "shared/profile_pill" %>
+        <div class="profile-pill-links hidden" data-layouts--profile-pill-target="links">
+          <%= link_to "My Profile", dashboard_users_path, class: "btn btn-tertiary" %>
+          <%= link_to "Logout", logout_path, class: "btn btn-tertiary", data: { turbo_method: :delete } %>
+        </div>
+      </div>
+    </nav>
     <div class="content">
       <%= yield %>
     </div>

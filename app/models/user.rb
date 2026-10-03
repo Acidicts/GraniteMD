@@ -4,7 +4,8 @@
 #
 #  id              :bigint           not null, primary key
 #  email_address   :string           not null
-#  name            :string
+#  first_name      :string
+#  last_name       :string
 #  password_digest :string           not null
 #  role            :integer
 #  created_at      :datetime         not null
@@ -24,8 +25,10 @@ class User < ApplicationRecord
   end
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
+  validates :email_address, uniqueness: { message: "Email in Use" }
 
-  attribute :name, null: false, default: ""
+  attribute :first_name, null: false, default: ""
+  attribute :last_name,  null: false, default: ""
 
   attribute :role, default: 0
   enum :role, {

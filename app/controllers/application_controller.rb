@@ -10,8 +10,7 @@ class ApplicationController < ActionController::Base
   before_action :current_path
 
   def current_user
-    return unless session[:user_id]
-    @current_user ||= User.find_by(id: session[:user_id])
+    @current_user ||= resume_session&.user
   end
 
   def current_url

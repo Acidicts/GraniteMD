@@ -4,7 +4,8 @@
 #
 #  id              :bigint           not null, primary key
 #  email_address   :string           not null
-#  name            :string
+#  first_name      :string
+#  last_name       :string
 #  password_digest :string           not null
 #  role            :integer
 #  created_at      :datetime         not null

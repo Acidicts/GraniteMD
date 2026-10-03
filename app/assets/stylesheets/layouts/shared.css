@@ -1,0 +1,22 @@
+/* Profile Pill */
+.profile-pill {
+    display: flex;
+    background-color: var(--surface-2);
+    color: var(--text);
+    padding: 4px 6px 4px 4px;
+    border-radius: 6px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.4s ease-in;
+    width: fit-content;
+}
+
+.profile-pill .profile-pill-name {
+    text-decoration: none;
+}
+
+.profile-pill:hover {
+    box-shadow: 0 0px 6px rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+}

@@ -1,15 +1,32 @@
 Rails.application.routes.draw do
-  get "/", to: "home#index", as: "home"
-  get "/faq", to: "home#faq", as: "home_faq"
-  get "/about", to: "home#about", as: "home_about"
-  get "/team", to: "home#team", as: "home_team"
+  root "home#index", as: :home
 
-  get "/dashboard", to: "dashboard#index", as: "dashboard"
+  controller :home do
+    get "faq"   => :faq,   as: :home_faq
+    get "about" => :about, as: :home_about
+    get "team"  => :team,  as: :home_team
+  end
+
+  controller :sessions do
+    get    "login"  => :new
+    post   "login"  => :create
+    delete "logout" => :destroy
+  end
+
+  get  "signup" => "dashboard/users#new"
+  post "signup" => "dashboard/users#create"
 
   resources :workspaces
-
-  resource :session
   resources :passwords, param: :token
+
+  get "/dashboard", to: "dashboard#index", as: :dashboard
+
+  scope "/dashboard", as: "dashboard", module: "dashboard" do
+    resources :users, only: %i[index edit update]
+
+    get "you", to: "users#index"
+    get "profile/edit", to: "users#edit"
+  end
 
   get "up" => "rails/health#show", as: :rails_health_check
 end
