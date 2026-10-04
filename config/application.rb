@@ -33,6 +33,31 @@ module Granitemd
     normalize_host(ENV[env_key]) || default
   end
 
+  # Reads host lists from the given env keys, accepting a JSON array
+  # (`["a.com", "b.com"]`), a single JSON string, or a comma/space separated
+  # list, and normalises every entry.
+  def self.hosts_from_env(*env_keys)
+    env_keys.filter_map { |key| ENV[key].presence }
+            .flat_map { |value| split_host_list(value) }
+            .filter_map { |host| normalize_host(host) }
+            .uniq
+  end
+
+  def self.split_host_list(value)
+    parsed = begin
+      JSON.parse(value)
+    rescue JSON::ParserError
+      nil
+    end
+
+    case parsed
+    when nil then value.split(/[\s,]+/)
+    when String then [ parsed ]
+    when Array then parsed.grep(String)
+    else []
+    end
+  end
+
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1
