@@ -93,8 +93,12 @@ jobs:
         # drift cannot pass quietly again.
         shard: [1, 2, 3, 4]
     services:
+      # Must stay at or below the `postgresql-client` major version available on
+      # the runner image (16 on ubuntu-latest). setup-db dumps this service with
+      # pg_dump, and pg_dump refuses to dump from a newer server than itself.
+      # Bump the client in .github/actions/setup-db first, then this.
       postgres:
-        image: postgres:17
+        image: postgres:15
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres

@@ -7,6 +7,12 @@ runs:
       shell: bash
       # libpq-dev for gem compilation; postgresql-client provides
       # pg_dump/psql/createdb used by the cache fast path below.
+      #
+      # The client major version sets a hard ceiling on the server image the
+      # rspec job may use: `pg_dump` aborts with "server version mismatch" when
+      # the server is newer than the client. Ubuntu's default package tracks the
+      # runner image's bundled PostgreSQL. To move the service to a newer major,
+      # install postgresql-client-<N> here in the same step.
       run: sudo apt-get install -y libpq-dev postgresql-client
     - name: Detect postgres server version
       id: pg-version
