@@ -8,16 +8,24 @@
 #  last_name       :string
 #  password_digest :string           not null
 #  role            :integer
+#  username        :string
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
+#  workspace_id    :bigint
 #
 # Indexes
 #
 #  index_users_on_email_address  (email_address) UNIQUE
+#  index_users_on_workspace_id   (workspace_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (workspace_id => workspaces.id)
 #
 class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
+  belongs_to :workspace, optional: true
 
   has_one_attached :pfp_image do |attachable|
     attachable.variant :thumb, resize_to_limit: [ 400, 400 ], format: :webp, saver: { quality: 75, strip: true }

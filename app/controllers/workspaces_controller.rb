@@ -53,6 +53,6 @@ class WorkspacesController < ApplicationController
 
   # Only allow a list of trusted parameters through.
   def workspace_params
-    params.fetch(:workspace, {})
+    params.require(:workspace).permit(:name)
   end
 end

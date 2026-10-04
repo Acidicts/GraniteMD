@@ -17,12 +17,16 @@ RSpec.describe "/workspaces", type: :request do
   # Workspace. As you add validations to Workspace, be sure to
   # adjust the attributes here as well.
   let(:valid_attributes) {
-    skip("Add a hash of attributes valid for your model")
+    { name: "Engineering" }
   }
 
   let(:invalid_attributes) {
-    skip("Add a hash of attributes invalid for your model")
+    { name: "" }
   }
+
+  before do
+    sign_in create(:user)
+  end
 
   describe "GET /index" do
     it "renders a successful response" do
@@ -86,14 +90,14 @@ RSpec.describe "/workspaces", type: :request do
   describe "PATCH /update" do
     context "with valid parameters" do
       let(:new_attributes) {
-        skip("Add a hash of attributes valid for your model")
+        { name: "Renamed Workspace" }
       }
 
       it "updates the requested workspace" do
         workspace = Workspace.create! valid_attributes
         patch workspace_url(workspace), params: { workspace: new_attributes }
         workspace.reload
-        skip("Add assertions for updated state")
+        expect(workspace.name).to eq("Renamed Workspace")
       end
 
       it "redirects to the workspace" do

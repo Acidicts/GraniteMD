@@ -2,6 +2,27 @@
 
 ### Hierarchy
 
+- [ ] Useful stuff
+    - [ ] Email Sending
+        - [ ] Codes
+        - [ ] Workspace limits
+        - [ ] Billing
+            - [ ] Yearly renewal
+            - [ ] Payment Failed
+
+    - [ ] Plans
+        - [ ] Free
+            - Cost Free
+            - 50MB of Storage
+        - [ ] Education
+            - [ ] Proof of student status
+                - [ ] Yearly renewal
+            - Cost $2.50/month
+            - 1GB of storage
+        - [ ] Paid
+            - Cost $5/month
+            - 3GB Storage
+
 - [ ] Management
     - [ ] Users
         - [ ] Stats
@@ -21,6 +42,7 @@
 - [ ] Organisation
     - [ ] Teams
         - [ ] Users
+            - [ ] Premade User accounts with password change request
 
     - [ ] Workspace - Optional Organisation
         - [ ] Users
@@ -50,7 +72,9 @@
 
 ### Order of Development
 
-- [ ] Markdown - Page
-- [ ] Pages
-- [ ] Files
+- [x] User Signups / Login
+- [ ] Workspaces (Obsidian Vaults equivalent)
+    - [ ] Markdown - Page
+    - [ ] Pages
+    - [ ] Files
 
