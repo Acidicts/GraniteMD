@@ -38,15 +38,26 @@ RSpec.describe "Session tokens", type: :request do
 
   it "does not leak the row id inside the signed cookie payload" do
     sign_in user
+    record = Session.sole
 
-    payload = Base64.decode64(
-      CGI.unescape(Array(response.headers["Set-Cookie"])
-        .find { |value| value.start_with?("session_token=") }
-        .to_s.split(";").first.to_s.split("=", 2).last.to_s.split("--").first.to_s)
-    )
+    # Compare the decoded value against the id rather than substring-matching the
+    # raw payload: the envelope holds a base64 blob and an ISO8601 expiry, both of
+    # which contain digits for every small id.
+    message = decoded_cookie("session_token").dig("_rails", "message")
+    carried = JSON.parse(Base64.decode64(message))
 
-    expect(payload).to be_present
-    expect(payload).not_to include(Session.sole.id.to_s)
+    expect(carried).to eq(record.token)
+    expect(carried).not_to eq(record.id.to_s)
+    expect(carried.length).to be >= 24
+  end
+
+  it "never resolves a session from the row id alone" do
+    sign_in user
+    record = Session.sole
+
+    # The token is the only lookup key: knowing an id must not be enough.
+    expect(Session.find_by_token(record.id.to_s)).to be_nil
+    expect(Session.find_by_token(nil)).to be_nil
   end
 
   it "resumes the session from the token alone" do
