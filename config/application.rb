@@ -19,6 +19,20 @@ require "rails/test_unit/railtie"
 Bundler.require(*Rails.groups)
 
 module Granitemd
+  # Deployments spell the app's address inconsistently: a bare host
+  # (`granitemd.com`), a full URL (`https://granitemd.com/`), or a URL with a
+  # path. Host authorization compares `config.hosts` literally against the
+  # `Host`/`X-Forwarded-Host` headers, so a scheme or path makes every request
+  # fail the check. Normalise once, here, and reuse it everywhere a host is
+  # needed.
+  def self.normalize_host(value)
+    value.to_s.sub(%r{\A[a-z][a-z0-9+.-]*://}i, "").split("/").first.to_s.strip.presence
+  end
+
+  def self.app_host(env_key: "APP_HOST", default: "granitemd.local")
+    normalize_host(ENV[env_key]) || default
+  end
+
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1
@@ -37,7 +51,7 @@ module Granitemd
 
     config.active_storage.variant_processor = :vips
 
-    config.hosts << ENV.fetch("APP_URL", "localhost")
+    config.hosts << Granitemd.app_host(env_key: "APP_URL", default: "localhost")
 
     # Configuration for the application, engines, and railties goes here.
     #

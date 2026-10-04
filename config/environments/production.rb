@@ -66,8 +66,11 @@ Rails.application.configure do
   # Enable DNS rebinding protection and other `Host` header attacks. Leaving this
   # empty lets any Host header through, which in turn lets a spoofed Host
   # poison any absolute URL the app generates or redirects to.
-  app_host = ENV.fetch("APP_HOST", "granitemd.com")
-  config.hosts = [ app_host, ".#{app_host}" ]
+  app_host = Granitemd.app_host(default: "granitemd.com")
+  # Extra names for the same deployment (aliases, custom domains, the proxy's
+  # X-Forwarded-Host). Comma or space separated.
+  extra_hosts = ENV.fetch("ALLOWED_HOSTS", "").split(/[\s,]+/).filter_map { |host| Granitemd.normalize_host(host) }
+  config.hosts = ([ app_host ] + extra_hosts).uniq.flat_map { |host| [ host, ".#{host}" ] }
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local

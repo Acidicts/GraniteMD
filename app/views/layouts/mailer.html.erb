@@ -12,7 +12,7 @@
     <div class="mailer-container">
       <%= yield %>
       <div class="mailer-footer">
-        Sent by GraniteMD &middot; <%= ENV.fetch("APP_HOST", "granitemd.local") %>
+        Sent by GraniteMD &middot; <%= Granitemd.app_host %>
       </div>
     </div>
   </body>
