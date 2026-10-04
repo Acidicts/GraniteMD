@@ -24,13 +24,21 @@ RSpec.describe "/workspaces", type: :request do
     { name: "" }
   }
 
+  let!(:user) {
+    create(:user)
+  }
+
   before do
-    sign_in create(:user)
+    sign_in user
+  end
+
+  def create_workspace(attributes = valid_attributes)
+    Workspace.create!(attributes).tap { |workspace| workspace.users << user }
   end
 
   describe "GET /index" do
     it "renders a successful response" do
-      Workspace.create! valid_attributes
+      create_workspace
       get workspaces_url
       expect(response).to be_successful
     end
@@ -38,7 +46,7 @@ RSpec.describe "/workspaces", type: :request do
 
   describe "GET /show" do
     it "renders a successful response" do
-      workspace = Workspace.create! valid_attributes
+      workspace = create_workspace
       get workspace_url(workspace)
       expect(response).to be_successful
     end
@@ -53,7 +61,7 @@ RSpec.describe "/workspaces", type: :request do
 
   describe "GET /edit" do
     it "renders a successful response" do
-      workspace = Workspace.create! valid_attributes
+      workspace = create_workspace
       get edit_workspace_url(workspace)
       expect(response).to be_successful
     end
@@ -94,14 +102,14 @@ RSpec.describe "/workspaces", type: :request do
       }
 
       it "updates the requested workspace" do
-        workspace = Workspace.create! valid_attributes
+        workspace = create_workspace
         patch workspace_url(workspace), params: { workspace: new_attributes }
         workspace.reload
         expect(workspace.name).to eq("Renamed Workspace")
       end
 
       it "redirects to the workspace" do
-        workspace = Workspace.create! valid_attributes
+        workspace = create_workspace
         patch workspace_url(workspace), params: { workspace: new_attributes }
         workspace.reload
         expect(response).to redirect_to(workspace_url(workspace))
@@ -110,7 +118,7 @@ RSpec.describe "/workspaces", type: :request do
 
     context "with invalid parameters" do
       it "renders a response with 422 status (i.e. to display the 'edit' template)" do
-        workspace = Workspace.create! valid_attributes
+        workspace = create_workspace
         patch workspace_url(workspace), params: { workspace: invalid_attributes }
         expect(response).to have_http_status(:unprocessable_content)
       end
@@ -119,14 +127,14 @@ RSpec.describe "/workspaces", type: :request do
 
   describe "DELETE /destroy" do
     it "destroys the requested workspace" do
-      workspace = Workspace.create! valid_attributes
+      workspace = create_workspace
       expect {
         delete workspace_url(workspace)
       }.to change(Workspace, :count).by(-1)
     end
 
     it "redirects to the workspaces list" do
-      workspace = Workspace.create! valid_attributes
+      workspace = create_workspace
       delete workspace_url(workspace)
       expect(response).to redirect_to(workspaces_url)
     end

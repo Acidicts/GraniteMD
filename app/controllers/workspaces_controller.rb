@@ -3,7 +3,7 @@ class WorkspacesController < ApplicationController
 
   # GET /workspaces
   def index
-    @workspaces = Workspace.all
+    @workspaces = current_user.workspaces
   end
 
   # GET /workspaces/1
@@ -24,6 +24,8 @@ class WorkspacesController < ApplicationController
     @workspace = Workspace.new(workspace_params)
 
     if @workspace.save
+      @workspace.users << current_user
+
       redirect_to @workspace, notice: "Workspace was successfully created."
     else
       render :new, status: :unprocessable_content
@@ -49,6 +51,9 @@ class WorkspacesController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_workspace
     @workspace = Workspace.find(params.expect(:id))
+    return if @workspace.users.exists?(current_user.id)
+
+    redirect_to dashboard_path
   end
 
   # Only allow a list of trusted parameters through.

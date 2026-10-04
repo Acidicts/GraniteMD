@@ -43,10 +43,12 @@ Rails.application.configure do
   # Don't log any deprecations.
   config.active_support.report_deprecations = false
 
-  # Add Redis cache store:
+  # Add Redis cache store. Deliberately no `ssl_params`: the generator default
+  # sets VERIFY_NONE, which silently disables certificate validation on the tier
+  # holding the rate-limit counters. Pass a CA bundle via REDIS_URL/REDIS_SSL_* if
+  # the cache is reached over TLS.
   config.cache_store = :redis_cache_store, {
     url: ENV.fetch("REDIS_URL"),
-    ssl_params: { verify_mode: OpenSSL::SSL::VERIFY_NONE }, # If using TLS (e.g., Heroku Redis, AWS ElastiCache)
     pool_size: ENV.fetch("RAILS_MAX_THREADS") { 5 }.to_i,
     pool_timeout: 5
   }
@@ -61,15 +63,29 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [ :id ]
 
-  # Enable DNS rebinding protection and other `Host` header attacks.
-  # config.hosts = [
-  #   "example.com",     # Allow requests from example.com
-  #   /.*\.example\.com/ # Allow requests from subdomains like `www.example.com`
-  # ]
-  #
-  # Skip DNS rebinding protection for the default health check endpoint.
-  # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  # Enable DNS rebinding protection and other `Host` header attacks. Leaving this
+  # empty lets any Host header through, which in turn lets a spoofed Host
+  # poison any absolute URL the app generates or redirects to.
+  app_host = ENV.fetch("APP_HOST", "granitemd.com")
+  config.hosts = [ app_host, ".#{app_host}" ]
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
+
+  # Email delivery over SMTP, configured entirely from the environment.
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.default_url_options = { host: app_host, protocol: "https" }
+  smtp_settings = {
+    address: ENV["SMTP_HOST"].presence || "localhost",
+    port: ENV["SMTP_PORT"].presence&.to_i || 587,
+    domain: ENV["SMTP_DOMAIN"].presence || app_host,
+    enable_starttls_auto: ENV.fetch("SMTP_STARTTLS", "true") == "true",
+    user_name: ENV["SMTP_USER"].presence,
+    password: ENV["SMTP_PASSWORD"].presence
+  }.compact
+  smtp_settings[:authentication] = ENV.fetch("SMTP_AUTHENTICATION", "plain").to_sym if smtp_settings[:user_name]
+
+  config.action_mailer.smtp_settings = smtp_settings
 end

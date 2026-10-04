@@ -87,12 +87,14 @@ jobs:
       # failures in a single run rather than a slow loop of retries.
       fail-fast: false
       matrix:
-        # Bumping this number adds more parallel runners. Keep it in sync
-        # with SHARD_TOTAL below.
-        shard: [1]
+        # SHARD_TOTAL and this matrix MUST stay equal -- a shard total larger
+        # than the matrix silently leaves specs unrun. The coverage guard in
+        # the run step below fails the build if they ever disagree, so the
+        # drift cannot pass quietly again.
+        shard: [1, 2, 3, 4]
     services:
       postgres:
-        image: postgres:15
+        image: postgres:17
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -105,9 +107,9 @@ jobs:
           - 5432:5432
       # https://docs.github.com/en/actions/tutorials/use-containerized-services/create-redis-service-containers
       redis:
-        image: redis:latest
+        image: valkey/valkey:8
         options: >-
-          --health-cmd "redis-cli ping"
+          --health-cmd "valkey-cli ping"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -119,24 +121,55 @@ jobs:
       - uses: ./.github/actions/setup-db
       - name: Run RSpec
         env:
-          ${{ insert }}: ${{ secrets }}
           # Must match the database setup-db creates/loads (granite_test).
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/granite_test
           REDIS_URL: redis://localhost:6379
           RAILS_ENV: test
+          # Throwaway keys so CI never depends on a .env file (which is
+          # gitignored). These decrypt nothing real -- CI rebuilds its database
+          # from schema on every run. Never reuse these values outside test.
+          ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY: e3thjpxBEMSXvniHfQnAafG+fKhQKv3nu/5Mdh3iAyo=
+          ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY: z1N3uzTWwPeRhv8EvYtSavEmLD/07uhLw4h4iYui6Po=
+          ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT: jcp77SZdceuWLZ08+CRQVZ0ro6cNnxnOf9jz7OYO4Mk=
           CC_TEST_REPORTER_ID: "1" # Force SimpleCov to generate a JSON report
           SHARD_INDEX: ${{ matrix.shard }}
-          SHARD_TOTAL: 8
-        # Deterministic round-robin split of spec files across shards. We
-        # sort the file list first so each runner computes the same ordering,
-        # then `awk` keeps only the files whose 1-based index mod SHARD_TOTAL
-        # maps to this shard. With 143 spec files over 8 shards, each shard
-        # runs ~18 files. This is simple and doesn't require extra gems;
-        # upgrade to a balancer (ci-queue, knapsack_pro) later if shards
-        # drift apart in wall time.
+          SHARD_TOTAL: 4
+          # Number of shards GitHub actually created from the matrix above.
+          SHARD_MATRIX_SIZE: ${{ strategy.job-total }}
+        # Deterministic round-robin split of spec files across shards: sort the
+        # file list so each runner computes the same ordering, then keep the
+        # files whose 1-based index maps to this shard.
         run: |
-          specs=$(find spec -name '*_spec.rb' | sort | awk -v i="$SHARD_INDEX" -v n="$SHARD_TOTAL" 'NR % n == (i - 1) % n { print }')
-          echo "Running $(echo "$specs" | wc -l) spec files on shard $SHARD_INDEX/$SHARD_TOTAL"
+          set -euo pipefail
+
+          select_shard() {
+            find spec -name '*_spec.rb' | sort | awk -v i="$1" -v n="$SHARD_TOTAL" 'NR % n == (i - 1) % n'
+          }
+
+          # Guard against SHARD_TOTAL drifting away from the matrix size, which
+          # would silently skip specs entirely: with matrix [1] and
+          # SHARD_TOTAL 8, seven eighths of the suite never runs and the build
+          # still goes green.
+          if [ "$SHARD_TOTAL" -ne "$SHARD_MATRIX_SIZE" ]; then
+            echo "SHARD_TOTAL=$SHARD_TOTAL but the matrix created $SHARD_MATRIX_SIZE shard(s). Fix one to match the other." >&2
+            exit 1
+          fi
+
+          total=$(find spec -name '*_spec.rb' | wc -l | tr -d ' ')
+          covered=$(for i in $(seq 1 "$SHARD_TOTAL"); do select_shard "$i"; done | sort -u | wc -l | tr -d ' ')
+          if [ "$covered" -ne "$total" ]; then
+            echo "Shard matrix covers $covered of $total spec files -- the shards do not partition the suite." >&2
+            exit 1
+          fi
+
+          specs=$(select_shard "$SHARD_INDEX")
+          count=$(echo "$specs" | grep -c . || true)
+          if [ "$count" -eq 0 ]; then
+            echo "Shard $SHARD_INDEX/$SHARD_TOTAL selected no spec files." >&2
+            exit 1
+          fi
+
+          echo "Running $count of $total spec files on shard $SHARD_INDEX/$SHARD_TOTAL"
           seed=$RANDOM
           cmd="bundle exec rspec --seed $seed --tag '~skip' $(echo $specs | tr '\n' ' ')"
           echo "To reproduce locally, run:"
@@ -152,64 +185,11 @@ jobs:
           name: simplecov-report-shard-${{ matrix.shard }}
           path: coverage/coverage.json
 
-  system-test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-
-    services:
-      postgres:
-        image: postgres:17
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_USER: coder
-          POSTGRES_PASSWORD: coder
-        options: --health-cmd "pg_isready -U coder" --health-interval 10s --health-timeout 5s --health-retries 5
-      redis:
-        image: valkey/valkey:8
-        ports:
-          - 6379:6379
-        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
-
-      - name: Install system dependencies
-        run: sudo apt-get update && sudo apt-get install -y libvips-dev
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          bundler-cache: true
-
-      - name: Run System Tests
-        env:
-          RAILS_ENV: test
-          POSTGRES_USER: coder
-          POSTGRES_PASSWORD: coder
-          POSTGRES_HOST: localhost
-          POSTGRES_PORT: 5432
-          REDIS_URL: redis://localhost:6379/0
-        run: |
-          if [ -d test/system ]; then
-            bin/rails db:prepare && bin/rails test:system
-          else
-            echo "No system tests found, skipping test:system"
-          fi
-
-      - name: Keep screenshots from failed system tests
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: screenshots
-          path: ${{ github.workspace }}/tmp/screenshots
-          if-no-files-found: ignore
-
   build:
     name: Build & Push Docker Image
-    needs: [scan_ruby, scan_js, lint, rspec, system-test]
+    needs: [scan_ruby, scan_js, lint, rspec]
     # Only push on main branch, not on pull requests
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -242,6 +222,7 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=sha,format=short
+            type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push
         uses: docker/build-push-action@v6

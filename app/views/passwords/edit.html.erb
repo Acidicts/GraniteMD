@@ -1,12 +1,38 @@
 <%= stylesheet_link_tag "components/forms" %>
-<%= stylesheet_link_tag "pages/passwords/new" %>
+<%= stylesheet_link_tag "pages/passwords/edit" %>
 
 <div class="edit-password">
-  <h1>Update your password</h1>
-  <%= tag.div(flash[:alert], style: "color:red") if flash[:alert] %>
-  <%= form_with url: password_path(params[:token]), method: :put do |form| %>
-    <%= form.password_field :password, required: true, autocomplete: "new-password", placeholder: "Enter new password", maxlength: 72 %><br>
-    <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", placeholder: "Repeat new password", maxlength: 72 %><br>
-    <%= form.submit "Save", class: "edit-submit" %>
+  <h3>Update your password</h3>
+  <%= form_with url: password_path(params[:token]), method: :put, html: { data: { controller: "passwords--reset-password" } } do |form| %>
+  <% if @user.errors.any? %>
+    <%= alert_box(:error,
+                  title: "#{pluralize(@user.errors.count, "error")} prevented this password from being saved:",
+                  dismissible: false) do %>
+      <ul>
+        <% @user.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    <% end %>
+  <% end %>
+
+  <%= form.password_field :password,
+        required: true, autofocus: true, autocomplete: "new-password",
+        placeholder: "Enter new password", maxlength: 72, class: "field input",
+        data: {
+          "passwords--reset-password-target": "password",
+          action: "input->passwords--reset-password#match"
+        } %><br>
+
+  <%= form.password_field :password_confirmation,
+        required: true, autocomplete: "new-password",
+        placeholder: "Repeat new password", maxlength: 72, class: "field input",
+        data: {
+          "passwords--reset-password-target": "passwordConfirmation",
+          action: "input->passwords--reset-password#match"
+        } %><br>
+
+  <%= form.submit "Save", class: "btn btn-primary",
+        data: { "passwords--reset-password-target": "submitButton" } %>
   <% end %>
 </div>

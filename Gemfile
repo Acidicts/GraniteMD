@@ -1,5 +1,9 @@
 source "https://rubygems.org"
 
+# Pinned so the CI runner (via .ruby-version) and the production image (via the
+# Dockerfile's RUBY_VERSION) cannot drift apart unnoticed.
+ruby "4.0.7"
+
 gem "dotenv"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"

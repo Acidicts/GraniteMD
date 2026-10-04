@@ -20,6 +20,12 @@ Rails.application.configure do
 
   # Show full error reports.
   config.consider_all_requests_local = true
+
+  # Mirror production's Host header validation. Without this the test
+  # environment happily accepts `Host: evil.example.com`, which is what a
+  # spoofed Host header looks like, and open-redirect bugs go unnoticed.
+  config.hosts << "www.example.com"
+  config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
   config.cache_store = :null_store
 
   # Render exception templates for rescuable exceptions and raise for other exceptions.
@@ -42,4 +48,8 @@ Rails.application.configure do
 
   # Store uploaded files on the local file system in a temporary directory.
   config.active_storage.service = :test
+
+  # Emails are collected in ActionMailer::Base.deliveries instead of being sent.
+  config.action_mailer.delivery_method = :test
+  config.action_mailer.default_url_options = { host: "www.example.com" }
 end

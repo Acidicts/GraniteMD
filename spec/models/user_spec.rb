@@ -13,16 +13,10 @@ require 'rails_helper'
 #  username        :string
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
-#  workspace_id    :bigint
 #
 # Indexes
 #
 #  index_users_on_email_address  (email_address) UNIQUE
-#  index_users_on_workspace_id   (workspace_id)
-#
-# Foreign Keys
-#
-#  fk_rails_...  (workspace_id => workspaces.id)
 #
 RSpec.describe User, type: :model do
   describe "validations" do
@@ -96,6 +90,24 @@ RSpec.describe User, type: :model do
       user.sessions.create!(user_agent: "RSpec", ip_address: "127.0.0.1")
 
       expect { user.destroy }.to change(Session, :count).by(-1)
+    end
+
+    it "belongs to many workspaces" do
+      user = create(:user)
+      workspace = create(:workspace)
+
+      user.workspaces << workspace
+
+      expect(user.workspaces).to include(workspace)
+      expect(workspace.users).to include(user)
+    end
+
+    it "drops memberships when destroyed" do
+      user = create(:user)
+      workspace = create(:workspace)
+      user.workspaces << workspace
+
+      expect { user.destroy }.to change { workspace.users.reload.count }.by(-1)
     end
   end
 end

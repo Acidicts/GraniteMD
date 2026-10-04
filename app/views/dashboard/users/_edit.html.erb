@@ -1,16 +1,18 @@
 <%= stylesheet_link_tag "components/forms" %>
 
 <%= turbo_frame_tag @user do%>
-  <%= tag.div(flash[:alert], style: "color:red") if flash[:alert] %>
-  <%= tag.div(flash[:notice], style: "color:green") if flash[:notice] %>
 
   <%= form_with model: [ :dashboard, @user ] do |form| %>
     <% if @user.errors.any? %>
-      <div class="error">
-        <% @user.errors.full_messages.each do |message| %>
-          <div><%= message %></div>
-        <% end %>
-      </div>
+      <%= alert_box(:error,
+                    title: "#{pluralize(@user.errors.count, "error")} prevented this profile from being saved:",
+                    dismissible: false) do %>
+        <ul>
+          <% @user.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      <% end %>
     <% end %>
     <%= form.text_field :first_name, autofocus: true, placeholder: "First name", class: "field input" %><br>
     <%= form.text_field :last_name, autofocus: true, placeholder: "First name", class: "field input" %><br>

@@ -20,4 +20,21 @@ class ApplicationController < ActionController::Base
   def current_path
     @current_path = request.path
   end
+
+  private
+
+  def alert(error: nil, warn: nil, info: nil, title: nil)
+    type, message =
+      if error.present?
+        [ :error, error ]
+      elsif warn.present?
+        [ :warn, warn ]
+      elsif info.present?
+        [ :info, info ]
+      end
+
+    return super() if message.blank?
+
+    flash[:alert_box] = { type: type, title: title.presence, message: message }
+  end
 end

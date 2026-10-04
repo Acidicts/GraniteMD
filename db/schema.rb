@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_04_110000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_04_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -48,6 +48,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_04_110000) do
     t.string "user_agent"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "last_seen_at", null: false
+    t.string "token", null: false
+    t.index ["token"], name: "index_sessions_on_token", unique: true
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
@@ -60,9 +63,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_04_110000) do
     t.integer "role"
     t.string "last_name"
     t.string "username"
-    t.bigint "workspace_id"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
-    t.index ["workspace_id"], name: "index_users_on_workspace_id"
+  end
+
+  create_table "users_workspaces", id: false, force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "workspace_id", null: false
+    t.index ["user_id", "workspace_id"], name: "index_users_workspaces_on_user_id_and_workspace_id", unique: true
   end
 
   create_table "workspaces", force: :cascade do |t|
@@ -74,5 +81,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_04_110000) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "sessions", "users"
-  add_foreign_key "users", "workspaces"
+  add_foreign_key "users_workspaces", "users"
+  add_foreign_key "users_workspaces", "workspaces"
 end

@@ -11,21 +11,21 @@
 #  username        :string
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
-#  workspace_id    :bigint
 #
 # Indexes
 #
 #  index_users_on_email_address  (email_address) UNIQUE
-#  index_users_on_workspace_id   (workspace_id)
-#
-# Foreign Keys
-#
-#  fk_rails_...  (workspace_id => workspaces.id)
 #
 class User < ApplicationRecord
+  PASSWORD_RESET_TOKEN_TTL = 15.minutes
+
   has_secure_password
   has_many :sessions, dependent: :destroy
-  belongs_to :workspace, optional: true
+  has_and_belongs_to_many :workspaces
+
+  generates_token_for :password_reset, expires_in: PASSWORD_RESET_TOKEN_TTL do
+    password_digest
+  end
 
   has_one_attached :pfp_image do |attachable|
     attachable.variant :thumb, resize_to_limit: [ 400, 400 ], format: :webp, saver: { quality: 75, strip: true }
@@ -33,6 +33,8 @@ class User < ApplicationRecord
   end
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
+  normalizes :username, with: ->(u) { u.strip.downcase }
+  validates :username, uniqueness: { case_sensitive: false, message: "Username in Use" }
   validates :email_address, uniqueness: { message: "Email in Use" }
   validates :password,
             length: { minimum: 8 },
@@ -41,7 +43,13 @@ class User < ApplicationRecord
               message: "must include an uppercase letter, a lowercase letter, a number, and a special character"
             },
             if: -> { password.present? }
-  validates :password_confirmation, presence: true, on: :create
+  validates :password_confirmation, presence: true, if: -> { password.present? }
+
+  encrypts :first_name
+  encrypts :last_name
+  # Deterministic so sign-in lookups, uniqueness validation and the unique index
+  # still work against the encrypted value.
+  encrypts :email_address, deterministic: true
 
   attribute :first_name, null: false, default: ""
   attribute :last_name,  null: false, default: ""

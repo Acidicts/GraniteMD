@@ -13,13 +13,17 @@ Rails.application.routes.draw do
     delete "logout" => :destroy
   end
 
-  get  "signup"          => "dashboard/users#new"
+  resources :passwords, param: :token, only: %i[ new create edit update ]
+
+  get "signup"          => "dashboard/users#new"
   post "signup"          => "dashboard/users#create"
-  get  "unique_username" => "dashboard/users#unique_username"
-  get  "unique_email" => "dashboard/users#unique_email"
+  # POST rather than GET so the request needs a CSRF token: a GET can be fired
+  # cross-origin from any page, which turns this into a third-party email
+  # lookup oracle.
+  post "unique_username" => "dashboard/users#unique_username"
+  post "unique_email"    => "dashboard/users#unique_email"
 
   resources :workspaces
-  resources :passwords, param: :token
 
   get "/dashboard", to: "dashboard#index", as: :dashboard
 

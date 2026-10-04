@@ -11,6 +11,12 @@ body {
     font-family: "Roboto Mono", monospace;
 }
 
+.content {
+    flex: 1;
+    min-width: 0;
+    padding: 24px 16px 48px;
+}
+
 .nav {
     display: flex;
     flex-direction: column;

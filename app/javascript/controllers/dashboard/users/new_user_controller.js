@@ -33,6 +33,10 @@ export default class extends Controller {
     this.cancel("email")
   }
 
+  get csrfToken() {
+    return document.querySelector("meta[name='csrf-token']")?.content ?? ""
+  }
+
   // ---- Unique username / email -------------------------------------------
 
   checkUniqueUsername(event) {
@@ -40,7 +44,7 @@ export default class extends Controller {
   }
 
   checkUniqueEmail(event) {
-    this.checkUnique(event, "email", "/unique_email", (v) => EMAIL_FORMAT.test(v))
+    this.checkUnique(event, "email_address", "/unique_email", (v) => EMAIL_FORMAT.test(v))
   }
 
   checkUnique(event, field, endpoint, isValid = () => true) {
@@ -55,8 +59,14 @@ export default class extends Controller {
     const request = new AbortController()
     this.requests[field] = request
 
-    fetch(`${endpoint}?${field}=${encodeURIComponent(value)}`, {
-      headers: { Accept: "application/json" },
+    fetch(endpoint, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "X-CSRF-Token": this.csrfToken,
+      },
+      body: JSON.stringify({ [field]: value }),
       signal: request.signal,
     })
       .then((response) => {

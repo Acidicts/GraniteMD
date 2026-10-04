@@ -37,6 +37,14 @@ RSpec.describe Workspace, type: :model do
   end
 
   describe "associations" do
-    it { is_expected.to have_many(:users) }
+    it "shares users through the membership join table" do
+      workspace = create(:workspace)
+      user = create(:user)
+
+      workspace.users << user
+
+      expect(workspace.users).to contain_exactly(user)
+      expect(Workspace.reflect_on_association(:users).macro).to eq(:has_and_belongs_to_many)
+    end
   end
 end

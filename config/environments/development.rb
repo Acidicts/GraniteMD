@@ -55,4 +55,27 @@ Rails.application.configure do
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
+
+  # Email delivery: real SMTP when SMTP_HOST is set, otherwise write files to tmp/mails.
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+
+  if ENV["SMTP_HOST"].present?
+    config.action_mailer.delivery_method = :smtp
+    smtp_settings = {
+      address: ENV["SMTP_HOST"],
+      port: ENV["SMTP_PORT"].presence&.to_i || 587,
+      domain: ENV["SMTP_DOMAIN"].presence || "localhost",
+      enable_starttls_auto: ENV.fetch("SMTP_STARTTLS", "true") == "true",
+      user_name: ENV["SMTP_USER"].presence,
+      password: ENV["SMTP_PASSWORD"].presence
+    }.compact
+    smtp_settings[:authentication] = ENV.fetch("SMTP_AUTHENTICATION", "plain").to_sym if smtp_settings[:user_name]
+
+    config.action_mailer.smtp_settings = smtp_settings
+  else
+    config.action_mailer.delivery_method = :file
+    config.action_mailer.file_settings = { location: Rails.root.join("tmp", "mails") }
+  end
 end

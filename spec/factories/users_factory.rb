@@ -11,16 +11,10 @@
 #  username        :string
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
-#  workspace_id    :bigint
 #
 # Indexes
 #
 #  index_users_on_email_address  (email_address) UNIQUE
-#  index_users_on_workspace_id   (workspace_id)
-#
-# Foreign Keys
-#
-#  fk_rails_...  (workspace_id => workspaces.id)
 #
 FactoryBot.define do
   factory :user do

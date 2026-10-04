@@ -16,10 +16,11 @@
     <link rel="apple-touch-icon" href="/icon.png">
     
     <%= stylesheet_link_tag "layouts/application", "layouts/shared", "data-turbo-track": "reload" %>
-    <%= stylesheet_link_tag "components/buttons", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "components/buttons", "components/alerts", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
   <body>
+    <%= flash_alerts %>
     <nav class="nav">
       <%= link_to "Workspaces", dashboard_path, class: "btn-nav" %>
       <%= link_to "Settings", dashboard_path, class: "btn-nav" %>
