@@ -26,11 +26,11 @@ This uses databases, and email smtp to run
 
 ## Deployment instructions
 ~ Needs [Docker](https://www.docker.com/) for easy run
-1. Run `docker pull ghcr.io/acidicts/issued:latest`
+1. Run `docker pull ghcr.io/acidicts/granitemd:latest`
 	If github needs authentication do:
 	```
-	echo "$GITHUB_TOKEN" | docker login ghcr.io -u Acidicts --password-stdin
-	docker pull ghcr.io/acidicts/issued:latest
+	echo "$GITHUB_TOKEN" | docker login ghcr.io -u <your username> --password-stdin
+	docker pull ghcr.io/acidicts/granitemd:latest
 	```
 2. Download [.env.example](/.env.example)
 3. Rename `.env.example` to `.env`
@@ -39,7 +39,7 @@ This uses databases, and email smtp to run
 	```
 	services:
 	  web:
-	    image: ghcr.io/acidicts/issued:latest
+	    image: ghcr.io/acidicts/granitemd:latest
 	    env_file:
 	      - .env
 	    environment:
@@ -65,7 +65,7 @@ This uses databases, and email smtp to run
 	    environment:
 	      POSTGRES_USER: postgres
 	      POSTGRES_PASSWORD: postgres
-	      POSTGRES_DB: issued_production
+	      POSTGRES_DB: production
 	    volumes:
 	      - postgres_data:/var/lib/postgresql/data
 	    healthcheck:
@@ -96,7 +96,7 @@ docker run --rm \
   -e DB_PASSWORD=your-password \
   -e REDIS_URL=redis://your-redis-host:6379/0 \
   -p 3000:3000 \
-  ghcr.io/acidicts/issued:latest
+  ghcr.io/acidicts/granitemd:latest
 ```
 
 ### Credits
