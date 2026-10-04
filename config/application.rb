@@ -35,6 +35,8 @@ module Granitemd
     config.active_record.encryption.support_unencrypted_data = true
     config.active_record.encryption.extend_queries = true
 
+    config.active_storage.variant_processor = :vips
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

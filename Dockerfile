@@ -14,7 +14,7 @@ RUN apt-get update -qq && \
       libffi-dev \
       libpq-dev \
       libyaml-dev \
-      libvips \
+      libvips-dev \
       pkg-config && \
     rm -rf /var/lib/apt/lists/*
 
@@ -45,8 +45,13 @@ FROM ruby:${RUBY_VERSION}-slim AS runtime
 
 WORKDIR /rails
 
+# libvips is required at runtime, not just at build time: ruby-vips is in the
+# default Gemfile group, so Bundler.require loads it on every boot and resolves
+# libvips.so.42 through ffi. Installing it only in the build stage makes the
+# production image abort on boot with
+# "Could not open library 'libvips.so.42'".
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y ca-certificates libpq5 && \
+    apt-get install --no-install-recommends -y ca-certificates libpq5 libvips-dev && \
     rm -rf /var/lib/apt/lists/* && \
     groupadd --system --gid 1000 rails && \
     useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
