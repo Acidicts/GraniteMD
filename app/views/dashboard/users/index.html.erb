@@ -1,2 +1,9 @@
-<h1>Dashboard/Users#index</h1>
-<p>Find me in app/views/dashboard/users/index.html.erb</p>
+<%= stylesheet_link_tag "pages/dashboard/users/index" %>
+
+<div class="my-profile-card">
+    <h1>My Profile</h1> 
+    <%= turbo_frame_tag @user do%>
+            <div>
+            </div>
+    <% end %>
+</div>

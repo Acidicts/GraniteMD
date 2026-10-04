@@ -1,14 +1,17 @@
 module Dashboard
   class UsersController < DashboardController
-    allow_unauthenticated_access only: %i[ new create ]
+    allow_unauthenticated_access only: %i[ new create unique_username unique_email ]
     before_action :set_user, only: %i[ edit update ]
 
     layout "home", only: %i[ new ]
 
     def index
+      @user = current_user
     end
 
     def edit
+      @user = current_user
+      render partial: "dashboard/users/edit"
     end
 
     def new
@@ -34,13 +37,23 @@ module Dashboard
       end
     end
 
+    def unique_username
+      username = params[:username].to_s.strip
+      render json: { available: username.present? && !User.exists?(username: username) }
+    end
+
+    def unique_email
+      email = params[:email].to_s.strip
+      render json: { available: email.present? && !User.exists?(email_address: email) }
+    end
+
     private
     def set_user
       @user = params[:id] ? User.find(params.expect(:id)) : current_user
     end
 
     def user_params
-      params.require(:user).permit(:first_name, :last_name, :username, :email_address)
+      params.require(:user).permit(:first_name, :last_name, :username, :email_address, :pfp_image)
     end
 
     def signup_params

@@ -13,8 +13,10 @@ Rails.application.routes.draw do
     delete "logout" => :destroy
   end
 
-  get  "signup" => "dashboard/users#new"
-  post "signup" => "dashboard/users#create"
+  get  "signup"          => "dashboard/users#new"
+  post "signup"          => "dashboard/users#create"
+  get  "unique_username" => "dashboard/users#unique_username"
+  get  "unique_email" => "dashboard/users#unique_email"
 
   resources :workspaces
   resources :passwords, param: :token

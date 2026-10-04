@@ -1,0 +1,19 @@
+<%= stylesheet_link_tag "components/forms" %>
+
+<%= tubo_frame_tag @user do%>
+  <%= tag.div(flash[:alert], style: "color:red") if flash[:alert] %>
+  <%= tag.div(flash[:notice], style: "color:green") if flash[:notice] %>
+
+  <%= form_with model: [ :dashboard, @user ] do |form| %>
+    <% if @user.errors.any? %>
+      <div class="error">
+        <% @user.errors.full_messages.each do |message| %>
+          <div><%= message %></div>
+        <% end %>
+      </div>
+    <% end %>
+    <%= form.text_field :name, autofocus: true, placeholder: "Name", class: "field input" %><br>
+    <%= form.email_field :email_address, required: true, autocomplete: "username", placeholder: "Email address", class: "field input" %><br>
+    <%= form.submit "Save", class: "btn btn-primary" %>
+  <% end %>
+<% end %>

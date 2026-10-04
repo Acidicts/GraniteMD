@@ -4,7 +4,7 @@
 <div class="signup-card">
     <h1 class="signup-heading"><%= logo_svg(width: 32, height: 32) %><span style="width:16px"></span>Granite-MD</h1>
     <p class="description">Create Your Account</p>
-    <%= form_with model: @user, url: signup_path, class: "form" do |f| %>
+    <%= form_with model: @user, url: signup_path, class: "form", html: {"data-controller": "dashboard--users--new-user"} do |f| %>
         <div class="form-group">
             <div class="form-grid">
                 <div class="form-group">
@@ -18,27 +18,80 @@
             </div>
             <div class="form-group">
                 <%= f.label :username, class: "label" %>
-                <%= f.text_field :username, class: "field input" %>
+                <%= f.text_field :username,
+                    autocomplete: "username",
+                    aria: { describedby: "username_hint" },
+                    class: "field input",
+                    data: { action: "input->dashboard--users--new-user#checkUniqueUsername" } %>
+                <p class="hint" >
+                    <span id="username-hint-icon" class="hint-icon" data-dashboard--users--new-user-target="usernameHintIcon"></span>
+                    <span id="username_hint"
+                        aria-live="polite"
+                        data-dashboard--users--new-user-target="usernameHint"></span>
+                </p>
             </div>
         </div>
         <div class="form-group">
             <div class="form-group">
                 <%= f.label :email_address, class: "label" %>
-                <%= f.email_field :email_address, class: "field input" %>
+                <%= f.email_field :email_address, class: "field input",
+                    autocomplete: "email",
+                    aria: { describedby: "email_hint" },
+                    data: { action: "input->dashboard--users--new-user#checkUniqueEmail" } %>
+                <p class="hint" >
+                    <span id="email-hint-icon" class="hint-icon" data-dashboard--users--new-user-target="emailHintIcon"></span>
+                    <span id="email_hint"
+                        aria-live="polite"
+                        data-dashboard--users--new-user-target="emailHint"></span>
+                </p>
             </div>
             <div class="form-group">
                 <%= f.label :password, class: "label" %>
-                <%= f.password_field :password, class: "field input" %>
-                <%= f.label "At least 8 Characters", class: "hint" %>
+                <%= f.password_field :password,
+                    class: "field input",
+                    autocomplete: "new-password",
+                    aria: { describedby: "password_rules" },
+                    data: {
+                    "dashboard--users--new-user-target": "password",
+                    action: "input->dashboard--users--new-user#checkSecurePassword"
+                    } %>
+                <ul id="password_rules" class="hint password-rules" aria-live="polite">
+                    <% {
+                        length:  "At least 8 characters",
+                        upper:   "At least 1 uppercase letter",
+                        lower:   "At least 1 lowercase letter",
+                        number:  "At least 1 number",
+                        special: "At least 1 special character"
+                    }.each do |rule, text| %>
+                        <li data-rule="<%= rule %>" data-dashboard--users--new-user-target="passwordRule">
+                            <span class="hint-icon"></span>
+                            <span><%= text %></span>
+                        </li>
+                    <% end %>
+                </ul>
             </div>
+
             <div class="form-group">
                 <%= f.label :password_confirmation, class: "label" %>
-                <%= f.password_field :password_confirmation, class: "field input" %>
+                <%= f.password_field :password_confirmation,
+                    class: "field input",
+                    autocomplete: "new-password",
+                    aria: { describedby: "password_confirmation_hint" },
+                    data: {
+                    "dashboard--users--new-user-target": "passwordConfirmation",
+                    action: "input->dashboard--users--new-user#checkMatchingPasswords"
+                    } %>
+                <p class="hint">
+                    <span class="hint-icon" data-dashboard--users--new-user-target="passwordConfirmationHintIcon"></span>
+                    <span id="password_confirmation_hint"
+                        aria-live="polite"
+                        data-dashboard--users--new-user-target="passwordConfirmationHint"></span>
+                </p>
             </div>
         </div>
         <div class="form-actions">
-            <%= f.submit class: "btn btn-primary submit" %>
-            <p class="hint">Already have an account <%= link_to "Sign In", login_path, class: "form-link" %>
+        <%= f.submit class: "btn btn-primary submit" %>
+            <p class="hint">Already have an account? <%= link_to "Sign In", login_path, class: "form-link" %></p>
         </div>
     <% end %>
 </div>

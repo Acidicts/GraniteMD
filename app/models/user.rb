@@ -26,6 +26,14 @@ class User < ApplicationRecord
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
   validates :email_address, uniqueness: { message: "Email in Use" }
+  validates :password,
+            length: { minimum: 8 },
+            format: {
+              with: /\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9\s]).+\z/,
+              message: "must include an uppercase letter, a lowercase letter, a number, and a special character"
+            },
+            if: -> { password.present? }
+  validates :password_confirmation, presence: true, on: :create
 
   attribute :first_name, null: false, default: ""
   attribute :last_name,  null: false, default: ""

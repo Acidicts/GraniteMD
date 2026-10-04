@@ -11,7 +11,7 @@
     background-color: var(--surface-1);
     padding: 1rem;
 
-    transform: translateY(25%);
+    transform: translateY(5%);
 }
 
 .form {
@@ -32,4 +32,34 @@
 
 .forgot-submit {
     width: 100%;
+}
+
+#username-hint-icon,
+#email-hint-icon,
+.hint-icon {
+    display: inline-block;
+    box-sizing: border-box;
+    vertical-align: middle;
+
+    border-radius: 50%;
+    border: currentColor solid 1px;
+    width: 1rem;
+    height: 1rem;
+
+    font-size: 0.7rem;
+    padding: 0.05rem 0.05rem;
+    line-height: calc(1rem - 4px);
+    text-align: center;
+}
+
+.hint-icon-success {
+    color: seagreen;
+}
+
+.hint-icon-error {
+    color: var(--accent);
+}
+
+.hint-icon-neutral {
+    color: var(--muted);
 }
