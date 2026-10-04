@@ -120,7 +120,8 @@ jobs:
       - name: Run RSpec
         env:
           ${{ insert }}: ${{ secrets }}
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/bank_test
+          # Must match the database setup-db creates/loads (granite_test).
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/granite_test
           REDIS_URL: redis://localhost:6379
           RAILS_ENV: test
           CC_TEST_REPORTER_ID: "1" # Force SimpleCov to generate a JSON report
