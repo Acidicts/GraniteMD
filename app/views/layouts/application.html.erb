@@ -21,19 +21,36 @@
   </head>
   <body>
     <%= flash_alerts %>
-    <nav class="nav">
-      <%= link_to "Workspaces", dashboard_workspaces_path, class: "btn-nav" %>
-      <%= link_to "Settings", dashboard_path, class: "btn-nav" %>
-      <div data-controller="layouts--profile-pill" data-action="click->layouts--profile-pill#clicked click@window->layouts--profile-pill#close">
-        <%= render "shared/profile_pill" %>
-        <div class="profile-pill-links hidden" data-layouts--profile-pill-target="links">
-          <%= link_to "My Profile", dashboard_users_path, class: "btn btn-tertiary" %>
-          <%= link_to "Logout", logout_path, class: "btn btn-tertiary", data: { turbo_method: :delete } %>
+    <div class="app-shell" data-controller="layouts--hide-application">
+      <div class="nav-rail">
+        <div class="nav-clip">
+          <nav class="nav" data-layouts--hide-application-target="nav" aria-label="Primary">
+            <%= link_to "Workspaces", dashboard_workspaces_path, class: "btn-nav" %>
+            <%= link_to "Settings", dashboard_path, class: "btn-nav" %>
+            <div data-controller="layouts--profile-pill" data-action="click->layouts--profile-pill#clicked click@window->layouts--profile-pill#close">
+              <%= render "shared/profile_pill" %>
+              <div class="profile-pill-links hidden" data-layouts--profile-pill-target="links">
+                <%= link_to "My Profile", dashboard_users_path, class: "btn btn-tertiary" %>
+                <%= link_to "Logout", logout_path, class: "btn btn-tertiary", data: { turbo_method: :delete } %>
+              </div>
+            </div>
+          </nav>
         </div>
+        <button type="button"
+                class="nav-toggle"
+                data-action="click->layouts--hide-application#toggle"
+                data-layouts--hide-application-target="toggle"
+                aria-label="Hide navigation"
+                aria-expanded="true"
+                title="Hide navigation">
+          <svg data-layouts--hide-application-target="icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="10 3 5 8 10 13"></polyline>
+          </svg>
+        </button>
       </div>
-    </nav>
-    <div class="content">
-      <%= yield %>
+      <div class="content">
+        <%= yield %>
+      </div>
     </div>
   </body>
 </html>
