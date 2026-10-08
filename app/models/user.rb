@@ -77,7 +77,7 @@ class User < ApplicationRecord
     return unless pfp_image.attached?
 
     type = pfp_image.blob.content_type.to_s
-    if !["image/jpeg", "image/png", "image/gif", "image/webp"].include?(type)
+    if ![ "image/jpeg", "image/png", "image/gif", "image/webp" ].include?(type)
       errors.add(:base, "must be an image (jpg, png, gif, webp)")
     end
   end
