@@ -21,7 +21,7 @@
 #  fk_rails_...  (user_id => users.id)
 #
 class Session < ApplicationRecord
-  IDLE_TIMEOUT = Rails.env.development? ? 30.minutes : 30.days
+  IDLE_TIMEOUT = 30.minutes
 
   # Activity is written at most this often, so a burst of requests costs one
   # UPDATE per interval rather than one per request. It is also the slop on the

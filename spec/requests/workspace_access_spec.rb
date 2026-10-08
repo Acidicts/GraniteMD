@@ -3,7 +3,7 @@ require "rails_helper"
 RSpec.describe "Workspace access control", type: :request do
   let(:owner) { create(:user, email_address: "owner@example.com", username: "owneruser") }
   let(:outsider) { create(:user, email_address: "outsider@example.com", username: "outsideruser") }
-  let!(:workspace) { Workspace.create!(name: "Engineering").tap { |w| w.users << owner } }
+  let!(:workspace) { Workspace.create!(name: "Engineering", feature_set: :personal).tap { |w| w.users << owner } }
 
   describe "a member" do
     before { sign_in owner }
@@ -54,7 +54,7 @@ RSpec.describe "Workspace access control", type: :request do
 
   it "lists only the workspaces the user belongs to" do
     sign_in outsider
-    mine = Workspace.create!(name: "Mine").tap { |w| w.users << outsider }
+    mine = Workspace.create!(name: "Mine", feature_set: :personal).tap { |w| w.users << outsider }
 
     get dashboard_workspaces_url
 

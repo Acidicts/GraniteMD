@@ -25,6 +25,9 @@
       <div class="nav-rail">
         <div class="nav-clip">
           <nav class="nav" data-layouts--hide-application-target="nav" aria-label="Primary">
+            <div class="nav-logo">
+              <%= logo_svg(width: 32, height: 32) %> Granite <span class="granite-highlighted">MD</span>
+            </div>
             <%= link_to "Workspaces", dashboard_workspaces_path, class: "btn-nav" %>
             <%= link_to "Settings", dashboard_path, class: "btn-nav" %>
             <div data-controller="layouts--profile-pill" data-action="click->layouts--profile-pill#clicked click@window->layouts--profile-pill#close">

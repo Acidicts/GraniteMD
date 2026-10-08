@@ -63,7 +63,12 @@ class Workspace < ApplicationRecord
   private
 
   def assign_default_owner
-    return if owner_id.present? || self.organisation.presence
-    self.owner = users.first
+    return if owner_id.present? || self.organisation.present?
+    # Use user_ids (a separate query) rather than users.first so we do not
+    # load and cache an empty users collection on a fresh record. Caching
+    # [] here would make a later `user.workspaces << workspace` appear
+    # missing from `workspace.users` until reload.
+    first_id = user_ids.first
+    self.owner_id ||= first_id if first_id
   end
 end

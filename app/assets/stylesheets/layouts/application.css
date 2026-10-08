@@ -131,6 +131,20 @@ body {
     transition: transform 0.32s ease;
 }
 
+.nav-logo {
+    display: flex;
+    flex-direction: row;
+
+    font-size: 0.8rem;
+    font-weight: 700;
+    align-items: center;
+    gap: 5px;
+}
+
+.granite-highlighted {
+    color: var(--accent);
+}
+
 .app-shell.nav-collapsed .nav-toggle {
     border-radius: 32px;
     border-left: 0;
