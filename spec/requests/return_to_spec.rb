@@ -15,7 +15,7 @@ RSpec.describe "Sign-in return_to", type: :request do
   end
 
   it "blocks a spoofed Host header before it reaches the application" do
-    get workspaces_path, headers: { "HTTP_HOST" => "evil.example.com" }
+    get dashboard_workspaces_path, headers: { "HTTP_HOST" => "evil.example.com" }
 
     expect(response).to have_http_status(:forbidden)
   end
@@ -30,12 +30,12 @@ RSpec.describe "Sign-in return_to", type: :request do
   end
 
   it "returns the user to the path they asked for" do
-    get workspaces_path
+    get dashboard_workspaces_path
     expect(response).to redirect_to(login_path)
 
     sign_in
 
-    expect(response).to redirect_to(workspaces_path)
+    expect(response).to redirect_to(dashboard_workspaces_path)
   end
 
   it "falls back to the dashboard when nothing was stored" do
@@ -45,19 +45,19 @@ RSpec.describe "Sign-in return_to", type: :request do
   end
 
   it "keeps the query string even when it looks like a hostile URL" do
-    get "/workspaces?next=//evil.example.com"
+    get "/dashboard/workspaces?next=//evil.example.com"
     expect(response).to redirect_to(login_path)
 
     sign_in
 
-    expect(response.location).to include("/workspaces?next=//evil.example.com")
+    expect(response.location).to include("/dashboard/workspaces?next=//evil.example.com")
     expect(response.location).not_to start_with("//")
   end
 
   it "consumes the stored path, so a second sign-in goes to the dashboard" do
-    get workspaces_path
+    get dashboard_workspaces_path
     sign_in
-    expect(response).to redirect_to(workspaces_path)
+    expect(response).to redirect_to(dashboard_workspaces_path)
 
     delete logout_path
     sign_in

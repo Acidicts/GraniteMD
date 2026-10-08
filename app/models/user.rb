@@ -18,10 +18,12 @@
 #
 class User < ApplicationRecord
   PASSWORD_RESET_TOKEN_TTL = 15.minutes
+  DEFAULT_STORAGE = 50.megabytes
 
   has_secure_password
   has_many :sessions, dependent: :destroy
   has_and_belongs_to_many :workspaces
+  has_and_belongs_to_many :organisations
 
   generates_token_for :password_reset, expires_in: PASSWORD_RESET_TOKEN_TTL do
     password_digest
@@ -47,8 +49,7 @@ class User < ApplicationRecord
 
   encrypts :first_name
   encrypts :last_name
-  # Deterministic so sign-in lookups, uniqueness validation and the unique index
-  # still work against the encrypted value.
+
   encrypts :email_address, deterministic: true
 
   attribute :first_name, null: false, default: ""
@@ -60,4 +61,12 @@ class User < ApplicationRecord
     admin:      1, # Operations (Org Approval)
     superadmin: 2  # Creates Admin
   }
+
+  def available_storage
+    DEFAULT_STORAGE - self.used_storage.to_i.bytes
+  end
+
+  def used_storage
+    self.workspaces.sum(&:get_storage_use)
+  end
 end

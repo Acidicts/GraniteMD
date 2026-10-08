@@ -12,12 +12,12 @@ require 'rails_helper'
 # of tools you can use to make these specs even more expressive, but we're
 # sticking to rails and rspec-rails APIs to keep things simple and stable.
 
-RSpec.describe "/workspaces", type: :request do
+RSpec.describe "/dashboard/workspaces", type: :request do
   # This should return the minimal set of attributes required to create a valid
   # Workspace. As you add validations to Workspace, be sure to
   # adjust the attributes here as well.
   let(:valid_attributes) {
-    { name: "Engineering" }
+    { name: "Engineering", feature_set: "personal" }
   }
 
   let(:invalid_attributes) {
@@ -39,7 +39,7 @@ RSpec.describe "/workspaces", type: :request do
   describe "GET /index" do
     it "renders a successful response" do
       create_workspace
-      get workspaces_url
+      get dashboard_workspaces_url
       expect(response).to be_successful
     end
   end
@@ -47,14 +47,14 @@ RSpec.describe "/workspaces", type: :request do
   describe "GET /show" do
     it "renders a successful response" do
       workspace = create_workspace
-      get workspace_url(workspace)
+      get dashboard_workspace_url(workspace)
       expect(response).to be_successful
     end
   end
 
   describe "GET /new" do
     it "renders a successful response" do
-      get new_workspace_url
+      get new_dashboard_workspace_url
       expect(response).to be_successful
     end
   end
@@ -62,7 +62,7 @@ RSpec.describe "/workspaces", type: :request do
   describe "GET /edit" do
     it "renders a successful response" do
       workspace = create_workspace
-      get edit_workspace_url(workspace)
+      get edit_dashboard_workspace_url(workspace)
       expect(response).to be_successful
     end
   end
@@ -71,25 +71,25 @@ RSpec.describe "/workspaces", type: :request do
     context "with valid parameters" do
       it "creates a new Workspace" do
         expect {
-          post workspaces_url, params: { workspace: valid_attributes }
+          post dashboard_workspaces_url, params: { workspace: valid_attributes }
         }.to change(Workspace, :count).by(1)
       end
 
       it "redirects to the created workspace" do
-        post workspaces_url, params: { workspace: valid_attributes }
-        expect(response).to redirect_to(workspace_url(Workspace.last))
+        post dashboard_workspaces_url, params: { workspace: valid_attributes }
+        expect(response).to redirect_to(dashboard_workspace_url(Workspace.last))
       end
     end
 
     context "with invalid parameters" do
       it "does not create a new Workspace" do
         expect {
-          post workspaces_url, params: { workspace: invalid_attributes }
+          post dashboard_workspaces_url, params: { workspace: invalid_attributes }
         }.to change(Workspace, :count).by(0)
       end
 
       it "renders a response with 422 status (i.e. to display the 'new' template)" do
-        post workspaces_url, params: { workspace: invalid_attributes }
+        post dashboard_workspaces_url, params: { workspace: invalid_attributes }
         expect(response).to have_http_status(:unprocessable_content)
       end
     end
@@ -103,23 +103,23 @@ RSpec.describe "/workspaces", type: :request do
 
       it "updates the requested workspace" do
         workspace = create_workspace
-        patch workspace_url(workspace), params: { workspace: new_attributes }
+        patch dashboard_workspace_url(workspace), params: { workspace: new_attributes }
         workspace.reload
         expect(workspace.name).to eq("Renamed Workspace")
       end
 
       it "redirects to the workspace" do
         workspace = create_workspace
-        patch workspace_url(workspace), params: { workspace: new_attributes }
+        patch dashboard_workspace_url(workspace), params: { workspace: new_attributes }
         workspace.reload
-        expect(response).to redirect_to(workspace_url(workspace))
+        expect(response).to redirect_to(dashboard_workspace_url(workspace))
       end
     end
 
     context "with invalid parameters" do
       it "renders a response with 422 status (i.e. to display the 'edit' template)" do
         workspace = create_workspace
-        patch workspace_url(workspace), params: { workspace: invalid_attributes }
+        patch dashboard_workspace_url(workspace), params: { workspace: invalid_attributes }
         expect(response).to have_http_status(:unprocessable_content)
       end
     end
@@ -129,14 +129,14 @@ RSpec.describe "/workspaces", type: :request do
     it "destroys the requested workspace" do
       workspace = create_workspace
       expect {
-        delete workspace_url(workspace)
+        delete dashboard_workspace_url(workspace)
       }.to change(Workspace, :count).by(-1)
     end
 
     it "redirects to the workspaces list" do
       workspace = create_workspace
-      delete workspace_url(workspace)
-      expect(response).to redirect_to(workspaces_url)
+      delete dashboard_workspace_url(workspace)
+      expect(response).to redirect_to(dashboard_workspaces_url)
     end
   end
 end

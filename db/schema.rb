@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_04_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_07_210000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,37 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_04_160000) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "folders", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "workspace_id", null: false
+    t.bigint "parent_id"
+    t.index ["parent_id"], name: "index_folders_on_parent_id"
+    t.index ["workspace_id"], name: "index_folders_on_workspace_id"
+  end
+
+  create_table "organisations", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "organisations_users", id: false, force: :cascade do |t|
+    t.bigint "organisation_id", null: false
+    t.bigint "user_id", null: false
+    t.index ["organisation_id", "user_id"], name: "index_organisations_users_on_organisation_id_and_user_id", unique: true
+  end
+
+  create_table "pages", force: :cascade do |t|
+    t.text "body"
+    t.string "name"
+    t.bigint "folder_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["folder_id"], name: "index_pages_on_folder_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -76,11 +107,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_04_160000) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "name", default: "", null: false
+    t.integer "feature_set"
+    t.bigint "organisation_id"
+    t.integer "owner_id"
+    t.index ["organisation_id"], name: "index_workspaces_on_organisation_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "folders", "folders", column: "parent_id"
+  add_foreign_key "folders", "workspaces"
+  add_foreign_key "organisations_users", "organisations"
+  add_foreign_key "organisations_users", "users"
+  add_foreign_key "pages", "folders"
   add_foreign_key "sessions", "users"
   add_foreign_key "users_workspaces", "users"
   add_foreign_key "users_workspaces", "workspaces"
+  add_foreign_key "workspaces", "organisations"
 end

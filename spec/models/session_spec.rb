@@ -7,6 +7,7 @@ require "rails_helper"
 #  id           :bigint           not null, primary key
 #  ip_address   :string
 #  last_seen_at :datetime         not null
+#  token        :string           not null
 #  user_agent   :string
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
@@ -14,6 +15,7 @@ require "rails_helper"
 #
 # Indexes
 #
+#  index_sessions_on_token    (token) UNIQUE
 #  index_sessions_on_user_id  (user_id)
 #
 # Foreign Keys

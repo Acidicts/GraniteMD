@@ -22,7 +22,7 @@
   <body>
     <%= flash_alerts %>
     <nav class="nav">
-      <%= link_to "Workspaces", dashboard_path, class: "btn-nav" %>
+      <%= link_to "Workspaces", dashboard_workspaces_path, class: "btn-nav" %>
       <%= link_to "Settings", dashboard_path, class: "btn-nav" %>
       <div data-controller="layouts--profile-pill" data-action="click->layouts--profile-pill#clicked click@window->layouts--profile-pill#close">
         <%= render "shared/profile_pill" %>

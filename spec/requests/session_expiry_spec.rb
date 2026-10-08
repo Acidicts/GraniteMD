@@ -41,13 +41,13 @@ RSpec.describe "Session expiry", type: :request do
       sign_in user
 
       travel_to Session::IDLE_TIMEOUT.from_now + 1.minute do
-        get workspaces_path
+        get dashboard_workspaces_path
         expect(response).to redirect_to(login_path)
 
         post login_path, params: { email_address: user.email_address, password: user.password }
       end
 
-      expect(response).to redirect_to(workspaces_url)
+      expect(response).to redirect_to(dashboard_workspaces_url)
     end
 
     it "allows signing in again after the window closes" do

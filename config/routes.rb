@@ -23,11 +23,14 @@ Rails.application.routes.draw do
   post "unique_username" => "dashboard/users#unique_username"
   post "unique_email"    => "dashboard/users#unique_email"
 
-  resources :workspaces
-
   get "/dashboard", to: "dashboard#index", as: :dashboard
 
+  get "/workspace", to: redirect("/dashboard/workspaces"), as: nil
+  get "/workspace/:id", to: "workspace#show", as: :workspace
+
   scope "/dashboard", as: "dashboard", module: "dashboard" do
+    get "/workspaces/new_users", to: "workspaces#new_users"
+    resources :workspaces
     resources :users, only: %i[index edit update]
 
     get "you", to: "users#index"

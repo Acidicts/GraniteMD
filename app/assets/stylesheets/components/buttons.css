@@ -111,6 +111,44 @@
   color: var(--muted);
 }
 
+/* Icon-only (e.g. <%= button_to ..., class: "btn btn-icon" do %><%= delete_icon %><% end %>) */
+.btn-icon {
+  min-height: 0;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  gap: 0;
+  flex-shrink: 0;
+  border-radius: 8px;
+  color: var(--muted);
+}
+.btn-icon:hover:not(:disabled) {
+  background: var(--selection);
+  color: var(--text);
+}
+.btn-icon:disabled {
+  color: var(--muted);
+  background: transparent;
+}
+.btn-icon svg {
+  width: 20px;
+  height: 20px;
+  display: block;
+  flex-shrink: 0;
+  margin: auto;
+}
+
+/* button_to wraps the button in a <form class="button_to">, which becomes
+   the flex item instead of the button itself. Neutralise it so the button
+   stays aligned with neighbouring link_to icon buttons. */
+form.button_to {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+}
+
 /* Login */
 
 .btn-login {

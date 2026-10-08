@@ -12,9 +12,11 @@
     --code-chip: #e4dddb;
     --link: #4f6e53;
     --danger: #d9480f;
+    --danger-text: #b53a08;
+    --danger-tint: #f4ddd2;
 }
 
-@media(prefers-color-scheme: dark) {
+@media (prefers-color-scheme: dark) {
     :root {
         --bg: #171414;
         --surface-1: #211c1c;
@@ -29,5 +31,7 @@
         --code-chip: #2c2626;
         --link: #8fb093;
         --danger: #ff7a45;
+        --danger-text: #ff7a45;
+        --danger-tint: #3a2118;
     }
 }

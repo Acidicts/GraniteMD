@@ -36,6 +36,18 @@
   font-weight: 700;
 }
 
+.field .hint {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 400;
+  margin-left: 0.25rem;
+}
+
+.form-group:has(:is(input, select, textarea)[required]) > .label::after {
+  content: " *";
+  color: red;
+}
+
 .input,
 .select,
 .textarea {
