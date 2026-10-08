@@ -1,0 +1,55 @@
+<%= stylesheet_link_tag "pages/dashboard/workspaces/forms"%>
+<%= stylesheet_link_tag "components/forms"%>
+
+<%= form_with model: workspace,
+              url: workspace.persisted? ? dashboard_workspace_path(workspace) : dashboard_workspaces_path, class: "workspace-form__form" do |form| %>
+  <% if workspace.errors.any? %>
+    <%= alert_box(:error,
+                  title: "#{pluralize(workspace.errors.count, "error")} prohibited this workspace from being saved:",
+                  dismissible: false) do %>
+      <ul>
+        <% workspace.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    <% end %>
+  <% end %>
+  <div class="workspace-form__fields" data-controller="dashboard--workspaces--new-workspace">
+    <div class="form-grid">
+      <div class="form-group">
+        <%= form.label :name, class: "label" %>
+        <%= form.text_field :name, required: true, class: "field input" %>
+      </div>
+      <div class="form-group">
+        <%= form.label :organisation, class: "label" %>
+        <% has_orgs = current_user.organisations.any? %>
+        <%= form.select :organisation_id,
+              current_user.organisations.map { |o| [o.name, o.id] },
+              { include_blank: "Personal", selected: form.object.organisation_id },
+              { class: "select", required: false, disabled: !has_orgs,
+                data: { action: "dashboard--workspaces--new-workspace#update" } } %>
+      </div>
+    </div>
+    <%= turbo_frame_tag "new_workspace_organisation_users" do %>
+      <% existing_owners = workspace.organisation ? workspace.organisation.users : [] %>
+      <% if existing_owners.any? %>
+        <%= form.label :owner_id, "Owner", class: "label" %>
+        <%= form.select :owner_id,
+          options_from_collection_for_select(existing_owners, :id, :username, form.object.owner_id),
+          { include_blank: "Organisation" },
+          { class: "select", required: true } %>
+      <% end %>
+    <% end %>
+    <div class="form-group">
+      <%= form.label "Use Case", class: "label" %>
+      <%= form.select :feature_set,
+        Workspace.feature_sets.keys.map { |key| [key.humanize, key] },
+        { include_blank: "Select a use case" },
+        { class: "select", required: true } %>
+      <span class="hint">ⓘ This controls what feature sets you get</span>
+    </div>
+  </div>
+  <div class="workspace-form__actions">
+    <%= form.submit "Submit", class: "btn btn-secondary" %>
+  </div>
+<% end %>

@@ -1,0 +1,14 @@
+.workspace-form__form {
+    width: 100%;
+    max-width: 600px;
+    align-items: baseline;
+}
+
+.workspace-form__fields {
+    margin: 0.5rem;
+    width: 100%;
+}
+
+.workspace-form__actions {
+    width: 100%;
+}

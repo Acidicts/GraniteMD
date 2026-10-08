@@ -1,0 +1,48 @@
+<% content_for :title, "Workspace" %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "pages/dashboard/workspaces/show", "data-turbo-track": "reload" %>
+<% end %>
+
+<% workspace = @workspace%>
+
+<div class="workspace" id="<%= dom_id workspace %>">
+  <div class="workspace__container" id="<%= dom_id workspace %>">
+    <% if workspace.workspace_image.attached? %>
+      <%= image_tag workspace.workspace_image.variant(:thumb), class: "workspace__image" %>
+    <% else %>
+      <%= render "shared/placeholders/workspace_image", text: "Workspace Banner Image" %>
+    <% end %>
+
+    <div class="workspace__content">
+      <p><%= workspace.name %></p>
+      <div class="break" style="margin-top: 0 !important;"></div>
+      <p class="workspace__owner"><%= workspace.display_owner_or_organisation %></p>
+    </div>
+  </div>
+  <div class="workspace-stats__container">
+    <p class="workspace-stats__header">Stats</p>
+    <div class="workspace-stats__pages">
+      <p class="workspace-stats__pages_stat">Total Pages: <%= workspace.pages.count %></p>
+      <p class="workspace-stats__pages_stat">Total Lines: <%= workspace.pages.sum { |page| page.body.to_s.lines.count } %></p>
+    </div>
+    <div class="workspace-stats__storage_used" data-controller="dashboard--workspaces--storage-used-bar" data-dashboard--workspaces--storage-used-bar-percentage-value="<%= workspace.available_storage.to_i.zero? ? 0 : (workspace.get_storage_use.to_f / workspace.available_storage.to_i * 100).round(1) %>">
+      <p class="workspace-stats__storage_used_stat"><span style="color: var(--accent);"><%= human_storage_size(workspace.get_storage_use) %></span> of <span style="color: var(--accent)"><%= human_storage_size(workspace.available_storage) %></span></p>
+      <div class="workspace-stats__storage_used_bar">
+        <div class="workspace-stats__storage_used_bar_fill" data-dashboard--workspaces--storage-used-bar-target="bar"></div>
+      </div>
+    </div>
+    <div class="workspace-stats__actions_container">
+      <%= link_to workspace_path(@workspace), class: "btn btn-icon", aria: { label: "View workspace" } do %>
+        <%= view_icon %>
+      <% end %>
+      |
+      <%= link_to edit_dashboard_workspace_path(@workspace), class: "btn btn-icon", aria: { label: "Edit workspace" } do %>
+        <%= edit_icon %>
+      <% end %>
+      |
+      <%= button_to dashboard_workspace_path(@workspace), method: :delete, class: "btn btn-icon", aria: { label: "Delete workspace" } do %>
+        <%= delete_icon %>
+      <% end %>
+    </div>
+  </div>
+</div>

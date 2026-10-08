@@ -1,0 +1,14 @@
+<% content_for :title, "Workspaces" %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "pages/dashboard/workspaces/workspace", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "pages/dashboard/workspaces/index", "data-turbo-track": "reload" %>
+<% end %>
+
+<h1>Your Workspaces</h1>
+<div class="workspaces-grid" id="workspaces">
+  <% @workspaces.each do |workspace| %>
+    <%= render workspace %>
+  <% end %>
+
+  <%= render "dashboard/workspaces/new_workspace" %>
+</div>

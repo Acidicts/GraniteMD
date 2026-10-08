@@ -1,0 +1,29 @@
+.workspace-form-new__container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+    
+    width: 100%;
+    max-width: 600px;
+    margin-inline: auto;
+    
+    padding: 1rem;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    background-color: var(--surface-1);
+}
+
+.workspace-form-new__header {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+
+    justify-content: space-between;
+    align-items: center;
+}
+
+.workspace-form-new__header a {
+    max-height: 2rem;
+}

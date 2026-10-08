@@ -1,0 +1,15 @@
+<%= link_to dashboard_workspace_path(workspace.id), class: "workspace__link_container" do %>
+  <div class="workspace" id="<%= dom_id workspace %>">
+    <% if workspace.workspace_image.attached? %>
+      <%= image_tag workspace.workspace_image.variant(:thumb), class: "workspace__image" %>
+    <% else %>
+      <%= render "shared/placeholders/workspace_image", text: "Workspace Banner Image" %>
+    <% end %>
+
+    <div class="workspace__content">
+      <p><%= workspace.name %></p>
+      <div class="break" style="margin-top: 0 !important;"></div>
+      <p class="workspace__owner"><%= workspace.display_owner_or_organisation %></p>
+    </div>
+  </div>
+<% end %>

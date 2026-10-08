@@ -1,0 +1,8 @@
+<%= turbo_frame_tag "new_workspace_organisation_users" do %>
+  <% if @users.any? %>
+    <%= label_tag "workspace_owner_id", "Owner", class: "label" %>
+    <%= select_tag "workspace[owner_id]",
+          options_from_collection_for_select(@users, :id, :username),
+          { include_blank: "Select Owner", class: "select", required: true } %>
+  <% end %>
+<% end %>

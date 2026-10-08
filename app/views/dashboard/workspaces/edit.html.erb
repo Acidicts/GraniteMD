@@ -1,0 +1,11 @@
+<% content_for :title, "Edit workspace" %>
+<%= stylesheet_link_tag "pages/dashboard/workspaces/new"%>
+
+<div class="workspace-form-new__container">
+  <div class="workspace-form-new__header">
+    <h1>Edit Workspace</h1>
+    <%= link_to "Back to workspaces", dashboard_workspaces_path, class: "btn btn-secondary" %>
+  </div>
+  <div class="break"></div>
+  <%= render "form", workspace: @workspace %>
+</div>
