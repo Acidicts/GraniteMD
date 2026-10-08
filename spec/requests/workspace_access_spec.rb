@@ -1,11 +1,18 @@
 require "rails_helper"
 
 RSpec.describe "Workspace access control", type: :request do
-  let(:owner) { create(:user, email_address: "owner@example.com", username: "owneruser") }
+  let(:owner)    { create(:user, email_address: "owner@example.com",    username: "owneruser") }
+  let(:member)   { create(:user, email_address: "member@example.com",   username: "memberuser") }
   let(:outsider) { create(:user, email_address: "outsider@example.com", username: "outsideruser") }
-  let!(:workspace) { Workspace.create!(name: "Engineering", feature_set: :personal).tap { |w| w.users << owner } }
 
-  describe "a member" do
+  let!(:workspace) do
+    Workspace.create!(name: "Engineering", feature_set: :personal, owner: owner).tap do |w|
+      w.users << owner
+      w.users << member
+    end
+  end
+
+  describe "a owner" do
     before { sign_in owner }
 
     it "reads the workspace" do
@@ -20,6 +27,24 @@ RSpec.describe "Workspace access control", type: :request do
 
     it "destroys it" do
       expect { delete dashboard_workspace_url(workspace) }.to change(Workspace, :count).by(-1)
+    end
+  end
+
+  describe "a member" do
+    before { sign_in member }
+
+    it "reads the workspace" do
+      get dashboard_workspace_url(workspace)
+      expect(response).to have_http_status(:success)
+    end
+
+    it "renames it" do
+      patch dashboard_workspace_url(workspace), params: { workspace: { name: "Renamed" } }
+      expect(workspace.reload.name).to eq("Engineering")
+    end
+
+    it "destroys it" do
+      expect { delete dashboard_workspace_url(workspace) }.to change(Workspace, :count).by(0)
     end
   end
 

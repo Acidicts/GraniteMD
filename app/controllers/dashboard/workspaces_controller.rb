@@ -50,7 +50,7 @@ module Dashboard
 
     # PATCH/PUT /dashboard/workspaces/:id
     def update
-      return unless @workspace.owner.equals(current_user)
+      return unless @workspace&.owner == current_user
       if @workspace.update(workspace_params)
         redirect_to dashboard_workspace_path(@workspace), notice: "Workspace was successfully updated.", status: :see_other
       else
@@ -60,7 +60,7 @@ module Dashboard
 
     # DELETE /dashboard/workspaces/:id
     def destroy
-      return unless @workspace.owner.equals(current_user)
+      return unless @workspace&.owner == current_user
       @workspace.destroy!
       redirect_to dashboard_workspaces_path, notice: "Workspace was successfully destroyed.", status: :see_other
     end

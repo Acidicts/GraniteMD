@@ -33,7 +33,7 @@ RSpec.describe "/dashboard/workspaces", type: :request do
   end
 
   def create_workspace(attributes = valid_attributes)
-    Workspace.create!(attributes).tap { |workspace| workspace.users << user }
+    Workspace.create!(attributes.merge(owner: user)).tap { |workspace| workspace.users << user }
   end
 
   describe "GET /index" do
