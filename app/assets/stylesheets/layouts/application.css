@@ -3,6 +3,10 @@
 
 body {
     display: flex;
+    position: absolute;
+    /* Absolutely-positioned body shrink-wraps to content width instead of
+       spanning the viewport, starving the workspace layout. Force full width. */
+    width: 100%;
     flex-direction: row;
     min-height: 100vh;
     margin: 0;

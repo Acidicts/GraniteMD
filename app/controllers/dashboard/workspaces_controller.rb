@@ -19,7 +19,7 @@ module Dashboard
     def new_users
       @users = []
       if params[:id].present?
-        return unless Organisation.find(id: params[:id]).users.includes(current_user)
+        return unless Organisation.find(id: params[:id]).users.include?(current_user)
         organisation = Organisation.find_by(id: params[:id])
         @users = organisation.users if organisation&.users&.include?(current_user)
       end
@@ -32,6 +32,9 @@ module Dashboard
 
     # POST /dashboard/workspaces
     def create
+      unless params[:organisation_id].nil? || Organisation.find(id: workspace_params[:organisation_id])&.users.include?(current_user)
+        return redirect_to "You are not in this organisation"
+      end
       @workspace = Workspace.new(workspace_params)
       @workspace.owner = current_user if @workspace.organisation_id.blank? && @workspace.owner_id.blank?
 
@@ -47,6 +50,7 @@ module Dashboard
 
     # PATCH/PUT /dashboard/workspaces/:id
     def update
+      return unless @workspace.owner.equals(current_user)
       if @workspace.update(workspace_params)
         redirect_to dashboard_workspace_path(@workspace), notice: "Workspace was successfully updated.", status: :see_other
       else
@@ -56,7 +60,7 @@ module Dashboard
 
     # DELETE /dashboard/workspaces/:id
     def destroy
-      return unless @workspace.users.includes(current_user)
+      return unless @workspace.owner.equals(current_user)
       @workspace.destroy!
       redirect_to dashboard_workspaces_path, notice: "Workspace was successfully destroyed.", status: :see_other
     end

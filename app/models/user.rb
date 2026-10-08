@@ -51,6 +51,9 @@ class User < ApplicationRecord
   encrypts :last_name
 
   encrypts :email_address, deterministic: true
+  validate :pfp_image_content_type
+  validate :pfp_image_size
+
 
   attribute :first_name, null: false, default: ""
   attribute :last_name,  null: false, default: ""
@@ -68,5 +71,22 @@ class User < ApplicationRecord
 
   def used_storage
     self.workspaces.sum(&:get_storage_use)
+  end
+
+  def pfp_image_content_type
+    return unless pfp_image.attached?
+
+    type = pfp_image.blob.content_type.to_s
+    if !["image/jpeg", "image/png", "image/gif", "image/webp"].include?(type)
+      errors.add(:base, "must be an image (jpg, png, gif, webp)")
+    end
+  end
+
+  def pfp_image_size
+    return unless pfp_image.attached?
+
+    if pfp_image.byte_size >= 2.megabytes
+      errors.add(:base, "must be less than 2MB")
+    end
   end
 end

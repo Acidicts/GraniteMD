@@ -1,0 +1,6 @@
+<%# Response to DELETE /workspace/:workspace_id/pages/:id: drop the %>
+<%# row and reset the editor to a blank file. %>
+<%= turbo_stream.remove "workspace-page-#{@page_id}" %>
+<%= turbo_stream.replace "workspace-editor",
+      partial: "workspace/editor",
+      locals: { page: Page.new, workspace: @workspace } %>

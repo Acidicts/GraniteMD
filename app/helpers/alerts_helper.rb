@@ -74,15 +74,16 @@ module AlertsHelper
 
     tag.div(safe_join(children),
             class: classes.join(" "),
-            role: role || ALERT_ROLES.fetch(type, "status"))
+            role: role || ALERT_ROLES.fetch(type, "status"),
+            data: { controller: "alert" })
   end
 
   private
 
   def alert_body(title, message, action)
     parts = []
-    parts << tag.div(title, class: "alert-title") if title
-    parts << tag.div(message, class: "alert-message") if message
+    parts << tag.div(title, class: "alert-title") if title.present?
+    parts << tag.div(message, class: "alert-message") if message.present?
 
     if action
       label, href = action
@@ -98,7 +99,10 @@ module AlertsHelper
   end
 
   def alert_dismiss_button
-    tag.button(safe_join(alert_icon_shapes(:dismiss)), class: "alert-dismiss", type: "button",
+    icon = tag.svg(safe_join(alert_icon_shapes(:dismiss)), viewBox: "0 0 24 24",
+                   "aria-hidden": "true", focusable: "false")
+
+    tag.button(icon, class: "alert-dismiss", type: "button",
                aria: { label: "Dismiss" }, data: { action: "alert#dismiss" })
   end
 

@@ -26,7 +26,7 @@
       <p class="workspace-stats__pages_stat">Total Lines: <%= workspace.pages.sum { |page| page.body.to_s.lines.count } %></p>
     </div>
     <div class="workspace-stats__storage_used" data-controller="dashboard--workspaces--storage-used-bar" data-dashboard--workspaces--storage-used-bar-percentage-value="<%= workspace.available_storage.to_i.zero? ? 0 : (workspace.get_storage_use.to_f / workspace.available_storage.to_i * 100).round(1) %>">
-      <p class="workspace-stats__storage_used_stat"><span style="color: var(--accent);"><%= human_storage_size(workspace.get_storage_use) %></span> of <span style="color: var(--accent)"><%= human_storage_size(workspace.available_storage) %></span></p>
+      <p class="workspace-stats__storage_used_stat"><span style="color: var(--accent);"><%= human_storage_size(workspace.get_storage_use) %></span> of <span style="color: var(--accent)"><%= human_storage_size(workspace.available_storage) %></span><%= "  #{(workspace.available_storage.to_i.zero? ? 0 : (workspace.get_storage_use.to_f / workspace.available_storage.to_i * 100).round(2)).to_s}% used" %></p>
       <div class="workspace-stats__storage_used_bar">
         <div class="workspace-stats__storage_used_bar_fill" data-dashboard--workspaces--storage-used-bar-target="bar"></div>
       </div>

@@ -1,0 +1,62 @@
+<%# File explorer tree for a workspace. Accepts `workspace:` local, falls back to @workspace. %>
+<% explorer_workspace = local_assigns[:workspace] || @workspace %>
+<% root_folders = explorer_workspace&.folders&.where(parent_id: nil)&.includes(:pages, folders: :pages)&.order(:name) || [] %>
+<% total_pages = explorer_workspace&.pages&.count || 0 %>
+
+<div class="workspace-explorer"
+     data-controller="workspace--file-explorer"
+     data-action="click@window->workspace--file-explorer#hideContextMenu keydown.esc@window->workspace--file-explorer#hideContextMenu resize@window->workspace--file-explorer#hideContextMenu contextmenu@window->workspace--file-explorer#hideContextMenu">
+  <div class="workspace-explorer__header">
+    <span class="workspace-explorer__title"><%= explorer_workspace&.name.presence || "Files" %></span>
+    <% if root_folders.any? %>
+      <button type="button"
+              class="workspace-explorer__new-file"
+              data-action="workspace--file-explorer#showNewFileForm"
+              data-folder-id="<%= root_folders.first.id %>"
+              title="New file"
+              aria-label="New file">
+        <%= new_file_icon(width: 16, height: 16, color:"var(--text)") %>
+      </button>
+    <% end %>
+  </div>
+
+  <% if root_folders.any? %>
+    <ul class="workspace-explorer__tree" role="tree" aria-label="Workspace files">
+      <%= render partial: "workspace/files/folder", collection: root_folders, as: :folder, locals: { workspace: explorer_workspace } %>
+    </ul>
+  <% else %>
+    <div class="workspace-explorer__empty">
+      <p>No files yet</p>
+      <button type="button"
+              class="workspace-explorer__new-file"
+              data-action="workspace--file-explorer#showNewFileForm"
+              title="New file"
+              aria-label="New file">
+        <%= new_file_icon(width: 16, height: 16, color:"var(--text)") %>
+        <span>New file</span>
+      </button>
+    <ul id="workspace-tree-root" class="workspace-explorer__tree" role="tree" aria-label="Workspace files">
+        <%= render partial: "workspace/files/new_page_form", locals: { workspace: explorer_workspace, folder: nil } %>
+      </ul>
+    </div>
+  <% end %>
+  <div class="workspace-explorer__context-menu"
+       role="menu"
+       data-workspace--file-explorer-target="contextMenu"
+       hidden>
+    <button type="button"
+            class="workspace-explorer__folder-new-file"
+            data-action="workspace--file-explorer#newFileFromContextMenu"
+            title="New file in this folder"
+            aria-label="New file in this folder">
+      <%= new_file_icon(width: 16, height: 16) %> New File
+    </button>
+    <button type="button"
+            class="workspace-explorer__folder-new-file"
+            data-action="workspace--file-explorer#newFolderFromContextMenu"
+            title="New folder in this folder"
+            aria-label="New folder in this folder">
+      <%= new_file_icon(width: 16, height: 16) %> New Folder
+    </button>
+  </div>
+</div>

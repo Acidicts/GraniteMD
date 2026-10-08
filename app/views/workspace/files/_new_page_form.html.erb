@@ -1,0 +1,24 @@
+<%# Inline "new file" placeholder row. Revealed by the new-file buttons; %>
+<%# Enter submits, Escape cancels. Locals: workspace, folder (nil for a %>
+<%# blank workspace — the server picks/creates a default folder). %>
+<% form_id = folder ? "new-page-form-#{folder.id}" : "new-page-form-root" %>
+<li id="<%= form_id %>"
+    class="workspace-explorer__new-page-item"
+    data-workspace--file-explorer-target="newPageForm"
+    <% if folder %>data-folder-id="<%= folder.id %>"<% end %>
+    hidden>
+  <%= form_with url: workspace_pages_path(workspace), scope: :page, method: :post,
+        data: { action: "submit->workspace--file-explorer#guardNewPageSubmit", turbo: folder ? true : false } do |f| %>
+    <% if folder %>
+      <%= f.hidden_field :folder_id, value: folder.id %>
+    <% end %>
+    <span class="workspace-explorer__page-icon"><%= file_icon(width: 20, height: 20) %></span>
+    <%= f.text_field :name, placeholder: "File name…", autocomplete: "off", maxlength: 255,
+          class: "workspace-explorer__new-page-input",
+          aria: { label: folder ? "New file name in #{folder.name}" : "New file name" },
+          data: {
+            action: "keydown->workspace--file-explorer#newPageKeydown",
+            "workspace--file-explorer-target": "newPageInput"
+          } %>
+  <% end %>
+</li>

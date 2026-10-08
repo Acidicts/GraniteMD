@@ -2,14 +2,14 @@
    Requires tokens: --text, and the alert tokens below.
 
    Full alert:
-   <div class="alert alert-error" role="alert">
+   <div class="alert alert-error" role="alert" data-controller="alert">
      <svg class="alert-icon" ...></svg>
      <div class="alert-body">
        <div class="alert-title">Couldn't save README.md</div>
        <div class="alert-message">The file is read-only.</div>
        <a class="alert-action" href="#">Try again</a>
      </div>
-     <button class="alert-dismiss" aria-label="Dismiss">...</button>
+     <button class="alert-dismiss" aria-label="Dismiss"><svg ...></svg></button>
    </div>
 
    Compact alert (single line):
@@ -58,6 +58,9 @@
   right: 0;
   z-index: 1000;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   padding: 16px;
   pointer-events: none;
 }

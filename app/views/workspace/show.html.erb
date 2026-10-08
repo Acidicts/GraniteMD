@@ -1,2 +1,6 @@
-<h1>Workspace#show</h1>
-<p>Find me in app/views/workspace/show.html.erb</p>
+<%= stylesheet_link_tag "pages/workspace/show.css" %>
+
+<div class="workspace_page">
+    <%= render "workspace/file_explorer", workspace: @workspace %>
+    <%= render "workspace/editor", page: Page.new, workspace: @workspace %>
+</div>

@@ -27,6 +27,16 @@ Rails.application.routes.draw do
 
   get "/workspace", to: redirect("/dashboard/workspaces"), as: nil
   get "/workspace/:id", to: "workspace#show", as: :workspace
+  get "/workspace/:workspace_id/pages/new", to: redirect { |params, _req| "/workspace/#{params[:workspace_id]}" }, as: :new_workspace_page
+  post "/workspace/:workspace_id/pages", to: "workspace#new_file", as: :workspace_pages
+  post "/workspace/:workspace_id/folders", to: "workspace#new_folder", as: :workspace_folders
+  get "/workspace/:workspace_id/pages/:id", to: "workspace#change_file", as: :workspace_page
+  patch "/workspace/:workspace_id/pages/:id", to: "workspace#save_file", as: :save_workspace_page
+  # Same PATCH path as above (rename form + autosave share one endpoint;
+  # WorkspaceController#save_file dispatches on page[name] vs page[body]).
+  # Kept as a separate named route so `rename_workspace_page_path` keeps working.
+  patch "/workspace/:workspace_id/pages/:id", to: "workspace#save_file", as: :rename_workspace_page
+  delete "/workspace/:workspace_id/pages/:id", to: "workspace#delete_file", as: :delete_workspace_page
 
   scope "/dashboard", as: "dashboard", module: "dashboard" do
     get "/workspaces/new_users", to: "workspaces#new_users"

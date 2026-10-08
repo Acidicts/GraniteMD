@@ -1,0 +1,31 @@
+<%= turbo_frame_tag "workspace-editor" do %>
+    <% persisted = page.persisted? %>
+    <% save_url = persisted ? save_workspace_page_path(workspace, page) : nil %>
+    <%= form_with model: page, url: (save_url || workspace_path(workspace)), method: (persisted ? :patch : :get),
+            data: {
+            controller: "workspace--editor",
+            action: "submit->workspace--editor#handleSubmit",
+            "workspace--editor-endpoint-value": save_url,
+            "workspace--editor-page-id-value": (page.id if persisted),
+        },
+        class: "workspace--editor__form" do |f| %>
+        <div class="workspace-editor__textarea-wrapper__container">
+            <div class="workspace-editor__textarea-wrapper__header"></div>
+            <div class="workspace-editor__textarea-wrapper">
+                <%= f.textarea :body,
+                                class: "workspace-editor__textarea",
+                                wrap: "off",
+                                spellcheck: false,
+                                rows: 1,
+                                disabled: !persisted,
+                                placeholder: (persisted ? "" : "Select or create a file to start editing"),
+                                data: {
+                                "workspace--editor-target": "textarea",
+                                action: "input->workspace--editor#fileChange change->workspace--editor#fileChange"
+                                } %>
+            </div>
+        </div>
+    <div class="workspace-editor__status" data-workspace--editor-target="status" role="status" aria-live="polite"></div>
+    <div class="workspace-editor__preview"></div>
+  <% end %>
+<% end %>

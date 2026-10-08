@@ -1,0 +1,11 @@
+<%# Response to POST /workspace/:workspace_id/pages: insert the new page %>
+<%# into its folder, load it in the editor, and reset the placeholder form. %>
+<%= turbo_stream.before "new-page-form-#{@page.folder_id}",
+      partial: "workspace/files/page",
+      locals: { page: @page, workspace: @workspace } %>
+<%= turbo_stream.replace "workspace-editor",
+      partial: "workspace/editor",
+      locals: { page: @page, workspace: @workspace } %>
+<%= turbo_stream.replace "new-page-form-#{@page.folder_id}",
+      partial: "workspace/files/new_page_form",
+      locals: { workspace: @workspace, folder: @page.folder } %>

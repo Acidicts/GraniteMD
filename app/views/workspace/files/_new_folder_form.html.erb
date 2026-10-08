@@ -1,0 +1,24 @@
+<%# Inline "new folder" placeholder row. Revealed by the context menu's %>
+<%# "New folder" button; Enter submits, Escape cancels. Locals: workspace, %>
+<%# folder (the parent; nil for a root folder). %>
+<% form_id = folder ? "new-folder-form-#{folder.id}" : "new-folder-form-root" %>
+<li id="<%= form_id %>"
+    class="workspace-explorer__new-folder-item"
+    data-workspace--file-explorer-target="newFolderForm"
+    <% if folder %>data-folder-id="<%= folder.id %>"<% end %>
+    hidden>
+  <%= form_with url: workspace_folders_path(workspace), scope: :folder, method: :post,
+        data: { action: "submit->workspace--file-explorer#guardNewFolderSubmit" } do |f| %>
+    <% if folder %>
+      <%= f.hidden_field :parent_id, value: folder.id %>
+    <% end %>
+    <span class="workspace-explorer__page-icon"><%= folder_closed_icon(width: 20, height: 20) %></span>
+    <%= f.text_field :name, placeholder: "Folder name…", autocomplete: "off", maxlength: 255,
+          class: "workspace-explorer__new-folder-input",
+          aria: { label: folder ? "New folder name in #{folder.name}" : "New folder name" },
+          data: {
+            action: "keydown->workspace--file-explorer#newFolderKeydown",
+            "workspace--file-explorer-target": "newFolderInput"
+          } %>
+  <% end %>
+</li>

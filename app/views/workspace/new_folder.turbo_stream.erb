@@ -1,0 +1,14 @@
+<%# Response to POST /workspace/:workspace_id/folders: insert the new folder %>
+<%# into its parent (or the tree root) and reset the placeholder form. %>
+<% if @parent %>
+  <%= turbo_stream.before "new-folder-form-#{@parent.id}",
+        partial: "workspace/files/folder",
+        locals: { folder: @folder, workspace: @workspace } %>
+  <%= turbo_stream.replace "new-folder-form-#{@parent.id}",
+        partial: "workspace/files/new_folder_form",
+        locals: { workspace: @workspace, folder: @parent } %>
+<% else %>
+  <%= turbo_stream.append "workspace-tree-root",
+        partial: "workspace/files/folder",
+        locals: { folder: @folder, workspace: @workspace } %>
+<% end %>

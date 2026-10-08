@@ -1,0 +1,55 @@
+<%# locals: page, workspace (optional — falls back to page.workspace) %>
+<% explorer_workspace = local_assigns[:workspace] || page.workspace %>
+<li id="workspace-page-<%= page.id %>"
+    class="workspace-explorer__page-item"
+    role="treeitem"
+    aria-label="<%= page.name %>">
+  <%= link_to workspace_page_path(explorer_workspace, page),
+      class: "workspace-explorer__page-icon-link",
+      tabindex: -1,
+      aria: { hidden: true },
+      data: { turbo_frame: "workspace-editor" } do %>
+    <span class="workspace-explorer__page-icon"><%= file_icon(width: 20, height: 20) %></span>
+  <% end %>
+  <span class="workspace-explorer__page-name-zone">
+    <%= link_to workspace_page_path(explorer_workspace, page),
+        class: "workspace-explorer__page",
+        data: {
+          turbo_frame: "workspace-editor",
+          action: "click->workspace--file-explorer#selectPage",
+          page_id: page.id,
+          "workspace--file-explorer-target": "page"
+        } do %>
+      <span class="workspace-explorer__page-name"><%= page.name.presence || "Untitled" %></span>
+    <% end %><span class="workspace-explorer__page-extention">.md</span>
+    <div class="workspace-explorer__page-rename" hidden>
+      <%= form_with url: rename_workspace_page_path(explorer_workspace, page), scope: :page, method: :patch,
+            data: { action: "submit->workspace--file-explorer#guardRenameSubmit" } do |f| %>
+      <%= f.text_field :name, value: page.name, maxlength: 255, autocomplete: "off",
+            size: [ page.name.to_s.length + 2, 4 ].max,
+            class: "workspace-explorer__rename-input",
+              aria: { label: "Rename #{page.name}" },
+              data: { action: "keydown->workspace--file-explorer#renameKeydown" } %>
+      <% end %>
+    </div>
+  </span>
+  <div class="workspace-explorer__page-actions actions">
+    <button type="button"
+            class="workspace-explorer__page-rename-button"
+            data-action="workspace--file-explorer#showRenameForm"
+            title="Rename <%= page.name %>"
+            aria-label="Rename <%= page.name %>">
+      <%= edit_icon(width: 16, height: 16) %>
+    </button>
+    <%= link_to delete_workspace_page_path(explorer_workspace, page),
+        class: "workspace-explorer__page-delete",
+        title: "Delete #{page.name}",
+        aria: { label: "Delete #{page.name}" },
+        data: {
+          turbo_method: :delete,
+          turbo_confirm: "Delete #{page.name}.md? This can't be undone."
+        } do %>
+      <%= delete_icon(width: 16, height: 16) %>
+    <% end %>
+  </div>
+</li>
