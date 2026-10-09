@@ -1,5 +1,134 @@
-<h1>Home#index</h1>
-<p>Find me in app/views/home/index.html.erb</p>
+<%= stylesheet_link_tag "pages/home/index", "data-turbo-reload": "true" %>
 
+<div class="body">
+    <div class="heading">
+        <div class="development-pill">Early Development</div>
+        <div class="heading-title">
+            <h1 class="heading-title-main">Markdown Notes,<span class="heading-title-accent"> designed</span></h1>
+            <h1 class="heading-title-accent">for the web.</h1>
+        </div>
+        <p class="heading-paragraph-about">granite-MD is a web based markdown notebook with inspiration taken from obsidian-md supporting writing in markdown and in html depending on you style, using a database backed system to provide quick speeds and auto-save features</p>
+        <div class="heading-actions">
+            <%= link_to "Sign Up", signup_path, class: "btn btn-primary" %>
+            <%= link_to "Read the FAQ", home_faq_path, class: "btn btn-secondary" %>
+        </div>
+        <p class="heading-paragraph-note">Free 50MB of storage to all accounts</p>
+    </div>
 
-<p>Notice the current project is mostly user signup and login related</p>
+    <div class="editor"  data-controller="markdown">
+        <div class="editor-file-explorer">
+            <div class="editor-file-explorer__header">
+                Studio Notes
+            </div>
+            <div class="editor-file-explorer__files">
+                <div class="editor-file-explorer__files__folder">
+                    <%= folder_closed_icon(width: 16, height: 16) %> drafts
+                </div>
+                <div class="editor-file-explorer__files__folder">
+                    <%= folder_open_icon(width: 16, height: 16) %> projects
+                    <div class="editor-file-explorer__files__folder__files">
+                        <div class="editor-file-explorer__files__folder__files_file editor-file-explorer__files__folder__files_file-selected">
+                            <%= file_icon(width: 16, height: 16) %> launch-notes<span class="editor-file-explorer__files__folder__files_file--md">.md</span>
+                        </div>
+                        <div class="editor-file-explorer__files__folder__files_file">
+                            <%= file_icon(width: 16, height: 16) %> todo<span class="editor-file-explorer__files__folder__files_file--md">.md</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="editor-file-explorer__files__file">
+                    <%= file_icon(width: 16, height: 16) %> README<span class="editor-file-explorer__files__folder__files_file--md">.md</span>
+                </div>
+            </div>
+        </div>
+        <div class="editor-file-editor">
+            <textarea style="display:none;" data-markdown-target="input">
+# Launch Notes
+Ideas for **granite-MD**
+## ToDo
+- [x] Create a workspace
+- [ ] Add some folders
+- [ ] Write my first page
+> Autosave will save everything
+            </textarea>
+            <div class="editor-file-editor-header">
+                launch-notes<span class="editor-file-editor--md-hint">.md<span>
+            </div>
+            <div class="editor-file-editor-markdown-code">
+                <span class="new-line"><span class="muted"># </span><span class="accented">Launch Notes</span></span>
+                <span class="new-line"><span class="muted">Ideas for <strong class="bold">**granite-MD**</strong></span></span>
+                <span class="new-line"><span class="muted">## <span class="accented">To do</span></span></span>
+                <span class="new-line"><span class="text"><span class="accented">-</span> [x] Create a workspace</span></span>
+                <span class="new-line"><span class="text"><span class="accented">-</span> [ ] Add some folders</span></span>
+                <span class="new-line"><span class="text"><span class="accented">-</span> [ ] Write my first page</span></span>
+                <span class="new-line"><span class="muted">> Autosave will save everything</span></span>
+                <span class="new-line"></span>
+                <span class="new-line"></span>
+                <span class="new-line"></span>
+            </div>
+        </div>
+        <div class="editor-file-preview" data-markdown-target="body"></div>
+    </div>
+
+    <div class="development-banner">
+        <div class="development-banner-info"><%= info_icon(width: 24, height: 24, color: "var(--info-accent)") %> This project is in development go to roadmap to see what is done so far</div><%= link_to "Roadmap", home_roadmap_path, class: "btn-info" %>
+    </div>
+
+    <div class="features">
+        <h1>Features</h1>
+        <div class="features-grid">
+            <div class="features-grid-feature">
+                <div class="features-grid-feature-icon">
+                    <%= workspaces_icon(width: 32, height: 32, color: "var(--accent-hover)") %>
+                </div>
+                <strong class="features-grid-feature-header">Workspaces</strong>
+                <p class="features-grid-feature-paragraph">Organise notes by the workspace, whether it be for school or for pearsonal use.</p>
+            </div>
+            <div class="features-grid-feature">
+                <div class="features-grid-feature-icon">
+                    <%= folders_icon(width: 32, height: 32, color: "var(--accent-hover)") %>
+                </div>
+                <strong class="features-grid-feature-header">Folders and Pages</strong>
+                <p class="features-grid-feature-paragraph">Use a full file tree ui whilst it saves onto a database as a linked records; create, rename, or destroy them.</p>
+            </div>
+            <div class="features-grid-feature">
+                <div class="features-grid-feature-icon">
+                    <%= preview_icon(width: 32, height: 32, color: "var(--accent-hover)") %>
+                </div>
+                <strong class="features-grid-feature-header">Live preview</strong>
+                <p class="features-grid-feature-paragraph">See a preview of your code render with every keystroke. Headings, lists, task-lists, quotes and code-blocks are all supported.</p>
+            </div>
+            <div class="features-grid-feature">
+                <div class="features-grid-feature-icon">
+                    <%= autosave_icon(width: 32, height: 32, color: "var(--accent-hover)") %>
+                </div>
+                <strong class="features-grid-feature-header">Autosave</strong>
+                <p class="features-grid-feature-paragraph">Never lose your progress, with our periodic autosave system, that saves it after 3s of inactivity.</p>
+            </div>
+            <div class="features-grid-feature">
+                <div class="features-grid-feature-icon">
+                    <%= storage_icon(width: 32, height: 32, color: "var(--accent-hover)") %>
+                </div>
+                <strong class="features-grid-feature-header">Storage</strong>
+                <p class="features-grid-feature-paragraph">Make use of the 50MB for everything we provide, note that workspaces will have a storage usage cost, to prevent mass creation of them.</p>
+            </div>
+            <div class="features-grid-feature">
+                <div class="features-grid-feature-icon">
+                    <%= shield_icon(width: 32, height: 32, color: "var(--accent-hover)") %>
+                </div>
+                <strong class="features-grid-feature-header">Encrypted</strong>
+                <p class="features-grid-feature-paragraph">Your personal info is encrypted, and so are your pages on paid plans.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="get-started-banner">
+        <div class="get-started-banner-text">
+            <h2>Start your first workspace</h2>
+            <p class="get-started-banner-description">Create and account to get started</p>
+        </div>
+        <div class="get-started-banner-actions">
+            <%= link_to "Sign up", signup_path, class: "btn btn-primary" %>
+            <%= link_to "Login", login_path, class: "btn btn-tertiary" %>
+        </div>
+    </div>
+</div>

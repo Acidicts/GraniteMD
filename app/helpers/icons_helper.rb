@@ -222,6 +222,27 @@ module IconsHelper
                 aria: { label: label })
   end
 
+  def info_icon(width: 24, height: 24, color: "currentColor", label: "Info")
+    content_tag(:svg,
+                xmlns: "http://www.w3.org/2000/svg",
+                viewBox: "0 0 24 24",
+                fill: "none",
+                stroke: color,
+                "stroke-width": "2",
+                "stroke-linecap": "round",
+                "stroke-linejoin": "round",
+                width: width,
+                height: height,
+                role: "img",
+                aria: { label: label }) do
+      safe_join([
+                  tag.circle(cx: 12, cy: 12, r: 10),
+        tag.path(d: "M12 16v-4"),
+        tag.path(d: "M12 8h.01")
+                ])
+    end
+  end
+
   def profile_svg(width: 0, height: 0, color: "#B7A878", background: "#E5E7EB")
     clip_id = "profile-clip-#{SecureRandom.hex(4)}"
 
@@ -242,5 +263,86 @@ module IconsHelper
         end
                 ])
     end
+  end
+
+  def workspaces_icon(width: 24, height: 24, color: "currentColor", label: "Workspaces")
+    content_tag(:svg,
+                safe_join([
+                            tag.path(d: "M12 3l9 5-9 5-9-5z"),
+                            tag.path(d: "M3 13l9 5 9-5")
+                          ]),
+                xmlns: "http://www.w3.org/2000/svg",
+                viewBox: "0 0 24 24",
+                fill: "none", stroke: color, "stroke-width": 2,
+                "stroke-linecap": "round", "stroke-linejoin": "round",
+                preserveAspectRatio: "xMidYMid meet",
+                width: width, height: height,
+                role: "img", aria: { label: label })
 end
+
+  def folders_icon(width: 24, height: 24, color: "currentColor", label: "Folders and pages")
+    content_tag(:svg,
+                tag.path(d: "M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"),
+                xmlns: "http://www.w3.org/2000/svg",
+                viewBox: "0 0 24 24",
+                fill: "none", stroke: color, "stroke-width": 2,
+                "stroke-linecap": "round", "stroke-linejoin": "round",
+                preserveAspectRatio: "xMidYMid meet",
+                width: width, height: height,
+                role: "img", aria: { label: label })
+  end
+
+  def preview_icon(width: 24, height: 24, color: "currentColor", label: "Live preview")
+    content_tag(:svg,
+                safe_join([
+                            tag.rect(x: 3, y: 4, width: 18, height: 16, rx: 2),
+                            tag.path(d: "M12 4v16")
+                          ]),
+                xmlns: "http://www.w3.org/2000/svg",
+                viewBox: "0 0 24 24",
+                fill: "none", stroke: color, "stroke-width": 2,
+                "stroke-linecap": "round", "stroke-linejoin": "round",
+                preserveAspectRatio: "xMidYMid meet",
+                width: width, height: height,
+                role: "img", aria: { label: label })
+  end
+
+  def autosave_icon(width: 24, height: 24, color: "currentColor", label: "Autosave")
+    content_tag(:svg,
+                tag.path(d: "M20 6L9 17l-5-5"),
+                xmlns: "http://www.w3.org/2000/svg",
+                viewBox: "0 0 24 24",
+                fill: "none", stroke: color, "stroke-width": 2,
+                "stroke-linecap": "round", "stroke-linejoin": "round",
+                preserveAspectRatio: "xMidYMid meet",
+                width: width, height: height,
+                role: "img", aria: { label: label })
+  end
+
+  def storage_icon(width: 24, height: 24, color: "currentColor", label: "Storage")
+    content_tag(:svg,
+                safe_join([
+                            tag.ellipse(cx: 12, cy: 6, rx: 8, ry: 3),
+                            tag.path(d: "M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6")
+                          ]),
+                xmlns: "http://www.w3.org/2000/svg",
+                viewBox: "0 0 24 24",
+                fill: "none", stroke: color, "stroke-width": 2,
+                "stroke-linecap": "round", "stroke-linejoin": "round",
+                preserveAspectRatio: "xMidYMid meet",
+                width: width, height: height,
+                role: "img", aria: { label: label })
+  end
+
+  def shield_icon(width: 24, height: 24, color: "currentColor", label: "Security")
+    content_tag(:svg,
+                tag.path(d: "M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6z"),
+                xmlns: "http://www.w3.org/2000/svg",
+                viewBox: "0 0 24 24",
+                fill: "none", stroke: color, "stroke-width": 2,
+                "stroke-linecap": "round", "stroke-linejoin": "round",
+                preserveAspectRatio: "xMidYMid meet",
+                width: width, height: height,
+                role: "img", aria: { label: label })
+  end
 end

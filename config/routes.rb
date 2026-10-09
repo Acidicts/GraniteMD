@@ -2,9 +2,10 @@ Rails.application.routes.draw do
   root "home#index", as: :home
 
   controller :home do
-    get "faq"   => :faq,   as: :home_faq
-    get "about" => :about, as: :home_about
-    get "team"  => :team,  as: :home_team
+    get "roadmap" => :roadmap, as: :home_roadmap
+    get "faq"     => :faq,     as: :home_faq
+    get "about"   => :about,   as: :home_about
+    get "team"    => :team,    as: :home_team
   end
 
   controller :sessions do

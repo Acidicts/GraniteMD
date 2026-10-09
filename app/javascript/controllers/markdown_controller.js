@@ -98,7 +98,6 @@ function markdownToHtml(md) {
   const hold = (html) => `\u0000${stash.push(html) - 1}\u0000`;
   const escapeHtml = (s) =>
     s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-  // For normal text: keep existing entities like &nbsp; or &amp; intact
   const escapeText = (s) =>
     s.replace(/&(?!#?\w+;)/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   const safeUrl = (u) => (/^\s*(javascript|data|vbscript):/i.test(u) ? "#" : u);
@@ -106,7 +105,6 @@ function markdownToHtml(md) {
   function inline(text) {
     text = text.replace(/`([^`]+)`/g, (_, c) => hold(`<code>${escapeHtml(c)}</code>`));
 
-    // Stash allowed raw HTML tags so markdown rules don't touch their attributes
     text = text.replace(/<\/?([a-zA-Z][a-zA-Z0-9]*)(?:\s[^<>]*)?\/?>/g, (m, name) =>
       ALLOWED_TAGS.has(name.toLowerCase()) ? hold(m) : m
     );
@@ -135,13 +133,18 @@ function markdownToHtml(md) {
   const isHtmlBlock = (l) => HTML_BLOCK.test(l);
   const isHeading = (l) => /^#{1,6}\s+/.test(l);
   const isHr = (l) => /^\s*([-*_])(\s*\1){2,}\s*$/.test(l);
-  const isQuote = (l) => /^>/.test(l);
+  // Blockquote marker: up to 3 leading spaces (4+ is indented code, not a quote)
+  const isQuote = (l) => /^ {0,3}>/.test(l);
+  const stripQuote = (l) => l.replace(/^ {0,3}>[ \t]?/, "");
+  const isFenceStart = (l) => /^ {0,3}```/.test(l);
   const isItem = (l) => /^\s*([-*+]|\d+\.)\s+/.test(l);
   const startsBlock = (l) =>
-    isHold(l) || isHtmlBlock(l) || isHeading(l) || isHr(l) || isQuote(l) || isItem(l);
+    isHold(l) || isHtmlBlock(l) || isHeading(l) || isHr(l) || isQuote(l) || isItem(l) || isFenceStart(l);
 
-  function blocks(text) {
-    const lines = text.split("\n");
+  const isParaText = (l) =>
+    l.trim() && !isHold(l) && !isHtmlBlock(l) && !isHeading(l) && !isHr(l) && !isQuote(l) && !isItem(l) && !isFenceStart(l);
+
+  function blocksLines(lines, quotedFlags) {
     const out = [];
     let i = 0;
 
@@ -151,7 +154,6 @@ function markdownToHtml(md) {
       if (!line.trim()) { i++; continue; }
       if (isHold(line)) { out.push(line.trim()); i++; continue; }
 
-      // Raw HTML block: passed through as-is until the next blank line
       if (isHtmlBlock(line)) {
         const html = [];
         while (i < lines.length && lines[i].trim()) html.push(lines[i++]);
@@ -167,10 +169,69 @@ function markdownToHtml(md) {
 
       if (isHr(line)) { out.push("<hr>"); i++; continue; }
 
+      if (isFenceStart(line)) {
+        const fence = line.match(/^ {0,3}```(\w*)[ \t]*$/);
+        // Unclosed fence: treat opening as paragraph text
+        if (!fence) {
+          const para = [];
+          while (i < lines.length && lines[i].trim() && !startsBlock(lines[i])) para.push(lines[i++]);
+          // If nothing consumed (should not happen), avoid infinite loop
+          if (!para.length) { out.push(`<p>${inline(line)}</p>`); i++; }
+          else out.push(`<p>${inline(para.join(" "))}</p>`);
+          continue;
+        }
+        const lang = fence[1];
+        const codeLines = [];
+        i++;
+        while (i < lines.length && !/^ {0,3}```[ \t]*$/.test(lines[i])) codeLines.push(lines[i++]);
+        if (i < lines.length) i++; // consume closing fence
+        out.push(hold(`<pre><code${lang ? ` class="language-${lang}"` : ""}>${escapeHtml(codeLines.join("\n"))}</code></pre>`));
+        continue;
+      }
+
+      // Blockquote: supports nesting, lazy continuation lines, blank lines,
+      // and fenced code / lists / headings inside via recursion.
       if (isQuote(line)) {
         const inner = [];
-        while (i < lines.length && isQuote(lines[i])) inner.push(lines[i++].replace(/^>\s?/, ""));
-        out.push(`<blockquote>${blocks(inner.join("\n"))}</blockquote>`);
+        const innerQuoted = [];
+        while (i < lines.length) {
+          const cur = lines[i];
+          if (isQuote(cur)) {
+            inner.push(stripQuote(cur));
+            innerQuoted.push(true);
+            i++;
+            continue;
+          }
+          if (!cur.trim()) {
+            // Blank line belongs to the quote only if more quoted content follows.
+            let j = i + 1;
+            while (j < lines.length && !lines[j].trim()) j++;
+            if (j < lines.length && isQuote(lines[j])) {
+              while (i < j) { inner.push(""); innerQuoted.push(true); i++; }
+              continue;
+            }
+            break;
+          }
+          // Lazy continuation: a plain paragraph line following quoted
+          // paragraph text belongs to the quote (CommonMark). A bare line may
+          // also follow a nested `>` marker so it can be passed down to the
+          // nested quote, but never after a list/heading/code block.
+          // Inside a quote, only consume lines that were lazy at the parent
+          // level (flag false) so outer-quoted siblings aren't swallowed by
+          // a nested quote.
+          if (!startsBlock(cur) && inner.length) {
+            const prev = inner[inner.length - 1];
+            if ((isParaText(prev) || isQuote(prev)) && (quotedFlags == null || quotedFlags[i] === false)) {
+              inner.push(cur);
+              innerQuoted.push(false);
+              i++;
+              continue;
+            }
+          }
+          break;
+        }
+        const rendered = blocksLines(inner, innerQuoted);
+        if (rendered.trim()) out.push(`<blockquote>${rendered}</blockquote>`);
         continue;
       }
 
@@ -187,6 +248,10 @@ function markdownToHtml(md) {
       out.push(`<p>${inline(para.join(" "))}</p>`);
     }
     return out.join("\n");
+  }
+
+  function blocks(text) {
+    return blocksLines(text.split("\n"), null);
   }
 
   md = md.replace(/\r\n?/g, "\n");

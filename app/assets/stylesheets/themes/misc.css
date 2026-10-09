@@ -22,3 +22,11 @@
     height: 1px;
     margin: 0.25rem;
 }
+
+blockquote {
+    margin: 0.75rem 0;
+    padding: 0.5rem 1rem;
+    border-left: 3px solid var(--border);
+    background-color: var(--surface-2);
+    color: var(--muted);
+}

@@ -181,3 +181,36 @@ form.button_to {
   border-color: var(--border);
   color: var(--muted);
 }
+
+/* Info Buttons */
+.btn-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 24px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.12s, border-color 0.12s, color 0.12s;
+  background: var(--info-bg);
+  border-color: var(--info-title);
+  color: var(--info-title);
+}
+.btn-info:hover:not(:disabled) {
+  background: var(--info-accent);
+  border-color: var(--info-accent);
+  color: var(--info-title);
+}
+.btn-info:disabled {
+  background: var(--border);
+  border-color: var(--border);
+  color: var(--muted);
+}
