@@ -49,8 +49,10 @@ Rails.application.configure do
   # the cache is reached over TLS.
   config.cache_store = :redis_cache_store, {
     url: ENV.fetch("REDIS_URL"),
-    pool_size: ENV.fetch("RAILS_MAX_THREADS") { 5 }.to_i,
-    pool_timeout: 5
+    pool: {
+      size: ENV.fetch("RAILS_MAX_THREADS") { 5 }.to_i,
+      timeout: 5
+    }
   }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
