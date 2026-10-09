@@ -28,7 +28,11 @@ RSpec.describe Folder, type: :model do
     end
 
     it "persists with a workspace" do
-      expect { create(:folder) }.to change(Folder, :count).by(1)
+      # Creating a workspace auto-creates its root folder via
+      # Workspace#ensure_root_folder, so use an existing workspace
+      # to isolate the count to just the new folder.
+      workspace = create(:workspace)
+      expect { create(:folder, workspace: workspace) }.to change(Folder, :count).by(1)
     end
   end
 
