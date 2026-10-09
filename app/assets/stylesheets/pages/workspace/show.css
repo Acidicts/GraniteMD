@@ -126,6 +126,11 @@
     min-width: 0;
 }
 
+.workspace-explorer__page-item:has(.workspace-explorer__page.is-active) {
+    background-color: var(--surface-2);
+    border-radius: 0.375rem;
+}
+
 .workspace-explorer__page.is-active {
     font-weight: 700;
 }
@@ -142,6 +147,9 @@
     display: inline-flex;
     align-items: center;
     gap: 0.25rem;
+
+    text-decoration: none;
+    color: var(--text);
 }
 
 .workspace-explorer__page-icon-link {
@@ -234,13 +242,21 @@
     overflow: hidden; /* clips header + gutter to the shared rounded corners */
 }
 
+.workspace-editor__textarea-wrapper__header-text {
+    font-size: 12px;
+    font-weight: 700;
+    padding-left: 1rem;
+}
+
 .workspace-editor__textarea-wrapper__header {
     flex: none;
-    height: 2.5rem;
+    height: 2rem;
     width: 100%;
     box-sizing: border-box;
     background-color: var(--surface-2);
     border-bottom: 1px solid var(--border);
+
+    align-items: center;
 }
 
 .workspace-editor__textarea-wrapper {

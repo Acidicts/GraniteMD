@@ -81,36 +81,41 @@ RSpec.describe "Workspace explorer (verification)", type: :request do
     end
   end
 
-  describe "blank workspace (no folders)" do
+  describe "workspace root folder (single-root design)" do
     let!(:workspace) do
       Workspace.create!(name: "Blank", feature_set: "personal").tap { |ws| ws.users << user }
     end
 
-    it "offers a New file button in the empty state" do
+    it "auto-creates one root folder and renders it in the explorer" do
       get workspace_path(workspace)
       expect(response).to be_successful
-      expect(response.body).to include("No files yet")
-      expect(response.body).to include("new-page-form-root")
-      expect(response.body).to include("showNewFileForm")
+      root = workspace.reload.folder
+      expect(root).to be_present
+      expect(root.parent_id).to be_nil
+      expect(response.body).to include("Blank")
+      expect(response.body).to include("workspace-tree-root")
+      expect(response.body).to include("new-page-form-#{root.id}")
+      expect(response.body).to include("showContextMenu")
+      expect(response.body).to include("newFileFromContextMenu")
     end
 
-    it "creates a default folder and the page when no folder is given" do
+    it "creates the page in the root folder when no folder is given" do
+      root = workspace.reload.ensure_root_folder
       expect {
         post workspace_pages_path(workspace), params: { page: { name: "first" } }
-      }.to change { Folder.count }.by(1).and change { Page.count }.by(1)
+      }.to change { Page.count }.by(1)
+      expect(workspace.reload.folders.count).to eq(1)
       expect(response).to redirect_to(workspace_path(workspace))
 
-      folder = workspace.folders.first
-      expect(folder.parent_id).to be_nil
-      expect(folder.pages.first.name).to eq("first")
+      expect(root.reload.pages.first.name).to eq("first")
     end
 
     it "reuses the existing root folder instead of creating another" do
-      existing = Folder.create!(name: "Docs", workspace: workspace)
+      root = workspace.reload.ensure_root_folder
       expect {
         post workspace_pages_path(workspace), params: { page: { name: "second" } }
       }.not_to change { Folder.count }
-      expect(existing.pages.last.name).to eq("second")
+      expect(root.reload.pages.last.name).to eq("second")
     end
   end
 

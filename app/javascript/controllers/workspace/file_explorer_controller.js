@@ -179,7 +179,7 @@ export default class extends Controller {
 
   // Dismiss the context menu popup.
   hideContextMenu() {
-    if (this.hasContextMenuTarget) this.contextMenuTarget.hidden = true;
+    this.contextMenuTargets.forEach((menu) => { menu.hidden = true });
   }
 
   // Collapse every folder in the tree.

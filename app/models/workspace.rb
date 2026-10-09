@@ -24,6 +24,7 @@ class Workspace < ApplicationRecord
   has_and_belongs_to_many :users
 
   has_many :folders, dependent: :destroy
+  has_one :folder, -> { where(parent_id: nil).order(:created_at) }, class_name: "Folder", inverse_of: :workspace
   has_many :pages, through: :folders
 
   has_one_attached :workspace_image do |attachable|
@@ -41,6 +42,24 @@ class Workspace < ApplicationRecord
   validates :feature_set, presence: true
 
   before_validation :assign_default_owner
+  after_create :ensure_root_folder
+
+  # Single root folder for the workspace. All other folders and files
+  # live inside it (nested via Folder#parent / Folder#folders).
+  def root_folder
+    folder || ensure_root_folder
+  end
+
+  def ensure_root_folder
+    roots = folders.where(parent_id: nil).order(:created_at).to_a
+    root = roots.first || folders.create!(name: name.presence || "Untitled workspace")
+    # Consolidate legacy workspaces that ended up with multiple roots:
+    # nest any extra roots under the first so the tree stays single-rooted.
+    if roots.size > 1
+      roots[1..].each { |extra| extra.update!(parent: root) }
+    end
+    root
+  end
 
   def display_owner_or_organisation
     if self.owner.nil? && self.organisation.presence

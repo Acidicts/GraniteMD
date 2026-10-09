@@ -4,6 +4,7 @@ class WorkspaceController < ApplicationController
     return redirect_to dashboard_workspaces_path, alert: "We couldn't find that workspace" if workspace.nil?
     return redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace" unless workspace.users.exists?(current_user.id)
     @workspace = workspace
+    @workspace.ensure_root_folder
 
     render "workspace/show"
   end
@@ -34,11 +35,15 @@ class WorkspaceController < ApplicationController
 
     folder_id = params.dig(:page, :folder_id) || params[:folder_id]
     folder = workspace.folders.find_by(id: folder_id) if folder_id.present?
-    if folder.nil? && folder_id.blank?
-      # Blank workspace (or no location picked): reuse the first root
-      # folder, creating a default one if none exists yet.
-      folder = workspace.folders.where(parent_id: nil).order(:created_at).first ||
-               workspace.folders.create(name: workspace.name)
+    if folder.nil?
+      # A folder was picked but doesn't belong to this workspace: reject
+      # instead of dropping the file into the root folder.
+      if folder_id.present?
+        return redirect_to workspace_path(workspace), alert: "Choose a folder for the new file"
+      end
+      # Single-root design: everything lives inside the workspace's one
+      # root folder. Fall back to it (creating/consolidating if needed).
+      folder = workspace.ensure_root_folder
     end
     if folder.nil? || !folder.persisted?
       return redirect_to workspace_path(workspace), alert: "Choose a folder for the new file"
@@ -73,6 +78,9 @@ class WorkspaceController < ApplicationController
     if parent.nil? && parent_id.present?
       return redirect_to workspace_path(workspace), alert: "We couldn't find that folder"
     end
+    # Single-root design: new folders always live inside the tree.
+    # No parent given means "directly under the root folder".
+    parent ||= workspace.ensure_root_folder
 
     name = params.dig(:folder, :name).to_s.strip
     @workspace = workspace

@@ -10,7 +10,13 @@
         },
         class: "workspace--editor__form" do |f| %>
         <div class="workspace-editor__textarea-wrapper__container">
-            <div class="workspace-editor__textarea-wrapper__header"></div>
+            <div class="workspace-editor__textarea-wrapper__header">
+                <% if page.name.nil? %>
+                    <p class="workspace-editor__textarea-wrapper__header-text">Select or create a file to start editing</p>
+                <% else %>
+                    <p class="workspace-editor__textarea-wrapper__header-text"><%= page.name.to_s %><span class="workspace-explorer__page-extention">.md</span></p>
+                <% end %>
+            </div>
             <div class="workspace-editor__textarea-wrapper">
                 <%= f.textarea :body,
                                 class: "workspace-editor__textarea",
@@ -18,7 +24,7 @@
                                 spellcheck: false,
                                 rows: 1,
                                 disabled: !persisted,
-                                placeholder: (persisted ? "" : "Select or create a file to start editing"),
+                                placeholder: (persisted ? "" : ""),
                                 data: {
                                 "workspace--editor-target": "textarea",
                                 action: "input->workspace--editor#fileChange change->workspace--editor#fileChange"
