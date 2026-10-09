@@ -9,7 +9,7 @@
       tabindex: -1,
       aria: { hidden: true },
       data: { turbo_frame: "workspace-editor" } do %>
-    <span class="workspace-explorer__page-icon"><%= file_icon(width: 20, height: 20) %></span>
+    <span class="workspace-explorer__page-icon"><%= file_icon(width: 20, height: 20, color: "var(--text)") %></span>
   <% end %>
   <span class="workspace-explorer__page-name-zone">
     <%= link_to workspace_page_path(explorer_workspace, page),
