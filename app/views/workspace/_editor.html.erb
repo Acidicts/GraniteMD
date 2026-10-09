@@ -3,7 +3,7 @@
     <% save_url = persisted ? save_workspace_page_path(workspace, page) : nil %>
     <%= form_with model: page, url: (save_url || workspace_path(workspace)), method: (persisted ? :patch : :get),
             data: {
-            controller: "workspace--editor",
+            controller: "workspace--editor markdown",
             action: "submit->workspace--editor#handleSubmit",
             "workspace--editor-endpoint-value": save_url,
             "workspace--editor-page-id-value": (page.id if persisted),
@@ -27,11 +27,12 @@
                                 placeholder: (persisted ? "" : ""),
                                 data: {
                                 "workspace--editor-target": "textarea",
-                                action: "input->workspace--editor#fileChange change->workspace--editor#fileChange"
+                                "markdown-target": "input",
+                                action: "input->workspace--editor#fileChange change->workspace--editor#fileChange input->markdown#update"
                                 } %>
             </div>
         </div>
     <div class="workspace-editor__status" data-workspace--editor-target="status" role="status" aria-live="polite"></div>
-    <div class="workspace-editor__preview"></div>
+    <div class="workspace-editor__preview" data-markdown-target="body"></div>
   <% end %>
 <% end %>
