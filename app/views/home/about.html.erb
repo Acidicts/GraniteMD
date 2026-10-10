@@ -1,2 +1,69 @@
-<h1>Home#about</h1>
-<p>Find me in app/views/home/about.html.erb</p>
+<%= stylesheet_link_tag "pages/home/about", "data-turbo-reload": "true" %>
+
+<div class="body">
+    <div class="header">
+        <div class="header-left">
+            <h5 class="header-title-page">About</h5>
+            <h1 class="header-title">An Obsidian-style notes app,</h1>
+            <h1 class="header-title header-title-accent">built for you browser.</h1>
+            <p class="header-bio">granite-MD takes obsidian and turns it into the web app we need and not the local app we have. Bringing notes to the browser, and to remote saftey.</p>
+        </div>
+        <div class="header-right">
+            <%= logo_svg(width: 128, height: 128) %>
+            <p>Granite a sturdy stone. A bright red garnet, with many details in it</p>
+        </div>
+    </div>
+
+    <div class="why">
+        <div class="why-heading">
+            <h2>Why it exists</h2>
+        </div>
+        <div class="why-paragraph">
+            <p>granite-MD is a web app inspired by Obsidian-MD, designed from the start for the browser. Pages in markdown mixed with html, workspaces organise it all by folders, and everything is reachable with just on account.</p>
+            <p>Built by one developer, for many people</p>
+        </div>
+    </div>
+
+    <div class="security">
+        <div class="security-heading">
+            <h2>Privacy and security</h2>
+            <p>How the app protects your data</p>
+        </div>
+        <div class="security-paragraph">
+            <ul>
+                <li>Your name and email address are encrypted in the database</li>
+                <li>Strong passwords are mandatory</li>
+                <li>Password reset links expire after 15 minutes</li>
+                <li>Sanitized Markdown to prevent SQL Injection and other vulnerabilities</li>
+                <li>Pages are encrypted for paid plans</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="built-with">
+        <h2>Built with</h2>
+        <div class="dev-pills">
+            <div class="dev-pill">Ruby on Rails 8.1</div>
+            <div class="dev-pill">Ruby 4.0</div>
+            <div class="dev-pill">Ruby PostgreSQL</div>
+            <div class="dev-pill">Redis</div>
+            <div class="dev-pill">Hotwire</div>
+            <div class="dev-pill">RSpec</div>
+            <div class="dev-pill">Docker</div>
+        </div>
+        <div class="dev-para">
+            <p>granite-MD is run from a docker image, powered by rails and ruby, backed by a postgres database and a redis cache</p>
+        </div>
+    </div>
+
+    <div class="get-started-banner">
+        <div class="get-started-banner-text">
+            <h2>Try it while it grows</h2>
+            <p class="get-started-banner-description">Create github issues for new features and more.</p>
+        </div>
+        <div class="get-started-banner-actions">
+            <%= link_to "Sign up", signup_path, class: "btn btn-primary" %>
+            <%= link_to "Check out our team", home_team_path, class: "btn btn-secondary" %>
+        </div>
+    </div>
+</div>

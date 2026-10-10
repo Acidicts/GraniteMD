@@ -1,0 +1,171 @@
+.body {
+    margin: 2rem;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.header-title-page {
+    color: var(--muted);
+    margin-bottom: 0.4rem;;
+}
+
+.header-title {
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+.header-title-accent {
+    color: var(--accent);
+}
+
+.header-bio {
+    max-width: 500px;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.header-right {
+    display: flex;
+    flex-direction: column;
+
+    background-color: var(--surface-1);
+    padding: 1.5rem;
+    margin: 0.5rem;
+    max-width: 250px;
+
+    border: var(--border) 1px solid;
+    border-radius: 1rem;
+
+    align-items: center;
+}
+
+.header-right p {
+    width: 100%;
+    color: var(--muted);
+
+    font-size: 0.8rem;
+    line-height: 1.5rem;
+    text-align: center;
+}
+
+.why {
+    display: grid;
+    grid-template-columns: 2fr 5fr;
+    justify-content: space-between;
+    
+    background-color: var(--surface-1);
+    min-height: 10rem;
+    padding: 1rem; 
+    margin: 1rem 0;
+    gap: 3rem;
+}
+
+.why p {
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+
+.why-paragraph {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.security {
+    display: grid;
+    grid-template-columns: 2fr 5fr;
+    justify-content: space-between;
+    align-items: start;
+    
+    min-height: 10rem;
+    margin: 1rem 0;
+    gap: 3rem;
+}
+
+.security p {
+    font-size: 0.9rem;
+    color: var(--muted);
+}
+
+.security-paragraph {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.security-paragraph ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.security-paragraph li {
+    border-top: 1px solid color-mix(in srgb, var(--muted) 25%, transparent);
+    padding: 1rem 0;
+    list-style-type: none;
+}
+
+.security-paragraph li:last-child {
+    color: var(--muted);
+    border-bottom: 1px solid color-mix(in srgb, var(--muted) 25%, transparent);
+}
+
+.built-with {
+    width: 100%;
+    margin-bottom: 4rem;
+}
+
+.dev-pills {
+    display: flex;
+    flex-direction: row;
+
+    gap: 15px
+}
+.dev-pill {
+    background-color: var(--surface-1);
+    color: black;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.dev-para p {
+    color: var(--muted);
+    font-size: 0.8rem;
+    max-width: 650px;
+}
+
+.get-started-banner {
+    display: flex;
+    flex-direction: row;
+
+    background-color: var(--surface-1);
+    padding: 1rem;
+    margin: 1rem 0;
+    border-radius: 1rem;
+
+    justify-content: space-between;
+    align-items: center;
+}
+
+.get-started-banner-description {
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-top: -0.5rem;
+}
+
+.get-started-banner-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    align-items: center;
+
+    font-weight: 600;
+}
