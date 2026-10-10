@@ -126,3 +126,14 @@ header {
     height: 32px;
     border-radius: 50%;
 }
+
+footer {
+    display: flex;
+    flex-direction: row;
+
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+
+    border-top: color-mix(in srgb, var(--muted) 15%, transparent) 1px solid;
+}

@@ -62,4 +62,13 @@
     <%= flash_alerts %>
     <%= yield %>
   </body>
+  <footer>
+    <p>Built by <%= link_to "acidicts", home_team_path, class: "btn-nav" %></p>
+    <div class="footer-actions">
+      <%= link_to "Home", home_path, class: "btn-nav" %> | 
+      <%= link_to "About", home_about_path, class: "btn-nav" %>
+      <%= link_to "Team", home_team_path, class: "btn-nav" %>
+      <%= link_to "FAQ", home_faq_path, class: "btn-nav" %>
+    </div>
+  </footer>
 </html>
