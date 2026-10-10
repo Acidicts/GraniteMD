@@ -37,6 +37,12 @@ export default class extends Controller {
     this.#revealNewFileForm(event.currentTarget.dataset.folderId)
   }
 
+  // Reveal the inline "new folder" placeholder and focus its input.
+  // Mirrors showNewFileForm for the empty-state "New folder" button.
+  showNewFolderForm(event) {
+    this.#revealNewFolderForm(event.currentTarget.dataset.folderId)
+  }
+
   // "New file" button inside the right-click context menu: uses the
   // folder id stored when the menu was opened, then closes the menu.
   newFileFromContextMenu() {
