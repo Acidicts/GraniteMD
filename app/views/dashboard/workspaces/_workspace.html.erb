@@ -1,22 +1,22 @@
-<%= link_to dashboard_workspace_path(workspace.id), class: "workspace__link_container" do %>
-  <div class="workspace" id="<%= dom_id workspace %>">
+<article class="workspace" id="<%= dom_id workspace %>">
+  <%= link_to dashboard_workspace_path(workspace), class: "workspace__media-link", tabindex: "-1", aria: { hidden: true } do %>
     <% if workspace.workspace_image.attached? %>
-      <%= image_tag workspace.workspace_image.variant(:thumb), class: "workspace__image" %>
+      <%= image_tag workspace.workspace_image.variant(:thumb), class: "workspace__image", alt: "" %>
     <% else %>
       <%= render "shared/placeholders/workspace_image", text: "Workspace Banner Image" %>
     <% end %>
+  <% end %>
 
-    <div class="workspace__content">
-      <div class="workspace__content_name">
-        <p><%= workspace.name %></p>
-        <div class="break" style="margin-top: 0 !important;"></div>
-        <p class="workspace__owner"><%= workspace.display_owner_or_organisation %></p>
-      </div>
-      <div>
-        <%= link_to workspace_path(workspace), class: "btn btn-icon", aria: { label: "View Workspace" }, title: "View Workspace" do %>
-          <%= view_icon %>
-        <% end %>
-      </div>
+  <div class="workspace__content">
+    <div class="workspace__content_name">
+      <%= link_to workspace.name, dashboard_workspace_path(workspace), class: "workspace__name-link" %>
+      <div class="break" style="margin-top: 0 !important;"></div>
+      <p class="workspace__owner"><%= workspace.display_owner_or_organisation %></p>
+    </div>
+    <div class="workspace__actions">
+      <%= link_to workspace_path(workspace), class: "btn btn-icon", aria: { label: "View #{workspace.name}" }, title: "View Workspace" do %>
+        <%= view_icon %>
+      <% end %>
     </div>
   </div>
-<% end %>
+</article>

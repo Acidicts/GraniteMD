@@ -170,6 +170,27 @@ class WorkspaceController < ApplicationController
     end
   end
 
+  def rename_folder
+    folder = find_authorized_folder
+    return if folder.nil?
+
+    name = params.dig(:folder, :name).to_s.strip
+    if name.blank?
+      return redirect_to workspace_path(folder.workspace), alert: "Folder name can't be blank"
+    end
+
+    @workspace = folder.workspace
+    if folder.update(name: name)
+      @folder = folder
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to workspace_path(@workspace), notice: "Folder renamed" }
+      end
+    else
+      redirect_to workspace_path(@workspace), alert: folder.errors.full_messages.to_sentence
+    end
+  end
+
   def delete_file
     page = find_authorized_page
     return if page.nil?
@@ -200,6 +221,23 @@ class WorkspaceController < ApplicationController
       return nil
     end
     page
+  end
+
+  def find_authorized_folder
+    folder = Folder.find_by(id: params[:id])
+    if folder.nil?
+      redirect_to dashboard_workspaces_path, alert: "We couldn't find that folder"
+      return nil
+    end
+    if params[:workspace_id].present? && folder.workspace_id.to_s != params[:workspace_id].to_s
+      redirect_to dashboard_workspaces_path, alert: "We couldn't find that folder"
+      return nil
+    end
+    unless folder.workspace.users.exists?(current_user.id)
+      redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace"
+      return nil
+    end
+    folder
   end
 
   def sanitized_page_name(raw)

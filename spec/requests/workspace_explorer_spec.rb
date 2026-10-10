@@ -198,4 +198,52 @@ RSpec.describe "Workspace explorer (verification)", type: :request do
       expect(response).to redirect_to(dashboard_workspaces_path)
     end
   end
+
+  describe "rename folders" do
+    let!(:workspace) do
+      Workspace.create!(name: "Folder Renamer", feature_set: "personal").tap { |ws| ws.users << user }
+    end
+    let!(:folder) { Folder.create!(name: "Docs", workspace: workspace) }
+
+    it "shows the folder rename form and menu entry on each folder row" do
+      get workspace_path(workspace)
+      expect(response).to be_successful
+      expect(response.body).to include("workspace-folder-#{folder.id}")
+      expect(response.body).to include("renameFolderFromContextMenu")
+      expect(response.body).to include("Rename Docs")
+    end
+
+    it "renames via turbo-stream and html" do
+      patch rename_workspace_folder_path(workspace, folder),
+            params: { folder: { name: "Manuals" } }, as: :turbo_stream
+      expect(response).to be_successful
+      expect(folder.reload.name).to eq("Manuals")
+      expect(response.body).to include("workspace-folder-#{folder.id}")
+      expect(response.body).to include("Manuals")
+
+      patch rename_workspace_folder_path(workspace, folder),
+            params: { folder: { name: "Handbooks" } }
+      expect(response).to redirect_to(workspace_path(workspace))
+      expect(folder.reload.name).to eq("Handbooks")
+    end
+
+    it "rejects blank names, other workspaces' folders and strangers" do
+      patch rename_workspace_folder_path(workspace, folder), params: { folder: { name: "  " } }
+      expect(response).to redirect_to(workspace_path(workspace))
+      expect(folder.reload.name).to eq("Docs")
+
+      other = Workspace.create!(name: "Other", feature_set: "personal")
+      foreign = Folder.create!(name: "Elsewhere", workspace: other)
+      patch rename_workspace_folder_path(workspace, foreign), params: { folder: { name: "sneaky" } }
+      expect(response).to redirect_to(dashboard_workspaces_path)
+      expect(foreign.reload.name).to eq("Elsewhere")
+
+      stranger = create(:user, username: "folder_renamer_stranger", email_address: "folder_renamer_stranger@example.com")
+      delete logout_path
+      sign_in stranger
+      patch rename_workspace_folder_path(workspace, folder), params: { folder: { name: "hijacked" } }
+      expect(response).to redirect_to(dashboard_workspaces_path)
+      expect(folder.reload.name).to eq("Docs")
+    end
+  end
 end

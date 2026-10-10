@@ -1,0 +1,60 @@
+<%# locals: folder, workspace (optional — falls back to folder.workspace) %>
+<% explorer_workspace = local_assigns[:workspace] || folder.workspace %>
+<% subfolders = folder.folders.order(:name) %>
+<% pages = folder.pages.order(:name) %>
+<li id="workspace-folder-<%= folder.id %>"
+    class="workspace-explorer__folder-item"
+    role="treeitem"
+    aria-expanded="true"
+    aria-label="<%= folder.name %>"
+    data-workspace--file-explorer-target="folder"
+    data-folder-id="<%= folder.id %>">
+  <div class="workspace-explorer__folder-row"
+       data-action="contextmenu->workspace--file-explorer#showContextMenu"
+       data-folder-id="<%= folder.id %>">
+     <button type="button"
+             class="workspace-explorer__folder"
+             data-action="workspace--file-explorer#toggleFolder"
+             aria-expanded="true">
+       <span class="workspace-explorer__folder-icon workspace-explorer__folder-icon--open"
+             data-workspace--file-explorer-target="folderOpenIcon">
+         <%= folder_open_icon(width: 20, height: 20) %>
+       </span>
+       <span class="workspace-explorer__folder-icon workspace-explorer__folder-icon--closed"
+             data-workspace--file-explorer-target="folderClosedIcon"
+             hidden>
+         <%= folder_closed_icon(width: 20, height: 20) %>
+       </span>
+       <span class="workspace-explorer__folder-name"><%= folder.name %></span>
+     </button>
+     <div class="workspace-explorer__folder-rename" hidden>
+       <%= form_with url: rename_workspace_folder_path(explorer_workspace, folder), scope: :folder, method: :patch,
+             data: { action: "submit->workspace--file-explorer#guardFolderRenameSubmit" } do |f| %>
+       <%= f.text_field :name, value: folder.name, maxlength: 255, autocomplete: "off",
+             size: [ folder.name.to_s.length + 2, 4 ].max,
+             class: "workspace-explorer__rename-input",
+               aria: { label: "Rename #{folder.name}" },
+               data: { action: "keydown->workspace--file-explorer#folderRenameKeydown" } %>
+       <% end %>
+     </div>
+     <button type="button"
+             class="workspace-explorer__menu-btn"
+             data-action="click->workspace--file-explorer#showMenu"
+             data-folder-id="<%= folder.id %>"
+             title="Options for <%= folder.name %>"
+             aria-label="Options for <%= folder.name %>"
+             aria-haspopup="menu">
+       <%= ellipsis_icon(width: 16, height: 16) %>
+     </button>
+  </div>
+
+  <ul id="folder-children-<%= folder.id %>"
+      class="workspace-explorer__folder-children"
+      role="group"
+      data-workspace--file-explorer-target="folderChildren">
+    <%= render partial: "workspace/files/items/folder", collection: subfolders, as: :folder, locals: { workspace: explorer_workspace } %>
+    <%= render partial: "workspace/files/items/page", collection: pages, as: :page, locals: { workspace: explorer_workspace } %>
+    <%= render partial: "workspace/files/forms/new_folder_form", locals: { workspace: explorer_workspace, folder: folder } %>
+    <%= render partial: "workspace/files/forms/new_page_form", locals: { workspace: explorer_workspace, folder: folder } %>
+  </ul>
+</li>

@@ -1,5 +1,5 @@
 <%# Response to PATCH /workspace/:workspace_id/pages/:id: swap the %>
 <%# page row for a freshly rendered one (view state, new name). %>
 <%= turbo_stream.replace "workspace-page-#{@page.id}",
-      partial: "workspace/files/page",
+      partial: "workspace/files/items/page",
       locals: { page: @page, workspace: @workspace } %>

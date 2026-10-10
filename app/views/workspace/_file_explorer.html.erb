@@ -15,13 +15,24 @@
        data-folder-id="<%= root_folder.id %>"
        <% end %>>
     <span class="workspace-explorer__title"><%= explorer_workspace&.name.presence || "Files" %></span>
+    <% if root_folder.present? %>
+      <button type="button"
+              class="workspace-explorer__menu-btn"
+              data-action="click->workspace--file-explorer#showMenu"
+              data-folder-id="<%= root_folder.id %>"
+              title="New file or folder"
+              aria-label="New file or folder options"
+              aria-haspopup="menu">
+        <%= ellipsis_icon(width: 16, height: 16) %>
+      </button>
+    <% end %>
   </div>
 
   <% if explorer_workspace.folder.present? %>
     <% if !explorer_workspace.folder.pages.any? && !explorer_workspace.folder.folders.any? %>
     <div class="workspace-explorer__empty">
       <p>No files yet</p>
-      <p style="text-align: center; margin: 0.5rem;">Right click the header or existing folder to create new folder or file</p>
+      <p style="text-align: center; margin: 0.5rem;">Right click or use the ⋯ menu on the header or a folder to create a new folder or file</p>
       <button type="button"
               class="workspace-explorer__new-file btn btn-icon"
               data-action="workspace--file-explorer#showNewFileForm"
@@ -43,15 +54,15 @@
     </div>
     <% end %>
     <ul id="workspace-tree-root" class="workspace-explorer__tree" role="tree" aria-label="Workspace files">
-    <%= render partial: "workspace/files/folder", collection: explorer_workspace.folder.folders.order(:name), as: :folder, locals: { workspace: explorer_workspace } %>
-    <%= render partial: "workspace/files/page", collection: explorer_workspace.folder.pages.order(:name), as: :page, locals: { workspace: explorer_workspace } %>
-    <%= render partial: "workspace/files/new_folder_form", locals: { workspace: explorer_workspace, folder: explorer_workspace.folder } %>
-    <%= render partial: "workspace/files/new_page_form", locals: { workspace: explorer_workspace, folder: explorer_workspace.folder } %>
+    <%= render partial: "workspace/files/items/folder", collection: explorer_workspace.folder.folders.order(:name), as: :folder, locals: { workspace: explorer_workspace } %>
+    <%= render partial: "workspace/files/items/page", collection: explorer_workspace.folder.pages.order(:name), as: :page, locals: { workspace: explorer_workspace } %>
+    <%= render partial: "workspace/files/forms/new_folder_form", locals: { workspace: explorer_workspace, folder: explorer_workspace.folder } %>
+    <%= render partial: "workspace/files/forms/new_page_form", locals: { workspace: explorer_workspace, folder: explorer_workspace.folder } %>
     </ul>
   <% else %>
     <div class="workspace-explorer__empty">
       <p>No files yet</p>
-      <p style="text-align: center; margin: 0.5rem;">Right click the header or existing folder to create new folder or file</p>
+      <p style="text-align: center; margin: 0.5rem;">Right click or use the ⋯ menu on the header or a folder to create a new folder or file</p>
     </div>
   <% end %>
   <div class="workspace-explorer__context-menu"
@@ -70,7 +81,15 @@
             data-action="workspace--file-explorer#newFolderFromContextMenu"
             title="New folder in this folder"
             aria-label="New folder in this folder">
-      <%= new_file_icon(width: 16, height: 16) %> New Folder
+      <%= folder_closed_icon(width: 16, height: 16) %> New Folder
+    </button>
+    <button type="button"
+            class="workspace-explorer__folder-new-file"
+            data-workspace--file-explorer-target="folderRenameButton"
+            data-action="workspace--file-explorer#renameFolderFromContextMenu"
+            title="Rename this folder"
+            aria-label="Rename this folder">
+      <%= edit_icon(width: 16, height: 16) %> Rename Folder
     </button>
   </div>
 </div>

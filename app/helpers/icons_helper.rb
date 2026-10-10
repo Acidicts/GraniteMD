@@ -357,4 +357,19 @@ end
                 width: width, height: height,
                 role: "img", aria: { label: label })
   end
+
+  def ellipsis_icon(width: 24, height: 24, color: "currentColor", label: "More actions")
+    content_tag(:svg,
+                safe_join([
+                            tag.circle(cx: 12, cy: 5, r: 1.6, fill: color),
+                            tag.circle(cx: 12, cy: 12, r: 1.6, fill: color),
+                            tag.circle(cx: 12, cy: 19, r: 1.6, fill: color)
+                          ]),
+                xmlns: "http://www.w3.org/2000/svg",
+                viewBox: "0 0 24 24",
+                fill: "none",
+                preserveAspectRatio: "xMidYMid meet",
+                width: width, height: height,
+                role: "img", aria: { label: label })
+  end
 end

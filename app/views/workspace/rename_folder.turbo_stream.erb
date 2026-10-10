@@ -1,0 +1,5 @@
+<%# Response to PATCH /workspace/:workspace_id/folders/:id: swap the %>
+<%# folder row (including its subtree) for a freshly rendered one. %>
+<%= turbo_stream.replace "workspace-folder-#{@folder.id}",
+      partial: "workspace/files/items/folder",
+      locals: { folder: @folder, workspace: @workspace } %>
