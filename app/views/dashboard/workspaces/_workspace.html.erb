@@ -1,7 +1,11 @@
 <article class="workspace" id="<%= dom_id workspace %>">
   <%= link_to dashboard_workspace_path(workspace), class: "workspace__media-link", tabindex: "-1", aria: { hidden: true } do %>
     <% if workspace.workspace_image.attached? %>
-      <%= image_tag workspace.workspace_image.variant(:thumb), class: "workspace__image", alt: "" %>
+      <% if workspace.workspace_image.variable? %>
+        <%= image_tag workspace.workspace_image.variant(:thumb), class: "workspace__image", alt: "" %>
+      <% else %>
+        <%= image_tag workspace.workspace_image, class: "workspace__image", alt: "" %>
+      <% end %>
     <% else %>
       <%= render "shared/placeholders/workspace_image", text: "Workspace Banner Image" %>
     <% end %>

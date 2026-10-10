@@ -8,7 +8,11 @@
 <div class="workspace" id="<%= dom_id workspace %>">
   <div class="workspace__container" id="<%= dom_id workspace %>">
     <% if workspace.workspace_image.attached? %>
-      <%= image_tag workspace.workspace_image.variant(:thumb), class: "workspace__image" %>
+      <% if workspace.workspace_image.variable? %>
+        <%= image_tag workspace.workspace_image.variant(:thumb), class: "workspace__image" %>
+      <% else %>
+        <%= image_tag workspace.workspace_image, class: "workspace__image" %>
+      <% end %>
     <% else %>
       <%= render "shared/placeholders/workspace_image", text: "Workspace Banner Image" %>
     <% end %>

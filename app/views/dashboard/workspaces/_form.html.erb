@@ -54,7 +54,7 @@
            data-controller="components--image-dropzone"
            data-action="dragover->components--image-dropzone#dragover dragleave->components--image-dropzone#dragleave drop->components--image-dropzone#drop paste->components--image-dropzone#paste keydown->components--image-dropzone#keydown"
            tabindex="0" role="button" aria-label="Upload workspace image">
-        <%= form.file_field :workspace_image, class: "field file file--dropzone dropzone__input", accept: "image/*",
+        <%= form.file_field :workspace_image, class: "field file file--dropzone dropzone__input", accept: "image/jpeg,image/png,image/gif,image/webp",
               data: { "components--image-dropzone-target": "input",
                       action: "change->components--image-dropzone#preview" } %>
         <img hidden data-components--image-dropzone-target="preview" class="dropzone__preview" alt="Workspace image preview">

@@ -52,6 +52,8 @@ class Workspace < ApplicationRecord
 
   validates :name, presence: true
   validates :feature_set, presence: true
+  validate :workspace_image_content_type
+  validate :workspace_image_size
 
   before_validation :assign_default_owner
   after_create :ensure_root_folder
@@ -104,6 +106,23 @@ class Workspace < ApplicationRecord
   end
 
   private
+
+  def workspace_image_content_type
+    return unless workspace_image.attached?
+
+    type = workspace_image.blob.content_type.to_s
+    unless [ "image/jpeg", "image/png", "image/gif", "image/webp" ].include?(type)
+      errors.add(:workspace_image, "must be an image (jpg, png, gif, webp)")
+    end
+  end
+
+  def workspace_image_size
+    return unless workspace_image.attached?
+
+    if workspace_image.byte_size >= 5.megabytes
+      errors.add(:workspace_image, "must be less than 5MB")
+    end
+  end
 
   def ensure_public_id
     loop do
