@@ -33,7 +33,7 @@ class HomeController < ApplicationController
       ],
       [
         "Does it cost anything?",
-        "It is free while in development. Plans are planned but not final: Education at $2.50 a month with 1 GB, and Paid at $5 a month with 3 GB. Billing is not built yet."
+        "It is free while in development. Plans are planned but not final: Free Plan with 50MB, Education at $2.50 a month with 1 GB, and Paid at $5 a month with 3 GB. Billing is not built yet."
       ],
       [
         "What Markdown is supported?",
@@ -53,11 +53,11 @@ class HomeController < ApplicationController
       ],
       [
         "Can I run it myself?",
-        "Yes. granite-MD is published as a Docker image and needs a Postgres and a Redis database plus an SMTP service for email. The project README has a sample docker-compose file. [LINK TO REPOSITORY]"
+        "Yes. granite-MD is published as a Docker image and needs a Postgres and a Redis database plus an SMTP service for email. The project README has a sample docker-compose file. https://github.com/Acidicts/GraniteMD"
       ],
       [
         "How do I report a bug?",
-        "[SUPPORT CONTACT: email address or issue tracker link]. Reports go straight to the developer."
+        "Create a github issue at https://github.com/Acidicts/GraniteMD for any non sensitive bugs"
       ]
     ]
   end
