@@ -1,2 +1,56 @@
-<h1>Home#team</h1>
-<p>Find me in app/views/home/team.html.erb</p>
+<%= stylesheet_link_tag "pages/home/team", "data-turbo-reload": "true" %>
+
+<div class="body">
+    <div class="header">
+        <div class="header-left">
+            <h5 class="header-title-page">Team</h5>
+            <h1 class="header-title">One developer, <span class="header-title header-title-accent">one project.</span></h1>
+            <p class="header-bio">granite-MD is built and maintained by a single person. No wider team, just one dev and the community.</p>
+        </div>
+    </div>
+
+    <div class="developer">
+        <div class="developer-pfp">
+            <img src="https://avatars.githubusercontent.com/u/111660544">
+        </div>
+        <div class="developer-info">
+            <h2 class="username" title="username">Acidicts</h2>
+            <h5 class="role" title="role">Developer</h5>
+
+            <p class="bio">I chose to make this project after using obsidian md and being unable to use it within networks such as restricted school ones etc, due to software not being installed on school devices.</p>
+            <div class="contact">
+                <%= link_to "https://github.com/Acidicts", class: "btn btn-secondary" do %>
+                    <%= github_icon(width: 32, height: 32) %> Acidicts
+                <% end %>
+            </div>
+        </div>
+    </div>
+
+    <div class="for-you">
+        <h2>What this means for you</h2>
+        <div class="for-you-grid">
+            <div class="for-you-item">
+                <h3>Direct Feedback</h3>
+                <p>No Filtering of ideas, or bugs. All sent straight to the developer and/or community.</p>
+            </div>
+            <div class="for-you-item">
+                <h3>Public Roadmap</h3>
+                <p>What is done, in progress, or planned put into a publicly viewed workspace. ~ When Feature added for roadmaps</p>
+            </div>
+            <div class="for-you-item">
+                <h3>Steady Progress</h3>
+                <p>Development is anchored around my freetime, which is normally quite often, although it would be one feature added at a time instead of massive updates, and overhauls.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bug-banner">
+        <div class="bug-banner-text">
+            <h2>Got feedback or a bug?</h2>
+            <p class="bug-banner-description">Create github issues for new features, for security bugs please wait for integrated system.</p>
+        </div>
+        <div class="bug-banner-actions">
+            <%= link_to "Sign up", signup_path, class: "btn btn-primary" %>
+        </div>
+    </div>
+</div>

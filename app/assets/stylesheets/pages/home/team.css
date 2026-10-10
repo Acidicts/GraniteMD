@@ -1,0 +1,110 @@
+.body {
+    margin: 2rem;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.header-title-page {
+    color: var(--muted);
+    margin-bottom: 0.4rem;;
+}
+
+.header-title {
+    margin: 0;
+    font-size: 2.5rem;
+}
+
+.header-title-accent {
+    color: var(--accent);
+}
+
+.header-bio {
+    max-width: 500px;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.developer {
+    display: flex;
+    flex-direction: row;
+
+    background-color: var(--surface-1);
+    padding: 2rem;
+}
+
+.developer-pfp img {
+    width: 12rem;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+}
+
+.developer-info {
+    margin: 0 2rem;
+}
+
+.developer-info .username {
+    color: var(--text);
+    margin: 0;
+}
+
+.developer-info .role {
+    color: var(--accent);
+    margin: 0;
+}
+
+.developer-info .bio {
+    color: var(--muted);
+    margin: 2rem 0 1rem 0;
+    font-size: 0.8rem;
+}
+
+.for-you-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.for-you-item {
+    background-color: var(--surface-1);
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+.for-you-item p {
+    color: var(--muted);
+    font-size: 0.8rem;
+}
+
+.bug-banner {
+    display: flex;
+    flex-direction: row;
+
+    background-color: var(--surface-1);
+    padding: 1rem;
+    margin: 3rem 0 1rem 0;
+    border-radius: 1rem;
+
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bug-banner-description {
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-top: -0.5rem;
+}
+
+.bug-banner-actions {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+    align-items: center;
+
+    font-weight: 600;
+}
