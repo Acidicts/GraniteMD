@@ -9,6 +9,7 @@
 #  updated_at      :datetime         not null
 #  organisation_id :bigint
 #  owner_id        :integer
+#  public_id       :string
 #
 # Indexes
 #
@@ -37,6 +38,17 @@ class Workspace < ApplicationRecord
     education: 1,
     business: 2
   }
+
+  normalizes :public_id, with: ->(u) { u.strip.downcase }
+  validates :public_id, uniqueness: { case_sensitive: false }
+
+  before_validation :ensure_public_id, if: -> { public_id.blank? }
+
+  # Short URLs (/workspace/:public_id, /dashboard/workspaces/:public_id) use
+  # the public id. Lookups must accept either the numeric id or the public id.
+  def to_param
+    public_id.presence || id&.to_s
+  end
 
   validates :name, presence: true
   validates :feature_set, presence: true
@@ -79,7 +91,26 @@ class Workspace < ApplicationRecord
     (self.owner&.available_storage || 0).to_i
   end
 
+  # Finds by numeric id or public_id (case-insensitive).
+  # to_param emits public_id, so find() by itself would break for slugs.
+  def self.find_by_id_or_public_id!(identifier)
+    find_by(id: identifier) || find_by("LOWER(public_id) = ?", identifier.to_s.downcase)
+  end
+
+  def self.find_by_id_or_public_id(identifier)
+    find_by_id_or_public_id!(identifier)
+  rescue ActiveRecord::RecordNotFound
+    nil
+  end
+
   private
+
+  def ensure_public_id
+    loop do
+      self.public_id = SecureRandom.alphanumeric(8).downcase
+      break unless self.class.where("LOWER(public_id) = ?", public_id).exists?
+    end
+  end
 
   def assign_default_owner
     return if owner_id.present? || self.organisation.present?

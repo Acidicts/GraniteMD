@@ -30,23 +30,23 @@ Rails.application.routes.draw do
   # creation, rename/autosave and deletion all live under /workspace.
   scope "/workspace", controller: "workspace" do
     get "/", to: redirect("/dashboard/workspaces"), as: nil
-    get "/:id", action: :show, as: :workspace
-    get "/:workspace_id/pages/new", to: redirect { |params, _req| "/workspace/#{params[:workspace_id]}" }, as: :new_workspace_page
-    post "/:workspace_id/pages", action: :new_file, as: :workspace_pages
-    post "/:workspace_id/folders", action: :new_folder, as: :workspace_folders
-    patch "/:workspace_id/folders/:id", action: :rename_folder, as: :rename_workspace_folder
-    get "/:workspace_id/pages/:id", action: :change_file, as: :workspace_page
-    patch "/:workspace_id/pages/:id", action: :save_file, as: :save_workspace_page
+    get "/:workspace_public_id", action: :show, as: :workspace
+    get "/:workspace_public_id/pages/new", to: redirect { |params, _req| "/workspace/#{params[:workspace_public_id]}" }, as: :new_workspace_page
+    post "/:workspace_public_id/pages", action: :new_file, as: :workspace_pages
+    post "/:workspace_public_id/folders", action: :new_folder, as: :workspace_folders
+    patch "/:workspace_public_id/folders/:id", action: :rename_folder, as: :rename_workspace_folder
+    get "/:workspace_public_id/pages/:id", action: :change_file, as: :workspace_page
+    patch "/:workspace_public_id/pages/:id", action: :save_file, as: :save_workspace_page
     # Same PATCH path as above (rename form + autosave share one endpoint;
     # WorkspaceController#save_file dispatches on page[name] vs page[body]).
     # Kept as a separate named route so `rename_workspace_page_path` keeps working.
-    patch "/:workspace_id/pages/:id", action: :save_file, as: :rename_workspace_page
-    delete "/:workspace_id/pages/:id", action: :delete_file, as: :delete_workspace_page
+    patch "/:workspace_public_id/pages/:id", action: :save_file, as: :rename_workspace_page
+    delete "/:workspace_public_id/pages/:id", action: :delete_file, as: :delete_workspace_page
   end
 
   scope "/dashboard", as: "dashboard", module: "dashboard" do
     get "/workspaces/new_users", to: "workspaces#new_users"
-    resources :workspaces
+    resources :workspaces, param: :public_id
     resources :users, only: %i[index edit update]
 
     get "you", to: "users#index"

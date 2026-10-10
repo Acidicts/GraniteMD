@@ -75,6 +75,137 @@
   color: var(--muted);
 }
 
+/* File input: <input type="file" class="field file"> */
+.file {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px dashed var(--muted);
+  border-radius: 8px;
+  background: var(--field);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.file:hover {
+  border-color: var(--accent);
+}
+
+.file::file-selector-button {
+  min-height: 28px;
+  margin-right: 12px;
+  padding: 0 12px;
+  border: 1px solid var(--muted);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.file::file-selector-button:hover {
+  background: var(--selection);
+}
+
+.file:focus {
+  border-color: var(--accent);
+  outline: 3px solid var(--selection);
+}
+
+.file:disabled {
+  border-color: var(--border);
+  color: var(--muted);
+  cursor: not-allowed;
+}
+
+.file[aria-invalid="true"] {
+  border-color: var(--danger-text);
+}
+
+/* Dropzone variant: the native "Choose file" button is removed because the
+   components--image-dropzone Stimulus controller provides drag & drop,
+   paste, and click-to-browse with its own prompt/preview UI. */
+.file--dropzone::file-selector-button,
+.file--dropzone::-webkit-file-upload-button {
+  display: none;
+}
+
+.dropzone {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 16px 12px;
+  border: 1px dashed var(--muted);
+  border-radius: 8px;
+  background: var(--field);
+  color: var(--text);
+  cursor: pointer;
+  text-align: center;
+}
+
+.dropzone:hover {
+  border-color: var(--accent);
+}
+
+.dropzone:focus-visible,
+.dropzone:focus-within {
+  border-color: var(--accent);
+  outline: 3px solid var(--selection);
+}
+
+.dropzone.is-dragover {
+  border-color: var(--accent);
+  border-style: solid;
+  background: var(--selection);
+}
+
+/* Invisible input overlay: keeps native click-to-browse and file
+   submission while the dropzone prompt/preview is the visible UI. */
+.dropzone__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.dropzone__input::file-selector-button,
+.dropzone__input::-webkit-file-upload-button {
+  display: none;
+}
+
+.dropzone__preview {
+  max-width: 100%;
+  max-height: 160px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.dropzone__preview[hidden] {
+  display: none;
+}
+
+.dropzone__prompt {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
 .input:focus,
 .select:focus,
 .textarea:focus {

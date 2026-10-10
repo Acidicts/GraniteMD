@@ -1,25 +1,22 @@
 class WorkspaceController < ApplicationController
+  before_action :set_workspace, only: %i[ show new_file new_folder ]
+
   def show
-    workspace = Workspace.find_by(id: params[:id])
-    return redirect_to dashboard_workspaces_path, alert: "We couldn't find that workspace" if workspace.nil?
-    return redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace" unless workspace.users.exists?(current_user.id)
-    @workspace = workspace
     @workspace.ensure_root_folder
 
     render "workspace/show"
   end
 
   def update
-    workspace = Workspace.find_by(id: params[:id])
-    return redirect_to dashboard_workspaces_path, alert: "We couldn't find that workspace" if workspace.nil?
-    return redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace" unless workspace.users.exists?(current_user.id)
-    @workspace = workspace
+    @workspace = Workspace.find_by_id_or_public_id(params[:public_id] || params[:workspace_public_id])
+    return redirect_to dashboard_workspaces_path, alert: "We couldn't find that workspace" if @workspace.nil?
+    return redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace" unless @workspace.users.exists?(current_user.id)
   end
 
   def change_file
     page = Page.find_by(id: params[:id])
     return redirect_to dashboard_workspaces_path, alert: "We couldn't find that page" if page.nil?
-    if params[:workspace_id].present? && page.folder.workspace_id.to_s != params[:workspace_id].to_s
+    if params[:workspace_public_id].present? && !workspace_matches?(page.folder.workspace, params[:workspace_public_id])
       return redirect_to dashboard_workspaces_path, alert: "We couldn't find that page"
     end
     return redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace" unless page.workspace.users.exists?(current_user.id)
@@ -29,9 +26,7 @@ class WorkspaceController < ApplicationController
   alias_method :changeFile, :change_file
 
   def new_file
-    workspace = Workspace.find_by(id: params[:workspace_id])
-    return redirect_to dashboard_workspaces_path, alert: "We couldn't find that workspace" if workspace.nil?
-    return redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace" unless workspace.users.exists?(current_user.id)
+    workspace = @workspace
 
     folder_id = params.dig(:page, :folder_id) || params[:folder_id]
     folder = workspace.folders.find_by(id: folder_id) if folder_id.present?
@@ -69,9 +64,7 @@ class WorkspaceController < ApplicationController
   end
 
   def new_folder
-    workspace = Workspace.find_by(id: params[:workspace_id])
-    return redirect_to dashboard_workspaces_path, alert: "We couldn't find that workspace" if workspace.nil?
-    return redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace" unless workspace.users.exists?(current_user.id)
+    workspace = @workspace
 
     parent_id = params.dig(:folder, :parent_id) || params[:parent_id]
     parent = workspace.folders.find_by(id: parent_id) if parent_id.present?
@@ -206,13 +199,27 @@ class WorkspaceController < ApplicationController
 
   private
 
+  def set_workspace
+    @workspace = Workspace.find_by_id_or_public_id(params[:workspace_public_id])
+    if @workspace.nil?
+      redirect_to dashboard_workspaces_path, alert: "We couldn't find that workspace"
+    elsif !@workspace.users.exists?(current_user.id)
+      redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace"
+    end
+  end
+
+  def workspace_matches?(workspace, identifier)
+    return true if workspace.id.to_s == identifier.to_s
+    workspace.public_id.present? && workspace.public_id.casecmp?(identifier.to_s)
+  end
+
   def find_authorized_page
     page = Page.find_by(id: params[:id])
     if page.nil?
       redirect_to dashboard_workspaces_path, alert: "We couldn't find that page"
       return nil
     end
-    if params[:workspace_id].present? && page.folder.workspace_id.to_s != params[:workspace_id].to_s
+    if params[:workspace_public_id].present? && !workspace_matches?(page.folder.workspace, params[:workspace_public_id])
       redirect_to dashboard_workspaces_path, alert: "We couldn't find that page"
       return nil
     end
@@ -229,7 +236,7 @@ class WorkspaceController < ApplicationController
       redirect_to dashboard_workspaces_path, alert: "We couldn't find that folder"
       return nil
     end
-    if params[:workspace_id].present? && folder.workspace_id.to_s != params[:workspace_id].to_s
+    if params[:workspace_public_id].present? && !workspace_matches?(folder.workspace, params[:workspace_public_id])
       redirect_to dashboard_workspaces_path, alert: "We couldn't find that folder"
       return nil
     end

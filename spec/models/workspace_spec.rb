@@ -11,6 +11,7 @@ require 'rails_helper'
 #  updated_at      :datetime         not null
 #  organisation_id :bigint
 #  owner_id        :integer
+#  public_id       :string
 #
 # Indexes
 #

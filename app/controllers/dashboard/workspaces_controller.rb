@@ -68,7 +68,10 @@ module Dashboard
     private
     # Use callbacks to share common setup or constraints between actions.
     def set_workspace
-      @workspace = Workspace.find(params.expect(:id))
+      @workspace = Workspace.find_by_id_or_public_id(params.expect(:public_id))
+      if @workspace.nil?
+        return redirect_to dashboard_workspaces_path, alert: "We couldn't find that workspace"
+      end
       return if @workspace.users.exists?(current_user.id)
 
       redirect_to dashboard_path
@@ -76,7 +79,7 @@ module Dashboard
 
     # Only allow a list of trusted parameters through.
     def workspace_params
-      permitted = params.require(:workspace).permit(:name, :feature_set, :organisation_id, :owner_id)
+      permitted = params.require(:workspace).permit(:name, :feature_set, :organisation_id, :owner_id, :workspace_image)
       permitted[:organisation_id] = nil if permitted[:organisation_id].blank?
       permitted
     end

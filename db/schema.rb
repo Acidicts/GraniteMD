@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_07_210000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_10_210000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -110,6 +110,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_07_210000) do
     t.integer "feature_set"
     t.bigint "organisation_id"
     t.integer "owner_id"
+    t.string "public_id"
     t.index ["organisation_id"], name: "index_workspaces_on_organisation_id"
   end
 
