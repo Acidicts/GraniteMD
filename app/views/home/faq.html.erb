@@ -1,2 +1,29 @@
-<h1>Home#faq</h1>
-<p>Find me in app/views/home/faq.html.erb</p>
+<%= stylesheet_link_tag "pages/home/faq", "data-turbo-reload": "true" %>
+
+<div class="body">
+    <div class="heading">
+        <div class="development-pill">Early Development</div>
+        <div class="heading-title">
+            <h1 class="heading-title-main">Frequently Asked Questions</h1>
+        </div>
+        <p class="heading-paragraph-about">Plain, simple answers we think you may have</p>
+    </div>
+    
+    <div class="questions" data-controller="home--faq" data-home--faq-questions-value="<%= @faqs.to_json %>">
+        <template data-home--faq-target="template">
+            <div class="question" data-home--faq-target="question">
+                <button type="button" class="question-header" data-action="click->home--faq#toggle" aria-expanded="false">
+                    <h4 class="question-title"></h4>
+                    <span class="question-arrow" aria-hidden="true">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                </button>
+                <div class="question-answer-wrapper">
+                    <p class="question-answer"></p>
+                </div>
+            </div>
+        </template>
+    </div>
+</div>

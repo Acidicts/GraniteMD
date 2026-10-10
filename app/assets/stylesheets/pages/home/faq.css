@@ -1,0 +1,116 @@
+.body {
+    margin: 2rem;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.development-pill {
+    background-color: var(--warn-bg);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.75rem;
+    width: fit-content;
+
+    font-size: 0.7rem;
+}
+
+.heading-title {
+    font-size: 1.5rem;
+}
+
+.heading-title-main {
+    margin-bottom: 0;
+}
+
+.heading-paragraph-about {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--muted);
+    max-width: 650px;
+    text-align: justify;
+}
+
+.questions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    width: 100%;
+}
+
+.question {
+    border: 1px solid var(--border, #e5e5e5);
+    border-radius: 0.75rem;
+    background: var(--surface, #fff);
+    overflow: hidden;
+    width: 100%;
+    transition: color 0.3s ease;
+}
+
+.question.open {
+    border: 1px solid var(--border, #e5e5e5);
+    border-radius: 0.75rem;
+    background: var(--surface-1, #fff);
+}
+
+.question-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    width: 100%;
+    padding: 1rem 1.25rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+}
+
+.question-title {
+    margin: 0;
+}
+
+.question-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.3s ease;
+}
+
+.question.open .question-arrow {
+    transform: rotate(180deg);
+}
+
+.question-answer-wrapper {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transition: grid-template-rows 0.35s ease, opacity 0.25s ease;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.question.open .question-answer-wrapper {
+    grid-template-rows: 1fr;
+    opacity: 1;
+}
+
+.question-answer {
+    overflow: hidden;
+    min-height: 0;
+    margin: 0;
+    padding: 0 1.25rem;
+}
+
+.question.open .question-answer {
+    padding-bottom: 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .question-arrow,
+    .question-answer-wrapper {
+        transition: none;
+    }
+}
