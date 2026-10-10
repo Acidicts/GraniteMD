@@ -12,11 +12,27 @@ body {
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
+    overflow-x: hidden;
+}
+
+html {
+    overflow-x: hidden;
 }
 
 header {
     margin: 0;
     padding: 0;
+    flex-shrink: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.home-main {
+    flex: 1 0 auto;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
 }
 
 /* Nav Bar */
@@ -25,11 +41,13 @@ header {
     flex-direction: row;
 
     width: 100%;
-    overflow-x: hidden;
+    max-width: 100%;
     background-color: var(--surface-1);
     margin: 0;
     padding: 10px 2px;
     justify-content: space-between;
+    align-items: center;
+    gap: 8px;
     box-sizing: border-box;
 }
 
@@ -52,9 +70,10 @@ header {
 }
 
 .nav-bar .nav-left .nav-links {
-    display: inline;
-    justify-content: space-evenly;
-    gap: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 10px;
     margin: -0.25rem 0 0.25rem 15px;
 }
 
@@ -138,6 +157,8 @@ footer {
 
     align-items: center;
     justify-content: space-between;
+    gap: 0.5rem 1rem;
+    flex-wrap: wrap;
     padding: 1rem;
     margin-top: auto;
     flex-shrink: 0;
@@ -145,4 +166,48 @@ footer {
     box-sizing: border-box;
 
     border-top: color-mix(in srgb, var(--muted) 15%, transparent) 1px solid;
+}
+
+.footer-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 4px;
+}
+
+@media (max-width: 640px) {
+    .nav-bar {
+        padding: 8px 8px;
+    }
+
+    .nav-bar .nav-left {
+        margin-left: 0;
+        min-width: 0;
+    }
+
+    .nav-bar .nav-left .nav-links {
+        margin-left: 8px;
+    }
+
+    .nav-bar .nav-left .nav-links .btn-nav {
+        padding: 10px 4px;
+        font-size: 13px;
+    }
+
+    .nav-bar .nav-right {
+        margin-right: 0;
+        flex-shrink: 0;
+    }
+
+    .profile-pill .profile-pill-name {
+        max-width: 18vw;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    footer {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }

@@ -1,13 +1,21 @@
 .body {
-    margin: 2rem;
+    margin: 2rem auto;
+    width: min(1100px, calc(100% - 4rem));
     font-size: 16px;
     font-weight: 500;
+    box-sizing: border-box;
+    min-width: 0;
 }
 
 .header {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 
 .header-title-page {
@@ -18,6 +26,9 @@
 .header-title {
     margin: 0;
     font-size: 2.5rem;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    min-width: 0;
 }
 
 .header-title-accent {
@@ -28,24 +39,36 @@
     max-width: 500px;
     color: var(--muted);
     font-size: 0.9rem;
+    overflow-wrap: break-word;
+    min-width: 0;
 }
 
 .developer {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
 
     background-color: var(--surface-1);
     padding: 2rem;
+    border-radius: 1rem;
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
 }
 
 .developer-pfp img {
     width: 12rem;
+    max-width: 100%;
+    height: auto;
     aspect-ratio: 1/1;
     border-radius: 50%;
 }
 
 .developer-info {
     margin: 0 2rem;
+    flex: 1 1 240px;
+    min-width: 0;
 }
 
 .developer-info .username {
@@ -62,18 +85,32 @@
     color: var(--muted);
     margin: 2rem 0 1rem 0;
     font-size: 0.8rem;
+    overflow-wrap: break-word;
+}
+
+.for-you {
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .for-you-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 15px;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .for-you-item {
     background-color: var(--surface-1);
     padding: 1rem;
     border-radius: 1rem;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
 }
 
 .for-you-item p {
@@ -84,6 +121,7 @@
 .bug-banner {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
 
     background-color: var(--surface-1);
     padding: 1rem;
@@ -92,6 +130,10 @@
 
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .bug-banner-description {
@@ -103,8 +145,67 @@
 .bug-banner-actions {
     display: flex;
     flex-direction: row;
-    gap: 5px;
+    flex-wrap: wrap;
+    gap: 8px;
     align-items: center;
 
     font-weight: 600;
+}
+
+@media (max-width: 900px) {
+    .for-you-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .body {
+        margin: 1rem auto;
+        width: calc(100% - 2rem);
+        font-size: 15px;
+    }
+
+    .header-title {
+        font-size: 1.6rem;
+        overflow-wrap: break-word;
+    }
+
+    .header-bio {
+        max-width: 100%;
+    }
+
+    .developer {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 1.25rem;
+    }
+
+    .developer-info {
+        margin: 0;
+    }
+
+    .developer-info .bio {
+        margin: 1rem 0;
+    }
+
+    .developer .contact {
+        display: flex;
+        justify-content: center;
+    }
+
+    .for-you-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .bug-banner {
+        flex-direction: column;
+        align-items: stretch;
+        margin-top: 2rem;
+    }
+
+    .bug-banner-actions .btn {
+        flex: 1 1 auto;
+        text-align: center;
+    }
 }

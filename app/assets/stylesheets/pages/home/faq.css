@@ -1,7 +1,10 @@
 .body {
-    margin: 2rem;
+    margin: 2rem auto;
+    width: min(1100px, calc(100% - 4rem));
     font-size: 16px;
     font-weight: 500;
+    box-sizing: border-box;
+    min-width: 0;
 }
 
 .development-pill {
@@ -35,6 +38,9 @@
     gap: 0.75rem;
     margin-top: 1.5rem;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .question {
@@ -43,6 +49,9 @@
     background: var(--surface, #fff);
     overflow: hidden;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     transition: color 0.3s ease;
 }
 
@@ -58,6 +67,8 @@
     justify-content: space-between;
     gap: 1rem;
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
     padding: 1rem 1.25rem;
     background: none;
     border: none;
@@ -65,10 +76,13 @@
     text-align: left;
     font: inherit;
     color: inherit;
+    min-width: 0;
 }
 
 .question-title {
     margin: 0;
+    min-width: 0;
+    overflow-wrap: break-word;
 }
 
 .question-arrow {
@@ -99,9 +113,13 @@
 
 .question-answer {
     overflow: hidden;
+    overflow-wrap: break-word;
     min-height: 0;
+    min-width: 0;
     margin: 0;
     padding: 0 1.25rem;
+    box-sizing: border-box;
+    max-width: 100%;
 }
 
 .question.open .question-answer {
@@ -112,5 +130,27 @@
     .question-arrow,
     .question-answer-wrapper {
         transition: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .body {
+        margin: 1rem auto;
+        width: calc(100% - 2rem);
+        font-size: 15px;
+    }
+
+    .heading-title {
+        font-size: 1.15rem;
+        overflow-wrap: break-word;
+    }
+
+    .heading-paragraph-about {
+        font-size: 1rem;
+        text-align: left;
+    }
+
+    .question-header {
+        padding: 0.85rem 1rem;
     }
 }

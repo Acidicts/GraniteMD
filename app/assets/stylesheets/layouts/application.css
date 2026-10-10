@@ -207,3 +207,101 @@ body {
     color: var(--text);
     background: var(--selection);
 }
+
+@media (max-width: 600px) {
+    .app-shell {
+        flex-direction: column;
+    }
+
+    /* Topbar: full-width bar pinned to the top, stacks vertically. */
+    .nav-rail {
+        position: sticky;
+        top: 0;
+        transform: none;
+        align-self: stretch;
+        flex-direction: column;
+        align-items: stretch;
+        margin: 8px 8px 0;
+        border-radius: 20px;
+        z-index: 50;
+    }
+
+    .app-shell.nav-collapsed .nav-rail {
+        margin-right: 8px;
+    }
+
+    /* Collapse wipes vertically instead of sideways. */
+    .nav-clip {
+        flex: none;
+        max-width: none;
+        max-height: 60vh;
+        transition:
+            max-height 0.32s ease,
+            opacity 0.25s ease,
+            visibility 0s;
+    }
+
+    .app-shell.nav-collapsed .nav-clip {
+        max-width: none;
+        max-height: 0;
+        opacity: 0;
+        visibility: hidden;
+        transition:
+            max-height 0.32s ease,
+            opacity 0.25s ease,
+            visibility 0s linear 0.32s;
+    }
+
+    .nav {
+        position: static;
+        flex-direction: column;
+        align-items: stretch;
+        width: auto;
+        max-width: none;
+        padding: 0.75rem;
+        gap: 10px;
+    }
+
+    .app-shell.nav-collapsed .nav,
+    .nav.is-collapsed {
+        transform: translateY(-40%);
+    }
+
+    /* Toggle becomes a full-width bottom cap of the bar. */
+    .nav-toggle {
+        width: auto;
+        align-self: stretch;
+        border-left: 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 0 0 20px 20px;
+        padding: 6px;
+    }
+
+    .app-shell.nav-collapsed .nav-toggle {
+        border-radius: 20px;
+        border-top: 0;
+    }
+
+    /* Chevron: up when open, down when collapsed (overrides desktop 180deg). */
+    .nav-toggle svg {
+        transform: rotate(90deg);
+    }
+
+    .app-shell.nav-collapsed .nav-toggle svg {
+        transform: rotate(-90deg);
+    }
+
+    /* Dropdown stays anchored under the pill instead of flying off-screen. */
+    .nav > div[data-controller] {
+        position: relative;
+    }
+
+    .nav .profile-pill-links {
+        position: absolute;
+        left: 0;
+        top: 100%;
+        transform: none;
+        margin-top: 8px;
+        z-index: 60;
+    }
+}

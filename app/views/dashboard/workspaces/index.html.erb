@@ -18,8 +18,6 @@
       <% @workspaces.each do |workspace| %>
         <%= render workspace %>
       <% end %>
-
-      <%= render "dashboard/workspaces/new_workspace" %>
     </div>
   <% else %>
     <div class="workspaces__empty">
@@ -28,7 +26,6 @@
       <%= link_to "Create Workspace", new_dashboard_workspace_path, class: "btn btn-primary" %>
     </div>
     <div class="workspaces-grid" id="workspaces">
-      <%= render "dashboard/workspaces/new_workspace" %>
     </div>
   <% end %>
 </div>

@@ -1,7 +1,10 @@
 .body {
-    margin: 2rem;
+    margin: 2rem auto;
+    width: min(1100px, calc(100% - 4rem));
     font-size: 16px;
     font-weight: 500;
+    box-sizing: border-box;
+    min-width: 0;
 }
 
 .development-pill {
@@ -15,15 +18,20 @@
 
 .heading-title {
     font-size: 1.5rem;
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: break-word;
 }
 
 .heading-title-main {
     margin-bottom: 0;
+    overflow-wrap: break-word;
 }
 
 .heading-title-accent {
     margin-top: 0;
     color: var(--accent);
+    overflow-wrap: break-word;
 }
 
 .heading-paragraph-about {
@@ -32,6 +40,7 @@
     color: var(--muted);
     max-width: 650px;
     text-align: justify;
+    overflow-wrap: break-word;
 }
 
 .heading-paragraph-note {
@@ -41,6 +50,7 @@
 .heading-actions {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     gap: 10px;
 }
 
@@ -48,17 +58,26 @@
     display: grid;
     grid-template-columns: 2fr 3fr 3fr;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     height: 350px;
     border: var(--border) solid 1px;
     border-radius: 1.2rem;
     gap: 5px;
     padding: 5px;
+    overflow: hidden;
 }
 
 .editor-file-explorer {
     height: 100%;
+    min-width: 0;
+    min-height: 0;
+    box-sizing: border-box;
     background-color: var(--surface-1);
     border-radius: 1rem;
+    overflow: auto;
+    overflow-wrap: break-word;
 }
 
 .editor-file-explorer__header {
@@ -79,6 +98,10 @@
 
 .editor-file-explorer__files__folder__files_file {
     padding-left: 2rem;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .editor-file-explorer__files__folder__files_file-selected {
@@ -92,8 +115,12 @@
 
 .editor-file-editor {
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
     background-color: var(--surface-1);
     border-radius: 1rem;
+    overflow: hidden;
 }
 
 .editor-file-editor-header {
@@ -115,6 +142,8 @@
     font-family: ui-monospace, Menlo, Consolas, monospace;
     counter-reset: line;
     overflow: auto;
+    overflow-wrap: break-word;
+    max-width: 100%;
     padding: 0 0 8px 0;
 }
 
@@ -184,6 +213,11 @@
 
 .editor-file-preview {
     font-weight: 400;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: auto;
+    overflow-wrap: break-word;
 }
 
 .editor-file-preview strong {
@@ -193,6 +227,7 @@
 .development-banner {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
 
     margin: 2rem 0;
     padding: 0.5rem 1rem;
@@ -204,6 +239,10 @@
     align-items: center;
     gap: 1rem;
     justify-content: space-between;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
 }
 
 .development-banner-info {
@@ -212,6 +251,15 @@
 
     align-items: center;
     gap: 1rem;
+    min-width: 0;
+    flex: 1 1 200px;
+    overflow-wrap: break-word;
+}
+
+.features {
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .features-grid {
@@ -220,6 +268,9 @@
     grid-template-rows: repeat(2, 1fr);
 
     gap: 1rem;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .features-grid-feature {
@@ -228,6 +279,10 @@
     border-radius: 1rem;
 
     box-shadow: inset #00000080 0 0 2px;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
 }
 
 .features-grid-feature-icon {
@@ -256,6 +311,7 @@
 .get-started-banner {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
 
     background-color: var(--surface-1);
     padding: 1rem;
@@ -264,6 +320,11 @@
 
     justify-content: space-between;
     align-items: center;
+    gap: 1rem;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow-wrap: break-word;
 }
 
 .get-started-banner-description {
@@ -276,6 +337,97 @@
 .get-started-banner-actions {
     display: flex;
     flex-direction: row;
-    gap: 5px;
+    flex-wrap: wrap;
+    gap: 8px;
     align-items: center;
+}
+
+@media (max-width: 1024px) {
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
+    }
+
+    .editor {
+        grid-template-columns: 1fr 1fr;
+        height: auto;
+        min-height: 350px;
+    }
+
+    .editor-file-preview {
+        grid-column: 1 / -1;
+        min-height: 180px;
+        max-height: 300px;
+    }
+
+    .editor-file-explorer,
+    .editor-file-editor {
+        min-height: 280px;
+    }
+}
+
+@media (max-width: 640px) {
+    .body {
+        margin: 1rem auto;
+        width: calc(100% - 2rem);
+        font-size: 15px;
+    }
+
+    .heading-title {
+        font-size: 1.15rem;
+        overflow-wrap: break-word;
+    }
+
+    .heading-paragraph-about {
+        font-size: 1rem;
+        text-align: left;
+    }
+
+    .editor {
+        grid-template-columns: 1fr;
+        height: auto;
+        padding: 4px;
+    }
+
+    .editor-file-explorer {
+        min-height: 0;
+        max-height: 180px;
+        height: auto;
+    }
+
+    .editor-file-editor {
+        min-height: 240px;
+    }
+
+    .editor-file-preview {
+        min-height: 160px;
+        max-height: none;
+    }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+
+    .features-grid-feature {
+        padding: 1.25rem;
+    }
+
+    .development-banner-info {
+        font-size: 0.85rem;
+    }
+
+    .get-started-banner {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .get-started-banner-actions {
+        width: 100%;
+    }
+
+    .get-started-banner-actions .btn {
+        flex: 1 1 auto;
+        text-align: center;
+    }
 }

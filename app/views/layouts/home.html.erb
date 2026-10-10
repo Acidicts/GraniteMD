@@ -24,51 +24,52 @@
 
     <%= javascript_importmap_tags %>
   </head>
-  <header>
-    <nav class="nav-bar">
-      <div class="nav-left">
-        <%= link_to home_path do %>
-          <div class="nav-logo">
-              <%= logo_svg(width: 32, height: 32) %>
-          </div>
-        <% end %>
-        <div class="nav-links">
-          <%= link_to "About", home_about_path, class: "btn-nav" %>
-          <%= link_to "Team", home_team_path,   class: "btn-nav" %>
-          <%= link_to "FAQ", home_faq_path,     class: "btn-nav" %>
-        </div>
-      </div>
-      <div class="nav-right">
-        <% if current_user %>
-          <%= link_to dashboard_path, class: "btn-dashboard" do %>
-            <%= dashboard_icon(width: 32, height: 32) %>
-          <% end %>
-        <% end %>
-
-        
-        <div data-controller="layouts--profile-pill" data-action="click->layouts--profile-pill#clicked click@window->layouts--profile-pill#close">
-          <%= render "shared/profile_pill" %>
-          <% if current_user %>
-            <div class="profile-pill-links hidden" data-layouts--profile-pill-target="links">
-              <%= link_to "My Profile", dashboard_users_path, class: "btn btn-tertiary" %>
-              <%= link_to "Logout", logout_path, class: "btn btn-tertiary", data: { turbo_method: :delete } %>
+  <body>
+    <header>
+      <nav class="nav-bar">
+        <div class="nav-left">
+          <%= link_to home_path do %>
+            <div class="nav-logo">
+                <%= logo_svg(width: 32, height: 32) %>
             </div>
           <% end %>
+          <div class="nav-links">
+            <%= link_to "About", home_about_path, class: "btn-nav" %>
+            <%= link_to "Team", home_team_path,   class: "btn-nav" %>
+            <%= link_to "FAQ", home_faq_path,     class: "btn-nav" %>
+          </div>
         </div>
+        <div class="nav-right">
+          <% if current_user %>
+            <%= link_to dashboard_path, class: "btn-dashboard" do %>
+              <%= dashboard_icon(width: 32, height: 32) %>
+            <% end %>
+          <% end %>
+
+          <div data-controller="layouts--profile-pill" data-action="click->layouts--profile-pill#clicked click@window->layouts--profile-pill#close">
+            <%= render "shared/profile_pill" %>
+            <% if current_user %>
+              <div class="profile-pill-links hidden" data-layouts--profile-pill-target="links">
+                <%= link_to "My Profile", dashboard_users_path, class: "btn btn-tertiary" %>
+                <%= link_to "Logout", logout_path, class: "btn btn-tertiary", data: { turbo_method: :delete } %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main class="home-main">
+      <%= flash_alerts %>
+      <%= yield %>
+    </main>
+    <footer>
+      <p>Built by <%= link_to "acidicts", home_team_path, class: "btn-nav" %></p>
+      <div class="footer-actions">
+        <%= link_to "Home", home_path, class: "btn-nav" %> |
+        <%= link_to "About", home_about_path, class: "btn-nav" %>
+        <%= link_to "Team", home_team_path, class: "btn-nav" %>
+        <%= link_to "FAQ", home_faq_path, class: "btn-nav" %>
       </div>
-    </nav>
-  </header>
-  <body>
-    <%= flash_alerts %>
-    <%= yield %>
+    </footer>
   </body>
-  <footer>
-    <p>Built by <%= link_to "acidicts", home_team_path, class: "btn-nav" %></p>
-    <div class="footer-actions">
-      <%= link_to "Home", home_path, class: "btn-nav" %> | 
-      <%= link_to "About", home_about_path, class: "btn-nav" %>
-      <%= link_to "Team", home_team_path, class: "btn-nav" %>
-      <%= link_to "FAQ", home_faq_path, class: "btn-nav" %>
-    </div>
-  </footer>
 </html>
