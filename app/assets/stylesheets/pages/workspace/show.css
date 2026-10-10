@@ -172,6 +172,12 @@
     opacity: 0;
 }
 
+.workspace-explorer__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 .workspace-explorer__page-item:hover .workspace-explorer__page-actions,
 .workspace-explorer__page-item:focus-within .workspace-explorer__page-actions {
     opacity: 1;
