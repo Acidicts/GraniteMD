@@ -10,7 +10,7 @@ class WorkspaceController < ApplicationController
   def update
     @workspace = Workspace.find_by_id_or_public_id(params[:public_id] || params[:workspace_public_id])
     return redirect_to dashboard_workspaces_path, alert: "We couldn't find that workspace" if @workspace.nil?
-    return redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace" unless @workspace.users.exists?(current_user.id)
+    redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace" unless @workspace.users.exists?(current_user.id)
   end
 
   def change_file
