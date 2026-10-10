@@ -7,9 +7,16 @@
     <% end %>
 
     <div class="workspace__content">
-      <p><%= workspace.name %></p>
-      <div class="break" style="margin-top: 0 !important;"></div>
-      <p class="workspace__owner"><%= workspace.display_owner_or_organisation %></p>
+      <div class="workspace__content_name">
+        <p><%= workspace.name %></p>
+        <div class="break" style="margin-top: 0 !important;"></div>
+        <p class="workspace__owner"><%= workspace.display_owner_or_organisation %></p>
+      </div>
+      <div>
+        <%= link_to workspace_path(workspace), class: "btn btn-icon", aria: { label: "View Workspace" }, title: "View Workspace" do %>
+          <%= view_icon %>
+        <% end %>
+      </div>
     </div>
   </div>
 <% end %>

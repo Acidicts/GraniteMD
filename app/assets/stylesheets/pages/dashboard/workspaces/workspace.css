@@ -20,6 +20,12 @@
 }
 
 .workspace__content {
+    display: grid;
+    grid-template-columns: 5fr 1fr;
+    align-items: center;
+}
+
+.workspace__content_name {
     display: flex;
     flex-direction: column;
     margin: 0.5rem;
