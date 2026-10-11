@@ -47,6 +47,14 @@ class User < ApplicationRecord
             if: -> { password.present? }
   validates :password_confirmation, presence: true, if: -> { password.present? }
 
+  # NB: `attribute ... default:` must come *before* `encrypts` — `attribute`
+  # declares a PendingType that would otherwise overwrite the
+  # EncryptedAttributeType installed by `encrypts`, leaving a plain
+  # ActiveModel::Type::String that does not respond to `deterministic?`
+  # (crashes User.deterministic_encrypted_attributes / authenticate_by).
+  attribute :first_name, :string, default: ""
+  attribute :last_name, :string, default: ""
+
   encrypts :first_name
   encrypts :last_name
 
@@ -55,10 +63,7 @@ class User < ApplicationRecord
   validate :pfp_image_size
 
 
-  attribute :first_name, null: false, default: ""
-  attribute :last_name,  null: false, default: ""
-
-  attribute :role, default: 0
+  attribute :role, :integer, default: 0
   enum :role, {
     user:       0, # Standard User
     admin:      1, # Operations (Org Approval)
