@@ -27,6 +27,7 @@ Rails.application.configure do
   config.hosts << "www.example.com"
   config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
   config.cache_store = :null_store
+  config.active_job.queue_adapter = :test
 
   # Render exception templates for rescuable exceptions and raise for other exceptions.
   config.action_dispatch.show_exceptions = :rescuable

@@ -1,0 +1,36 @@
+<% content_for :title, "Organisations" %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "pages/dashboard/organisations/organisation_application", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "pages/dashboard/organisations/organisation", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "pages/dashboard/organisations/index", "data-turbo-track": "reload" %>
+<% end %>
+
+<div class="organisations">
+  <div class="organisations__header">
+    <div>
+      <h1 class="organisations__title">Your Organisations</h1>
+      <p class="organisations__count"><%= pluralize(@organisations.count, "organisations") %></p>
+    </div>
+    <%= link_to "New Organisation", new_dashboard_organisation_path, class: "btn btn-primary" %>
+  </div>
+
+  <% if @organisations.any? || @organisation_applications.any? %>
+    <div class="organisations-grid" id="organisations">
+      <% @organisations.each do |organisation| %>
+        <%= render "organisation", organisation: organisation %>
+      <% end %>
+
+      <% @organisation_applications.each do |organisation_application| %>
+        <%= render "organisation_application", organisation_application: organisation_application %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="organisations__empty">
+      <p class="organisations__empty-title">No organisation yet</p>
+      <p class="organisations__empty-text">Create your first organisation to start writing, shared documents, with lock.</p>
+      <%= link_to "Create Organisation", new_dashboard_organisation_path, class: "btn btn-primary" %>
+    </div>
+    <div class="organisations-grid" id="organisations">
+    </div>
+  <% end %>
+</div>

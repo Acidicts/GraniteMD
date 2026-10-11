@@ -16,6 +16,9 @@ gem "propshaft"
 gem "pg"
 gem "redis"
 
+gem "solid_queue"
+gem "mission_control-jobs"
+
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 gem "importmap-rails"
 

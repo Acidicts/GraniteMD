@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  # mount MissionControl::Jobs::Engine, at: "/jobs"
   root "home#index", as: :home
 
   controller :home do
@@ -47,6 +48,7 @@ Rails.application.routes.draw do
   scope "/dashboard", as: "dashboard", module: "dashboard" do
     get "/workspaces/new_users", to: "workspaces#new_users"
     resources :workspaces, param: :public_id
+    resources :organisations, param: :public_id
     resources :users, only: %i[index edit update]
 
     get "you", to: "users#index"

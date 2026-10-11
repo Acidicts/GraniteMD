@@ -1,0 +1,14 @@
+<article class="organisation" id="<%= dom_id organisation %>">
+  <div class="organisation__content">
+    <div class="organisation__content_name">
+      <%= link_to organisation.name, dashboard_organisation_path(organisation), class: "organisation__name-link" %>
+      <div class="break" style="margin-top: 0 !important;"></div>
+      <p class="organisation__meta"><%= pluralize(organisation.users.count, "member") %> &middot; <%= pluralize(organisation.workspaces.count, "workspace") %></p>
+    </div>
+    <div class="organisation__actions">
+      <%= link_to dashboard_organisation_path(organisation), class: "btn btn-icon", aria: { label: "View #{organisation.name}" }, title: "View Organisation" do %>
+        <%= view_icon %>
+      <% end %>
+    </div>
+  </div>
+</article>

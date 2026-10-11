@@ -78,4 +78,9 @@ Rails.application.configure do
     config.action_mailer.delivery_method = :file
     config.action_mailer.file_settings = { location: Rails.root.join("tmp", "mails") }
   end
+
+  # Mission Control ships with HTTP basic auth enabled but no credentials set,
+  # which returns a bare 401. In development, rely on the app's own session
+  # login (its controller inherits ApplicationController) instead.
+  config.mission_control.jobs.http_basic_auth_enabled = false
 end

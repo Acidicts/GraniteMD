@@ -14,12 +14,20 @@ module Dashboard
     # GET /dashboard/workspaces/new
     def new
       @workspace = Workspace.new
+      if params[:organisation].present?
+        ident = params[:organisation].to_s
+        # `new_dashboard_workspace_path(organisation: @organisation)` emits the
+        # public_id via to_param, but accept a numeric id too.
+        org = Organisation.find_by(id: ident) if ident.match?(/\A\d+\z/)
+        org ||= Organisation.find_by("LOWER(public_id) = ?", ident.downcase)
+        @workspace.organisation = org if org && org.users.exists?(current_user.id)
+      end
+      @org_locked = ActiveModel::Type::Boolean.new.cast(params[:org_locked]) && @workspace.organisation_id.present?
     end
 
     def new_users
       @users = []
       if params[:id].present?
-        return unless Organisation.find(id: params[:id]).users.include?(current_user)
         organisation = Organisation.find_by(id: params[:id])
         @users = organisation.users if organisation&.users&.include?(current_user)
       end
@@ -28,14 +36,18 @@ module Dashboard
 
     # GET /dashboard/workspaces/:id/edit
     def edit
+      @org_locked = false
     end
 
     # POST /dashboard/workspaces
     def create
-      unless params[:organisation_id].nil? || Organisation.find(id: workspace_params[:organisation_id])&.users.include?(current_user)
-        return redirect_to "You are not in this organisation"
-      end
       @workspace = Workspace.new(workspace_params)
+      if @workspace.organisation_id.present?
+        org = Organisation.find_by(id: @workspace.organisation_id)
+        unless org&.users&.include?(current_user)
+          return redirect_to dashboard_workspaces_path, alert: "You are not in this organisation"
+        end
+      end
       @workspace.owner = current_user if @workspace.organisation_id.blank? && @workspace.owner_id.blank?
 
       if @workspace.save
@@ -44,6 +56,7 @@ module Dashboard
 
         redirect_to dashboard_workspace_path(@workspace), notice: "Workspace was successfully created."
       else
+        @org_locked = false
         render :new, status: :unprocessable_content
       end
     end
@@ -54,6 +67,7 @@ module Dashboard
       if @workspace.update(workspace_params)
         redirect_to dashboard_workspace_path(@workspace), notice: "Workspace was successfully updated.", status: :see_other
       else
+        @org_locked = false
         render :edit, status: :unprocessable_content
       end
     end

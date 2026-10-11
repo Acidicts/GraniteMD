@@ -1,0 +1,126 @@
+.organisation-application {
+    background-color: var(--surface-1);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.organisation-application__content {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    gap: 0.75rem 1rem;
+    padding: 0.9rem 1rem;
+}
+
+.organisation-application__content_name {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+}
+
+.organisation-application__content_name > p {
+    margin: 0;
+}
+
+.organisation-application__name {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.3;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.organisation-application__pitch {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.45;
+    color: var(--muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    overflow: hidden;
+}
+
+.organisation-application__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    line-height: 1;
+    padding: 0.4rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.organisation-application__status::before {
+    content: "";
+    width: 0.45em;
+    height: 0.45em;
+    border-radius: 50%;
+    background-color: currentColor;
+    flex-shrink: 0;
+}
+
+.organisation-application__status--queued,
+.organisation-application__status--pending {
+    background-color: color-mix(in srgb, #e0b04a 22%, transparent);
+    color: #7a5a00;
+    border-color: color-mix(in srgb, #e0b04a 45%, transparent);
+}
+
+.organisation-application__status--created,
+.organisation-application__status--approved {
+    background-color: color-mix(in srgb, var(--link) 16%, transparent);
+    color: var(--link);
+    border-color: color-mix(in srgb, var(--link) 35%, transparent);
+}
+
+.organisation-application__status--rejected {
+    background-color: var(--danger-tint);
+    color: var(--danger-text);
+    border-color: color-mix(in srgb, var(--danger) 35%, transparent);
+}
+
+.organisation-application__meta {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--muted);
+}
+
+.organisation-application__actions {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+.organisation-application__actions > p {
+    margin: 0;
+}
+
+@media (max-width: 480px) {
+    .organisation-application__content {
+        grid-template-columns: 1fr;
+    }
+
+    .organisation-application__status {
+        justify-self: start;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .organisation-application__status--queued,
+    .organisation-application__status--pending {
+        color: #f0c96a;
+    }
+}

@@ -1,0 +1,18 @@
+<article class="organisation-application" id="<%= dom_id organisation_application %>">
+  <div class="organisation-application__content">
+    <div class="organisation-application__content_name">
+      <p class="organisation-application__name"><%= organisation_application.name %></p>
+      <% if organisation_application.respond_to?(:pitch) && organisation_application.pitch.present? %>
+        <p class="organisation-application__pitch"><span style="color: var(--text)">For</span> <%= truncate(organisation_application.pitch, length: 120) %></p>
+      <% end %>
+      <p class="organisation-application__meta">Applied <%= time_ago_in_words(organisation_application.created_at) %> ago</p>
+    </div>
+    <div class="organisation-application__actions">
+      <p>
+        <span class="organisation-application__status organisation-application__status--<%= organisation_application.status %>">
+            <%= organisation_application.status.humanize %>
+        </span>
+      </p>
+    </div>
+  </div>
+</article>

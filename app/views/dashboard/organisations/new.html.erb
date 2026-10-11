@@ -1,0 +1,39 @@
+<%= stylesheet_link_tag "pages/dashboard/organisations/new"%>
+<%= stylesheet_link_tag "components/forms"%>
+
+<div class="organisation-form-new__container">
+    <div class="organisation-form-new__header">
+        <h2>Organisation Application</h2>
+        <p>Create an application for admins to review before your org is created</p>
+    </div>
+    <%= form_with model: @organisation,
+                url: dashboard_organisations_path, class: "organisation-form__form" do |form| %>
+        <% if @organisation.errors.any? %>
+            <%= alert_box(:error,
+                        title: "#{pluralize(@organisation.errors.count, "error")} prohibited this organisation from being saved:",
+                        dismissible: false) do %>
+            <ul>
+                <% @organisation.errors.each do |error| %>
+                <li><%= error.full_message %></li>
+                <% end %>
+            </ul>
+            <% end %>
+        <% end %>
+        <div class="organisations-form__fields">
+            <div class="form-grid">
+                <div class="form-group">
+                    <%= form.label :name, class: "label" %>
+                    <%= form.text_field :name, required: true, class: "field input", placeholder: "Bing Bong Studios" %>
+                </div>
+            </div>
+            <div class="form-group">
+                <%= form.label :pitch, class: "label" %>
+                <%= form.textarea :pitch, required: true, class: "field textarea", placeholder: "I want a organisation to share with my class" %>
+            </div>
+        </div>
+        
+        <div class="workspace-form__actions">
+            <%= form.submit "Submit", class: "btn btn-secondary" %>
+        </div>
+    <% end %>
+</div>

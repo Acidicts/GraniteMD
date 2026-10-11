@@ -76,6 +76,10 @@ module Granitemd
 
     config.active_storage.variant_processor = :vips
 
+    # Solid Queue (single-database setup: queue tables live in the primary
+    # database via a regular migration, so no `connects_to` override needed).
+    config.active_job.queue_adapter = :solid_queue
+
     config.hosts << Granitemd.app_host(env_key: "APP_URL", default: "localhost")
 
     # Configuration for the application, engines, and railties goes here.

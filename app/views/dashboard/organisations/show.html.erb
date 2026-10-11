@@ -1,0 +1,34 @@
+<% content_for :title, @organisation.name %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "pages/dashboard/workspaces/workspace", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "pages/dashboard/workspaces/index", "data-turbo-track": "reload" %>
+<% end %>
+
+<div class="workspaces">
+  <div class="workspaces__header">
+    <div>
+      <h1 class="workspaces__title"><%= @organisation.name %></h1>
+      <p class="workspaces__count"><%= pluralize(@workspaces.count, "workspace") %> &middot; <%= pluralize(@organisation.users.count, "member") %></p>
+    </div>
+    <div>
+      <%= link_to "Back to Organisations", dashboard_organisations_path, class: "btn btn-secondary" %>
+      <%= link_to "New Workspace", new_dashboard_workspace_path(organisation: @organisation, org_locked: true), class: "btn btn-primary" %>
+    </div>
+  </div>
+
+  <% if @workspaces.any? %>
+    <div class="workspaces-grid" id="workspaces">
+      <% @workspaces.each do |workspace| %>
+        <%= render "dashboard/workspaces/workspace", workspace: workspace %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="workspaces__empty">
+      <p class="workspaces__empty-title">No workspaces yet</p>
+      <p class="workspaces__empty-text">This organisation doesn't have any workspaces yet.</p>
+      <%= link_to "Create Workspace", new_dashboard_workspace_path(organisation: @organisation, org_locked: true), class: "btn btn-primary" %>
+    </div>
+    <div class="workspaces-grid" id="workspaces">
+    </div>
+  <% end %>
+</div>
