@@ -1,0 +1,5 @@
+<%# Response to POST /workspace/:workspace_id/roadmaps: reload the file %>
+<%# explorer via Turbo so the new roadmap appears in the tree. %>
+<%= turbo_stream.replace "workspace-file-explorer",
+      partial: "workspace/file_explorer",
+      locals: { workspace: @workspace } %>

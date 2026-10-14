@@ -1,5 +1,5 @@
 class WorkspaceController < ApplicationController
-  before_action :set_workspace, only: %i[ show new_file new_folder ]
+  before_action :set_workspace, only: %i[ show new_file new_roadmap new_folder ]
 
   def show
     @workspace.ensure_root_folder
@@ -25,26 +25,34 @@ class WorkspaceController < ApplicationController
   end
   alias_method :changeFile, :change_file
 
+  def change_roadmap
+    roadmap = Roadmap.find_by(id: params[:id])
+    return redirect_to dashboard_workspaces_path, alert: "We couldn't find that roadmap" if roadmap.nil?
+    if params[:workspace_public_id].present? && !workspace_matches?(roadmap.folder.workspace, params[:workspace_public_id])
+      return redirect_to dashboard_workspaces_path, alert: "We couldn't find that roadmap"
+    end
+    return redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace" unless roadmap.workspace.users.exists?(current_user.id)
+
+    @categories = roadmap.roadmap_catagory
+
+    render partial: "workspace/roadmap_editor", locals: { roadmap: roadmap, workspace: roadmap.workspace }
+  end
+
   def new_file
     workspace = @workspace
 
     folder_id = params.dig(:page, :folder_id) || params[:folder_id]
     folder = workspace.folders.find_by(id: folder_id) if folder_id.present?
     if folder.nil?
-      # A folder was picked but doesn't belong to this workspace: reject
-      # instead of dropping the file into the root folder.
       if folder_id.present?
         return redirect_to workspace_path(workspace), alert: "Choose a folder for the new file"
       end
-      # Single-root design: everything lives inside the workspace's one
-      # root folder. Fall back to it (creating/consolidating if needed).
       folder = workspace.ensure_root_folder
     end
     if folder.nil? || !folder.persisted?
       return redirect_to workspace_path(workspace), alert: "Choose a folder for the new file"
     end
 
-    # Explorer already appends ".md", so strip it (and whitespace) if typed.
     name = params.dig(:page, :name).to_s.strip.sub(/\.(md|markdown)\z/i, "").strip
     @workspace = workspace
     @page = folder.pages.build(name: name, body: "")
@@ -63,6 +71,133 @@ class WorkspaceController < ApplicationController
     end
   end
 
+  def new_roadmap
+    workspace = @workspace
+
+    folder_id = params.dig(:roadmap, :folder_id) || params[:folder_id]
+    folder = workspace.folders.find_by(id: folder_id) if folder_id.present?
+    if folder.nil?
+      if folder_id.present?
+        return redirect_to workspace_path(workspace), alert: "Choose a folder for the new roadmap"
+      end
+      folder = workspace.ensure_root_folder
+    end
+    if folder.nil? || !folder.persisted?
+      return redirect_to workspace_path(workspace), alert: "Choose a folder for the new roadmap"
+    end
+
+    name = params.dig(:roadmap, :name).to_s.strip
+    @workspace = workspace
+    @roadmap = folder.roadmaps.build(name: name, body: "")
+
+    if name.blank?
+      return redirect_to workspace_path(workspace), alert: "Roadmap name can't be blank"
+    end
+
+    if @roadmap.save
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to workspace_path(workspace), notice: "Roadmap created" }
+      end
+    else
+      redirect_to workspace_path(workspace), alert: @roadmap.errors.full_messages.to_sentence
+    end
+  end
+
+  def new_catagory
+    roadmap = find_authorized_roadmap
+    return if roadmap.nil?
+
+    name = params.dig(:roadmap_catagory, :name).to_s.strip
+    @workspace = roadmap.workspace
+    @roadmap = roadmap
+    @roadmap_catagory = RoadmapCatagory.new(roadmap: roadmap, name: name)
+
+    if name.blank?
+      @roadmap_catagory.errors.add(:name, "can't be blank")
+      return render_roadmap_editor(roadmap)
+    end
+
+    if @roadmap_catagory.save
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to workspace_roadmap_path(@workspace, roadmap), notice: "Catagory created" }
+      end
+    else
+      render_roadmap_editor(roadmap)
+    end
+  end
+
+  def new_roadmap_item
+    roadmap = find_authorized_roadmap
+    return if roadmap.nil?
+
+    @workspace = roadmap.workspace
+    @roadmap = roadmap
+    @roadmap_task = RoadmapTask.new(roadmap: roadmap,
+                                    header: params.dig(:roadmap_task, :header).to_s.strip,
+                                    body: params.dig(:roadmap_task, :body).to_s.strip)
+    @roadmap_task.assignee = current_user
+
+    catagory = authorized_item_catagory(roadmap)
+    if catagory.nil?
+      @roadmap_task.errors.add(:category, "must be a catagory on this roadmap")
+      return render_roadmap_editor(roadmap)
+    end
+    @roadmap_task.category = catagory.id
+    @roadmap_catagory = catagory
+
+    if @roadmap_task.save
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to workspace_roadmap_path(@workspace, roadmap), notice: "Item created" }
+      end
+    else
+      render_roadmap_editor(roadmap)
+    end
+  end
+
+  def edit_roadmap_item
+    roadmap = find_authorized_roadmap
+    return if roadmap.nil?
+
+    task = roadmap.roadmap_tasks.find_by(id: params[:item_id])
+    if task.nil?
+      return redirect_to workspace_roadmap_path(roadmap.workspace, roadmap), alert: "We couldn't find that item"
+    end
+
+    @workspace = roadmap.workspace
+    @roadmap = roadmap
+    @roadmap_task = task
+
+    render_edit_form(task, roadmap)
+  end
+
+  def update_roadmap_item
+    roadmap = find_authorized_roadmap
+    return if roadmap.nil?
+
+    task = roadmap.roadmap_tasks.find_by(id: params[:item_id])
+    return render_item_update_error(roadmap, "We couldn't find that item") if task.nil?
+
+    attributes = task_update_attributes(roadmap)
+    return if attributes.nil?
+
+    if task.update(attributes)
+      @roadmap_task = task
+      respond_to do |format|
+        format.json { render json: { ok: true, id: task.id, catagory_id: task.category } }
+        format.turbo_stream
+        format.html { redirect_to workspace_roadmap_path(roadmap.workspace, roadmap), notice: "Item updated" }
+      end
+    else
+      @workspace = roadmap.workspace
+      @roadmap = roadmap
+      @roadmap_task = task
+      render_edit_form(task, roadmap, status: :unprocessable_content)
+    end
+  end
+
   def new_folder
     workspace = @workspace
 
@@ -71,8 +206,7 @@ class WorkspaceController < ApplicationController
     if parent.nil? && parent_id.present?
       return redirect_to workspace_path(workspace), alert: "We couldn't find that folder"
     end
-    # Single-root design: new folders always live inside the tree.
-    # No parent given means "directly under the root folder".
+
     parent ||= workspace.ensure_root_folder
 
     name = params.dig(:folder, :name).to_s.strip
@@ -101,9 +235,6 @@ class WorkspaceController < ApplicationController
     @workspace = page.workspace
     @page = page
 
-    # Rename flow (form sends page[name]) shares the same PATCH URL as
-    # autosave (see routes). Dispatch on which param is present so both
-    # helpers keep working despite sharing one path.
     if params.dig(:page, :name).present? || (params.key?(:page) && params[:page].key?(:name))
       name = sanitized_page_name(params.dig(:page, :name))
       if name.blank?
@@ -135,9 +266,9 @@ class WorkspaceController < ApplicationController
       end
     else
       respond_to do |format|
-        format.json { render json: { ok: false, errors: page.errors.full_messages }, status: :unprocessable_entity }
+        format.json { render json: { ok: false, errors: page.errors.full_messages }, status: :unprocessable_content }
         format.html { redirect_to workspace_path(@workspace), alert: page.errors.full_messages.to_sentence }
-        format.turbo_stream { head :unprocessable_entity }
+        format.turbo_stream { head :unprocessable_content }
       end
     end
   end
@@ -197,7 +328,143 @@ class WorkspaceController < ApplicationController
     end
   end
 
+  def save_roadmap
+    roadmap = find_authorized_roadmap
+    return if roadmap.nil?
+
+    @workspace = roadmap.workspace
+    @roadmap = roadmap
+
+    if params.key?(:roadmap) && params[:roadmap].key?(:name)
+      name = params.dig(:roadmap, :name).to_s.strip
+      if name.blank?
+        return redirect_to workspace_path(@workspace), alert: "Roadmap name can't be blank"
+      end
+
+      if roadmap.update(name: name)
+        @roadmap = roadmap
+        respond_to do |format|
+          format.turbo_stream { render :rename_roadmap }
+          format.html { redirect_to workspace_path(@workspace), notice: "Roadmap renamed" }
+        end
+      else
+        redirect_to workspace_path(@workspace), alert: roadmap.errors.full_messages.to_sentence
+      end
+      return
+    end
+
+    body = params.dig(:roadmap, :body)
+    body = params.dig(:page, :body) if body.nil?
+    body = params[:body] if body.nil? && params.key?(:body)
+    body = "" if body.nil?
+
+    if roadmap.update(body: body)
+      respond_to do |format|
+        format.json { render json: { ok: true, id: roadmap.id, updated_at: roadmap.updated_at } }
+        format.turbo_stream { head :ok }
+        format.html { redirect_to workspace_path(@workspace), notice: "Roadmap saved" }
+      end
+    else
+      respond_to do |format|
+        format.json { render json: { ok: false, errors: roadmap.errors.full_messages }, status: :unprocessable_content }
+        format.html { redirect_to workspace_path(@workspace), alert: roadmap.errors.full_messages.to_sentence }
+        format.turbo_stream { head :unprocessable_content }
+      end
+    end
+  end
+
+  def delete_roadmap
+    roadmap = find_authorized_roadmap
+    return if roadmap.nil?
+
+    @workspace = roadmap.workspace
+    @roadmap_id = roadmap.id
+    roadmap.destroy
+    respond_to do |format|
+      format.turbo_stream
+      format.html { redirect_to workspace_path(@workspace), notice: "Roadmap deleted" }
+    end
+  end
+
   private
+
+  def render_edit_form(task, roadmap, status: :ok)
+    render partial: "workspace/files/forms/edit_roadmap_item",
+           locals: { workspace: roadmap.workspace, roadmap: roadmap, roadmap_task: task },
+           formats: [ :html ],
+           status: status
+  end
+
+  def render_roadmap_editor(roadmap)
+    @categories = roadmap.roadmap_catagory.reload
+
+    respond_to do |format|
+      format.turbo_stream do
+        render partial: "workspace/roadmap_editor",
+               locals: { roadmap: roadmap, workspace: roadmap.workspace },
+               formats: [ :html ]
+      end
+      format.html do
+        redirect_to workspace_roadmap_path(roadmap.workspace, roadmap),
+                    alert: @roadmap_catagory.errors.full_messages.to_sentence
+      end
+    end
+  end
+
+  def authorized_item_catagory(roadmap)
+    id = params.dig(:roadmap_task, :category).to_i
+    return nil unless id.positive?
+
+    roadmap.roadmap_catagory.find_by(id: id)
+  end
+
+  def task_update_attributes(roadmap)
+    permitted = params.fetch(:roadmap_task, ActionController::Parameters.new)
+                      .permit(:header, :body, :category_index, :assignee_id)
+    attributes = permitted.to_h.symbolize_keys
+    attributes.delete_if { |_, value| value.nil? }
+    if attributes.key?(:assignee_id)
+      assignee = authorized_assignee(roadmap)
+      if assignee.nil? && params.dig(:roadmap_task, :assignee_id).present?
+        render_item_update_error(roadmap, "must be someone in this workspace")
+        return nil
+      end
+      return attributes.except(:assignee_id).merge(assignee: assignee)
+    end
+    return attributes unless attributes.key?(:category_index)
+
+    catagory = catagory_at_index(roadmap)
+    if catagory.nil?
+      render_item_update_error(roadmap, "must be a catagory on this roadmap")
+      return nil
+    end
+
+    attributes.merge(category: catagory.id).except(:category_index)
+  end
+
+  def catagory_at_index(roadmap)
+    raw = params.dig(:roadmap_task, :category_index).to_s
+    return nil unless raw.match?(/\A\d+\z/)
+
+    roadmap.roadmap_catagory[raw.to_i]
+  end
+
+  def authorized_assignee(roadmap)
+    raw = params.dig(:roadmap_task, :assignee_id).to_s
+    return nil if raw.blank?
+
+    return nil unless raw.match?(/\A\d+\z/)
+
+    roadmap.workspace.users.find_by(id: raw.to_i)
+  end
+
+  def render_item_update_error(roadmap, message)
+    respond_to do |format|
+      format.json { render json: { ok: false, errors: [ message ] }, status: :unprocessable_content }
+      format.turbo_stream { head :unprocessable_content }
+      format.html { redirect_to workspace_roadmap_path(roadmap.workspace, roadmap), alert: message }
+    end
+  end
 
   def set_workspace
     @workspace = Workspace.find_by_id_or_public_id(params[:workspace_public_id])
@@ -245,6 +512,23 @@ class WorkspaceController < ApplicationController
       return nil
     end
     folder
+  end
+
+  def find_authorized_roadmap
+    roadmap = Roadmap.find_by(id: params[:id])
+    if roadmap.nil?
+      redirect_to dashboard_workspaces_path, alert: "We couldn't find that roadmap"
+      return nil
+    end
+    if params[:workspace_public_id].present? && !workspace_matches?(roadmap.folder.workspace, params[:workspace_public_id])
+      redirect_to dashboard_workspaces_path, alert: "We couldn't find that roadmap"
+      return nil
+    end
+    unless roadmap.workspace.users.exists?(current_user.id)
+      redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace"
+      return nil
+    end
+    roadmap
   end
 
   def sanitized_page_name(raw)

@@ -1,0 +1,54 @@
+<%# Locals: roadmap_task (the persisted record). %>
+<%= turbo_frame_tag "roadmap-task-#{roadmap_task.id}" do %>
+    <%# An unsaved task has no roadmap, so the workspace and the assign URL are %>
+    <%# resolved defensively -- the editor only ever renders saved cards, but %>
+    <%# this partial is also rendered directly. %>
+    <% roadmap = roadmap_task.roadmap %>
+    <% workspace = roadmap&.workspace %>
+    <% assignable = roadmap_task.persisted? && roadmap&.persisted? && workspace&.persisted? %>
+    <div class="roadmap-task" data-roadmap-task-id="<%= roadmap_task.id %>" draggable=true>
+        <div class="roadmap-task__header" draggable=true>
+            <div class="roadmap-task__header-assignee-info" draggable=true>
+                <% assignee = roadmap_task.assignee %>
+                <% if assignee %>
+                    <span class="roadmap-task__assignee">
+                        <span class="roadmap-task__assignee-avatar" aria-hidden="true"><%= assignee.username.first&.upcase %></span>
+                        <span class="roadmap-task__assignee-name"><%= assignee.username %></span>
+                    </span>
+                <% elsif assignable %>
+                    <%# Nobody owns this item, so the pill doubles as the entry %>
+                    <%# point to the picker. The URL is resolved here rather than %>
+                    <%# in the dialog because the dialog is shared by every card. %>
+                    <button type="button"
+                            class="roadmap-task__assignee roadmap-task__assignee--empty"
+                            data-roadmap-assignee-trigger
+                            data-assign-url="<%= workspace_roadmap_item_path(workspace, roadmap, roadmap_task) %>"
+                            aria-haspopup="dialog"
+                            title="Assign this item">
+                        Unassigned
+                    </button>
+                <% else %>
+                    <span class="roadmap-task__assignee roadmap-task__assignee--empty">Unassigned</span>
+                <% end %>
+                <% if workspace %>
+                    <% org_name = workspace.organisation&.name %>
+                    <% label = org_name.presence || workspace.name %>
+                    <span class="roadmap-task__workspace" title="<%= label %>"><%= label %></span>
+                <% end %>
+            </div>
+            <div class="actions">
+                <% if assignable %>
+                <%= link_to edit_workspace_roadmap_item_path(workspace, roadmap, roadmap_task),
+                    class: "btn btn-icon",
+                    title: "Edit item",
+                    aria: { label: "Edit #{roadmap_task.header}" } do %>
+                    <%= edit_icon() %>
+                <% end %>
+                <% end %>
+                <%= draggable_icon() %>
+            </div>
+        </div>
+        <%= roadmap_task.header %>
+        <%= roadmap_task.body %>
+    </div>
+<% end %>

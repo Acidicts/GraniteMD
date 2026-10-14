@@ -12,8 +12,9 @@
 #
 FactoryBot.define do
   factory :organisation_application do
-    status { 1 }
-    name { "MyString" }
-    owner_id { 1 }
+    name { "Acme Org" }
+    pitch { "We need a shared workspace for our team." }
+    owner_id { create(:user).id }
+    status { :pending }
   end
 end

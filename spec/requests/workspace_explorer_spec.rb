@@ -126,11 +126,12 @@ RSpec.describe "Workspace explorer (verification)", type: :request do
     let!(:folder) { Folder.create!(name: "Docs", workspace: workspace) }
     let!(:page) { Page.create!(name: "draft", body: "hi", folder: folder) }
 
-    it "shows rename/delete controls on each page row" do
+    it "renders page rows with a context menu for rename/delete" do
       get workspace_path(workspace)
       expect(response).to be_successful
       expect(response.body).to include("workspace-page-#{page.id}")
-      expect(response.body).to include("showRenameForm")
+      expect(response.body).to include("showContextMenu")
+      expect(response.body).to include("renamePageFromContextMenu")
       expect(response.body).to include("Rename draft")
       expect(response.body).to include(delete_workspace_page_path(workspace, page))
     end
@@ -244,6 +245,73 @@ RSpec.describe "Workspace explorer (verification)", type: :request do
       patch rename_workspace_folder_path(workspace, folder), params: { folder: { name: "hijacked" } }
       expect(response).to redirect_to(dashboard_workspaces_path)
       expect(folder.reload.name).to eq("Docs")
+    end
+  end
+
+  describe "roadmaps" do
+    let!(:workspace) do
+      Workspace.create!(name: "Roadmapper", feature_set: "personal").tap { |ws| ws.users << user }
+    end
+    let!(:root) { workspace.ensure_root_folder }
+    let!(:roadmap) { root.roadmaps.create!(name: "plan", body: "") }
+
+    it "renders the roadmap row and opens it in the editor" do
+      get workspace_path(workspace)
+      expect(response).to be_successful
+      expect(response.body).to include("workspace-roadmap-#{roadmap.id}")
+      expect(response.body).to include("data-delete-url")
+      expect(response.body).to include("/roadmaps/#{roadmap.id}")
+
+      get workspace_roadmap_path(workspace, roadmap)
+      expect(response).to be_successful
+      expect(response.body).to include("workspace-editor")
+      expect(response.body).to include("plan")
+    end
+
+    it "renames and autosaves via turbo-stream and json" do
+      patch rename_workspace_roadmap_path(workspace, roadmap),
+            params: { roadmap: { name: "roadmap2026" } }, as: :turbo_stream
+      expect(response).to be_successful
+      expect(roadmap.reload.name).to eq("roadmap2026")
+      expect(response.body).to include("workspace-roadmap-#{roadmap.id}")
+
+      patch save_workspace_roadmap_path(workspace, roadmap),
+            params: { roadmap: { body: "todo" } }, as: :json
+      expect(response).to have_http_status(:success)
+      expect(roadmap.reload.body).to eq("todo")
+    end
+
+    it "deletes via turbo-stream and html" do
+      expect {
+        delete delete_workspace_roadmap_path(workspace, roadmap), as: :turbo_stream
+      }.to change { Roadmap.count }.by(-1)
+      expect(response).to be_successful
+
+      other = root.roadmaps.create!(name: "later", body: "")
+      expect {
+        delete delete_workspace_roadmap_path(workspace, other)
+      }.to change { Roadmap.count }.by(-1)
+      expect(response).to redirect_to(workspace_path(workspace))
+    end
+
+    it "rejects blank names, other workspaces' roadmaps and strangers" do
+      patch rename_workspace_roadmap_path(workspace, roadmap), params: { roadmap: { name: "  " } }
+      expect(response).to redirect_to(workspace_path(workspace))
+      expect(roadmap.reload.name).to eq("plan")
+
+      other = Workspace.create!(name: "Other", feature_set: "personal")
+      foreign = Folder.create!(name: "Elsewhere", workspace: other)
+      foreign_roadmap = foreign.roadmaps.create!(name: "nope", body: "")
+      patch rename_workspace_roadmap_path(workspace, foreign_roadmap), params: { roadmap: { name: "sneaky" } }
+      expect(response).to redirect_to(dashboard_workspaces_path)
+      expect(foreign_roadmap.reload.name).to eq("nope")
+
+      stranger = create(:user, username: "roadmap_stranger", email_address: "roadmap_stranger@example.com")
+      delete logout_path
+      sign_in stranger
+      delete delete_workspace_roadmap_path(workspace, roadmap)
+      expect(response).to redirect_to(dashboard_workspaces_path)
+      expect(Roadmap.exists?(roadmap.id)).to be(true)
     end
   end
 end

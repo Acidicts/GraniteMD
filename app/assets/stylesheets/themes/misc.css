@@ -2,6 +2,10 @@
     display: none !important;
 }
 
+.pointer {
+    cursor: pointer;
+}
+
 .workspace-placeholder__image {
     display: flex;
     justify-content: center;

@@ -124,7 +124,12 @@
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
 }
 
-.workspace-explorer__context-menu .workspace-explorer__folder-new-file {
+.workspace-explorer__context-menu-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.workspace-explorer__context-menu .workspace-explorer__context-menu-item {
     margin-left: 0.25rem;
     margin-right: auto;
 }
@@ -157,21 +162,24 @@
 }
 
 .workspace-explorer__new-file,
-.workspace-explorer__folder-new-file {
+.workspace-explorer__context-menu-item {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 0.375rem;
     background: none;
     border: none;
     border-radius: 0.375rem;
     padding: 0.25rem;
     cursor: pointer;
     color: inherit;
+    font: inherit;
+    text-decoration: none;
     opacity: 0.6;
 }
 
 .workspace-explorer__new-file:hover,
-.workspace-explorer__folder-new-file:hover {
+.workspace-explorer__context-menu-item:hover {
     opacity: 1;
     background-color: var(--surface-2);
 }
@@ -228,42 +236,25 @@
     align-items: center;
 }
 
-.workspace-explorer__page-actions {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.125rem;
-    opacity: 0;
-}
-
 .workspace-explorer__empty {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.workspace-explorer__page-item:hover .workspace-explorer__page-actions,
-.workspace-explorer__page-item:focus-within .workspace-explorer__page-actions {
-    opacity: 1;
+.workspace-explorer__page-item .workspace-explorer__menu-btn {
+    opacity: 0;
+    flex: none;
 }
 
-.workspace-explorer__page-rename-button,
-.workspace-explorer__page-delete {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: none;
-    border: none;
-    border-radius: 0.375rem;
-    padding: 0.25rem;
-    cursor: pointer;
-    color: inherit;
+.workspace-explorer__page-item:hover .workspace-explorer__menu-btn,
+.workspace-explorer__page-item:focus-within .workspace-explorer__menu-btn {
     opacity: 0.6;
 }
 
-.workspace-explorer__page-rename-button:hover,
-.workspace-explorer__page-delete:hover {
+.workspace-explorer__page-item .workspace-explorer__menu-btn:hover,
+.workspace-explorer__page-item .workspace-explorer__menu-btn:focus-visible {
     opacity: 1;
-    background-color: var(--surface-2);
 }
 
 .workspace-explorer__page-rename {
@@ -385,7 +376,341 @@
     color: inherit;
 }
 
+/* Disabled form controls swallow mouse events entirely, so the click never
+   reaches the window listener that dismisses the explorer context menu.
+   Let those clicks fall through to the wrapper instead. */
+.workspace-editor__textarea:disabled {
+    pointer-events: none;
+}
+
 .workspace-editor__preview {
     flex: 1 1 50%;
     min-width: 0;
+}
+
+.roadmap-catagories {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+    gap: 0.5rem;
+}
+
+.newCatagoryForm {
+    display: flex;
+    flex-direction: column;
+}
+
+.newCatagoryFormContainer {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    padding: 1rem;
+
+    transform: translateX(-50%) translateY(-50%);
+
+    background-color: var(--surface-1);
+    border: var(--border) 1px solid;
+    border-radius: 1rem;
+}
+
+.newItemForm {
+    display: flex;
+    flex-direction: column;
+}
+
+.newItemFormContainer {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    padding: 1rem;
+
+    transform: translateX(-50%) translateY(-50%);
+
+    background-color: var(--surface-1);
+    border: var(--border) 1px solid;
+    border-radius: 1rem;
+}
+
+.category {
+    border: var(--border) 1px solid;
+    height: 100vh;
+    padding: 0.5%;
+
+    /* Tasks stack as cards inside a full-height column; let the column scroll
+       instead of spilling past the editor, and stop border + padding from
+       pushing it past 100vh. */
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    overflow-y: auto;
+}
+
+.category-header {
+    display: flex;
+    flex-direction: row;
+
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+
+    flex: none;
+    font-weight: 700;
+}
+
+.roadmap-task {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+
+    font-size: 0.85rem;
+    text-align: left;
+    line-height: 1.4;
+
+    /* A long unbroken string would otherwise widen the whole column. */
+    overflow-wrap: anywhere;
+}
+
+.roadmap-task:nth-child(even) {
+    background-color: var(--surface-2);
+}
+
+.roadmap-task:nth-child(odd) {
+    background-color: var(--surface-1);
+}
+
+.roadmap-task:hover {
+    border-color: var(--text);
+}
+
+.roadmap-task--dragging {
+    opacity: 0.5;
+}
+
+.roadmap-task--editing {
+    gap: 0.5rem;
+}
+
+.roadmap-task--editing .form-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+.category.roadmap-task--drop-target {
+    border-color: var(--accent);
+}
+
+.roadmap-task__header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    align-items: center;
+    gap: 0.5rem;
+
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+
+.roadmap-task__header-assignee-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+
+    /* Without this a flex item refuses to shrink below its content, so the
+       drag handle gets pushed out of narrow categories. */
+    min-width: 0;
+}
+
+/* Both lines are pills so the eye reads the assignee first and the workspace
+   as secondary context, instead of two runs of identical grey text. */
+.roadmap-task__assignee,
+.roadmap-task__workspace {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+
+    font-size: 0.7rem;
+    line-height: 1.4;
+
+    /* A long username clips inside the pill rather than widening the column. */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.roadmap-task__assignee {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+
+    color: var(--text);
+    font-weight: 600;
+}
+
+.roadmap-task__assignee--empty {
+    color: var(--muted);
+    font-style: italic;
+    font-weight: 400;
+}
+
+/* The empty pill is a button that opens the picker, so it resets the native
+   button chrome back to the pill look and signals clickability. */
+button.roadmap-task__assignee {
+    font: inherit;
+    cursor: pointer;
+}
+
+button.roadmap-task__assignee--empty:hover {
+    border-color: var(--text);
+    color: var(--text);
+}
+
+/* Stands in for an avatar: the initials alone identify the assignee without
+   an image request per card. */
+.roadmap-task__assignee-avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+
+    background-color: var(--accent);
+    color: var(--on-accent);
+
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.roadmap-task__workspace {
+    background-color: var(--surface-2);
+    color: var(--muted);
+}
+
+/* draggable_icon defaults to 24px; the CSS wins over the SVG's own width
+   attribute, so the handle is sized here rather than at the call site. */
+.roadmap-task__header svg {
+    width: 16px;
+    height: 16px;
+
+    flex: none;
+    color: var(--muted);
+}
+
+.roadmap-task[draggable="true"],
+.roadmap-task__header[draggable="true"] {
+    cursor: grab;
+}
+
+.roadmap-task[draggable="true"]:active,
+.roadmap-task__header[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+/* Shared assignee picker: one native dialog per roadmap, opened from any
+   unassigned card's pill. Native dialog gives Escape, focus containment, and
+   the ::backdrop dimming without extra JS. */
+.roadmap-assignee-dialog {
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+
+    background-color: var(--surface);
+    color: var(--text);
+}
+
+.roadmap-assignee-dialog::backdrop {
+    background-color: rgb(0 0 0 / 0.4);
+}
+
+.roadmap-assignee-dialog__panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    box-sizing: border-box;
+    width: min(20rem, 90vw);
+    padding: 0.75rem;
+}
+
+.roadmap-assignee-dialog__header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.roadmap-assignee-dialog__title {
+    margin: 0;
+    font-weight: 700;
+}
+
+.roadmap-assignee-dialog__search {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.roadmap-assignee-dialog__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    max-height: 16rem;
+    overflow-y: auto;
+}
+
+.roadmap-assignee-dialog__option {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+
+    padding: 0.4rem 0.5rem;
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+
+    background: transparent;
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.roadmap-assignee-dialog__option:hover {
+    border-color: var(--border);
+    background-color: var(--surface-1);
+}
+
+/* Options set their own display, which would otherwise beat the browser's
+   built-in [hidden] handling when the search filters them out. */
+.roadmap-assignee-dialog__option[hidden] {
+    display: none;
+}
+
+.roadmap-assignee-dialog__option-name {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.roadmap-assignee-dialog__empty {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.85rem;
 }

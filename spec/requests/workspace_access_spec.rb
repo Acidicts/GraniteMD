@@ -86,4 +86,47 @@ RSpec.describe "Workspace access control", type: :request do
     expect(response.body).to include("workspace_#{mine.id}")
     expect(response.body).not_to include("workspace_#{workspace.id}")
   end
+
+  describe "ownership guards" do
+    let!(:org) do
+      Organisation.create!(name: "Acme").tap do |o|
+        o.users << owner
+        o.users << member
+      end
+    end
+
+    before { sign_in owner }
+
+    it "refuses to create a workspace owned by an outsider" do
+      expect {
+        post dashboard_workspaces_url,
+             params: { workspace: { name: "Trap", feature_set: "personal", owner_id: outsider.id } }
+      }.not_to change(Workspace, :count)
+    end
+
+    it "lets an owner transfer to a fellow organisation member" do
+      org_workspace = Workspace.create!(name: "Team", feature_set: :personal, organisation: org, owner: owner)
+                               .tap { |w| w.users << owner }
+
+      patch dashboard_workspace_url(org_workspace), params: { workspace: { owner_id: member.id } }
+
+      expect(org_workspace.reload.owner).to eq(member)
+    end
+
+    it "refuses to transfer ownership to an outsider" do
+      patch dashboard_workspace_url(workspace), params: { workspace: { owner_id: outsider.id } }
+
+      expect(response).to redirect_to(dashboard_workspaces_path)
+      expect(workspace.reload.owner).to eq(owner)
+    end
+
+    it "refuses to move a workspace into an organisation the owner does not belong to" do
+      foreign = Organisation.create!(name: "Rivals").tap { |o| o.users << outsider }
+
+      patch dashboard_workspace_url(workspace), params: { workspace: { organisation_id: foreign.id } }
+
+      expect(response).to redirect_to(dashboard_workspaces_path)
+      expect(workspace.reload.organisation).to be_nil
+    end
+  end
 end

@@ -3,7 +3,10 @@
 <li id="workspace-page-<%= page.id %>"
     class="workspace-explorer__page-item"
     role="treeitem"
-    aria-label="<%= page.name %>">
+    aria-label="<%= page.name %>"
+    data-page-id="<%= page.id %>"
+    data-delete-url="<%= delete_workspace_page_path(explorer_workspace, page) %>"
+    data-action="contextmenu->workspace--file-explorer#showContextMenu">
   <%= link_to workspace_page_path(explorer_workspace, page),
       class: "workspace-explorer__page-icon-link",
       tabindex: -1,
@@ -33,23 +36,13 @@
       <% end %>
     </div>
   </span>
-  <div class="workspace-explorer__page-actions actions">
-    <button type="button"
-            class="workspace-explorer__page-rename-button"
-            data-action="workspace--file-explorer#showRenameForm"
-            title="Rename <%= page.name %>"
-            aria-label="Rename <%= page.name %>">
-      <%= edit_icon(width: 16, height: 16) %>
-    </button>
-    <%= link_to delete_workspace_page_path(explorer_workspace, page),
-        class: "workspace-explorer__page-delete",
-        title: "Delete #{page.name}",
-        aria: { label: "Delete #{page.name}" },
-        data: {
-          turbo_method: :delete,
-          turbo_confirm: "Delete #{page.name}.md? This can't be undone."
-        } do %>
-      <%= delete_icon(width: 16, height: 16) %>
-    <% end %>
-  </div>
+  <button type="button"
+          class="workspace-explorer__menu-btn"
+          data-action="click->workspace--file-explorer#showMenu"
+          data-page-id="<%= page.id %>"
+          title="Options for <%= page.name %>"
+          aria-label="Options for <%= page.name %>"
+          aria-haspopup="menu">
+    <%= ellipsis_icon(width: 16, height: 16) %>
+  </button>
 </li>

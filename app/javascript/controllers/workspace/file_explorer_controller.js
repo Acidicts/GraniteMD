@@ -5,7 +5,7 @@ import { Controller } from "@hotwired/stimulus"
 // Page navigation itself is a Turbo-frame link; this controller only
 // manages the visual active state and notifies listeners.
 export default class extends Controller {
-  static targets = ["folder", "folderChildren", "folderOpenIcon", "folderClosedIcon", "page", "newPageForm", "newPageInput", "newFolderForm", "newFolderInput", "contextMenu", "folderRenameButton"]
+  static targets = ["folder", "folderChildren", "folderOpenIcon", "folderClosedIcon", "page", "newPageForm", "newPageInput", "newFolderForm", "newFolderInput", "newRoadmapForm", "newRoadmapInput", "contextMenu", "folderMenu", "pageMenu", "folderRenameButton", "pageDeleteButton"]
 
   // Expand or collapse the folder containing the clicked toggle button.
   toggleFolder(event) {
@@ -46,9 +46,7 @@ export default class extends Controller {
   // "New file" button inside the right-click context menu: uses the
   // folder id stored when the menu was opened, then closes the menu.
   newFileFromContextMenu() {
-    const folderId = this.hasContextMenuTarget
-      ? this.contextMenuTarget.dataset.folderId
-      : null
+    const folderId = this.hasContextMenuTarget ? this.contextMenuTarget.dataset.id : null
     this.#revealNewFileForm(folderId)
     this.hideContextMenu()
   }
@@ -72,10 +70,16 @@ export default class extends Controller {
   // "New folder" button inside the right-click context menu: uses the
   // folder id stored when the menu was opened, then closes the menu.
   newFolderFromContextMenu() {
-    const folderId = this.hasContextMenuTarget
-      ? this.contextMenuTarget.dataset.folderId
-      : null
+    const folderId = this.hasContextMenuTarget ? this.contextMenuTarget.dataset.id : null
     this.#revealNewFolderForm(folderId)
+    this.hideContextMenu()
+  }
+
+  // "New roadmap" button inside the right-click context menu: uses the
+  // folder id stored when the menu was opened, then closes the menu.
+  newRoadmapFromContextMenu() {
+    const folderId = this.hasContextMenuTarget ? this.contextMenuTarget.dataset.id : null
+    this.#revealNewRoadmapForm(folderId)
     this.hideContextMenu()
   }
 
@@ -95,26 +99,31 @@ export default class extends Controller {
     }
   }
 
-  // Swap a page row for its inline rename form. Enter submits (PATCH),
-  // Escape cancels.
-  showRenameForm(event) {
-    const item = event.currentTarget.closest(".workspace-explorer__page-item")
-    if (!item) return
+  // Escape cancels the placeholder; Enter submits natively.
+  newRoadmapKeydown(event) {
+    if (event.key !== "Escape") return
+    event.preventDefault()
+    this.#hideNewRoadmapForm(event.currentTarget.closest("li"))
+  }
 
-    const link = item.querySelector(".workspace-explorer__page")
-    const actions = item.querySelector(".workspace-explorer__page-actions")
-    const form = item.querySelector(".workspace-explorer__page-rename")
-    if (!form) return
-
-    if (link) link.hidden = true
-    if (actions) actions.hidden = true
-    form.hidden = false
-
-    const input = form.querySelector("input")
-    if (input) {
-      input.focus()
-      input.select()
+  // Submitting an empty name cancels instead of posting a blank roadmap.
+  guardNewRoadmapSubmit(event) {
+    const input = event.target.querySelector("input")
+    if (input && input.value.trim() === "") {
+      event.preventDefault()
+      this.#hideNewRoadmapForm(event.target.closest("li"))
     }
+  }
+
+  // "Rename" in the page context menu: reveal the inline rename form for
+  // the page the menu was opened on, then close the menu.
+  renamePageFromContextMenu() {
+    const menu = this.hasContextMenuTarget ? this.contextMenuTarget : null
+    const kind = menu?.dataset.kind
+    const id = (kind === "page" || kind === "roadmap") ? menu.dataset.id : null
+    this.hideContextMenu()
+    if (!id) return
+    this.#showPageRename(this.#pageItemFor(id, kind))
   }
 
   // Escape cancels renaming and restores the row.
@@ -145,9 +154,7 @@ export default class extends Controller {
   // stored when the menu was opened, then closes the menu. The root
   // folder has no row, so there is nothing to rename for it.
   renameFolderFromContextMenu() {
-    const folderId = this.hasContextMenuTarget
-      ? this.contextMenuTarget.dataset.folderId
-      : null
+    const folderId = this.hasContextMenuTarget ? this.contextMenuTarget.dataset.id : null
     this.hideContextMenu()
     if (!folderId) return
     this.#showFolderRename(this.#folderItemFor(folderId))
@@ -193,25 +200,25 @@ export default class extends Controller {
     })
   }
 
-  // Open the folder menu from a ⋯ button, anchored below the button
-  // like in VS Code. Reuses the same popup as right-click. Toggles
-  // closed when clicking the same folder's button again. stopPropagation
-  // keeps the click@window->hideContextMenu handler from closing it at once.
+  // Open the menu from a ⋯ button, anchored below the button like in VS
+  // Code. Reuses the same popup as right-click and adapts its entries to
+  // the row it was opened on (folder or page). Toggles closed when
+  // clicking the same row's button again. stopPropagation keeps the
+  // click@window->hideContextMenu handler from closing it at once.
   showMenu(event) {
     event.preventDefault();
     event.stopPropagation();
     if (!this.hasContextMenuTarget) return;
 
     const menu = this.contextMenuTarget;
-    const folderId = event.currentTarget.dataset.folderId ?? "";
-    if (!menu.hidden && menu.dataset.folderId === folderId) {
+    const { kind, id } = this.#menuContextFor(event.currentTarget);
+    if (!menu.hidden && menu.dataset.kind === kind && menu.dataset.id === id) {
       this.hideContextMenu();
       return;
     }
 
-    menu.dataset.folderId = folderId;
+    this.#populateContextMenu(kind, id);
     menu.hidden = false;
-    this.#toggleFolderRenameButton(folderId);
 
     const buttonRect = event.currentTarget.getBoundingClientRect();
     const menuRect = menu.getBoundingClientRect();
@@ -223,7 +230,7 @@ export default class extends Controller {
     menu.style.top = `${y}px`;
   }
 
-  // Open an (empty) context menu over a folder row on right-click,
+  // Open the context menu over a folder or page row on right-click,
   // positioned at the cursor like in VS Code. The native menu is
   // suppressed; the popup dismisses on click, Escape, resize, or the
   // next contextmenu event.
@@ -233,9 +240,9 @@ export default class extends Controller {
     if (!this.hasContextMenuTarget) return;
 
     const menu = this.contextMenuTarget;
-    menu.dataset.folderId = event.currentTarget.dataset.folderId ?? "";
+    const { kind, id } = this.#menuContextFor(event.currentTarget);
+    this.#populateContextMenu(kind, id);
     menu.hidden = false;
-    this.#toggleFolderRenameButton(menu.dataset.folderId);
 
     const rect = menu.getBoundingClientRect();
     let x = event.clientX;
@@ -346,10 +353,42 @@ export default class extends Controller {
     if (input) input.value = ""
   }
 
+  #revealNewRoadmapForm(folderId) {
+    const form = folderId
+      ? this.newRoadmapFormTargets.find((el) => el.dataset.folderId === folderId)
+      : this.newRoadmapFormTargets.find((el) => !el.dataset.folderId)
+    if (!form) return
+
+    const folder = form.closest('[data-workspace--file-explorer-target="folder"]')
+    if (folder) this.#setFolderExpanded(folder, true)
+
+    // Hide any other open placeholder so only one is visible at a time.
+    this.newRoadmapFormTargets.forEach((el) => {
+      if (el !== form) {
+        el.hidden = true
+        const other = el.querySelector("input")
+        if (other) other.value = ""
+      }
+    })
+
+    form.hidden = false
+    const input = form.querySelector("input")
+    if (input) {
+      input.focus()
+      input.select()
+    }
+  }
+
+  #hideNewRoadmapForm(item) {
+    if (!item) return
+    item.hidden = true
+    const input = item.querySelector("input")
+    if (input) input.value = ""
+  }
+
   #hideRenameForm(item) {
     if (!item) return
     const link = item.querySelector(".workspace-explorer__page")
-    const actions = item.querySelector(".workspace-explorer__page-actions")
     const form = item.querySelector(".workspace-explorer__page-rename")
     if (form) {
       form.hidden = true
@@ -360,7 +399,65 @@ export default class extends Controller {
       }
     }
     if (link) link.hidden = false
-    if (actions) actions.hidden = false
+  }
+
+  // Work out whether the menu was opened for a folder, a page or a
+  // roadmap, and which one. Folder rows carry data-folder-id; page rows
+  // data-page-id; roadmap rows data-roadmap-id.
+  #menuContextFor(element) {
+    if (element.dataset.pageId) {
+      return { kind: "page", id: element.dataset.pageId }
+    }
+    if (element.dataset.roadmapId) {
+      return { kind: "roadmap", id: element.dataset.roadmapId }
+    }
+    return { kind: "folder", id: element.dataset.folderId ?? "" }
+  }
+
+  // Show the entries that belong to the row the menu was opened on and,
+  // for pages and roadmaps, point the Delete entry at that row's delete URL.
+  #populateContextMenu(kind, id) {
+    const menu = this.contextMenuTarget
+    menu.dataset.kind = kind
+    menu.dataset.id = id
+
+    if (this.hasFolderMenuTarget) this.folderMenuTarget.hidden = kind !== "folder"
+    if (this.hasPageMenuTarget) this.pageMenuTarget.hidden = kind !== "page" && kind !== "roadmap"
+
+    if (kind === "folder") {
+      this.#toggleFolderRenameButton(id)
+    } else if (this.hasPageDeleteButtonTarget) {
+      const item = this.#pageItemFor(id, kind)
+      const name = item?.querySelector(".workspace-explorer__page-name")?.textContent?.trim() || "this file"
+      const ext = item?.dataset.extension ?? "md"
+      const label = ext ? `${name}.${ext}` : name
+      this.pageDeleteButtonTarget.setAttribute("href", item?.dataset.deleteUrl || "#")
+      this.pageDeleteButtonTarget.setAttribute("data-turbo-confirm", `Delete ${label}? This can't be undone.`)
+    }
+  }
+
+  #pageItemFor(id, kind = "page") {
+    if (!id) return null
+    const selector = kind === "roadmap"
+      ? `.workspace-explorer__roadmap-item[data-roadmap-id="${id}"]`
+      : `.workspace-explorer__page-item[data-page-id="${id}"]`
+    return this.element.querySelector(selector)
+  }
+
+  #showPageRename(item) {
+    if (!item) return
+    const link = item.querySelector(".workspace-explorer__page")
+    const form = item.querySelector(".workspace-explorer__page-rename")
+    if (!form) return
+
+    if (link) link.hidden = true
+    form.hidden = false
+
+    const input = form.querySelector("input")
+    if (input) {
+      input.focus()
+      input.select()
+    }
   }
 
   #folderItemFor(folderId) {

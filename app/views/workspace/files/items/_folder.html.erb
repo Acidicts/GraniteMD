@@ -1,6 +1,7 @@
 <%# locals: folder, workspace (optional — falls back to folder.workspace) %>
 <% explorer_workspace = local_assigns[:workspace] || folder.workspace %>
 <% subfolders = folder.folders.order(:name) %>
+<% roadmaps = folder.roadmaps.order(:name) %>
 <% pages = folder.pages.order(:name) %>
 <li id="workspace-folder-<%= folder.id %>"
     class="workspace-explorer__folder-item"
@@ -53,8 +54,10 @@
       role="group"
       data-workspace--file-explorer-target="folderChildren">
     <%= render partial: "workspace/files/items/folder", collection: subfolders, as: :folder, locals: { workspace: explorer_workspace } %>
+    <%= render partial: "workspace/files/items/roadmap", collection: roadmaps, as: :roadmap, locals: { workspace: explorer_workspace } %>
     <%= render partial: "workspace/files/items/page", collection: pages, as: :page, locals: { workspace: explorer_workspace } %>
     <%= render partial: "workspace/files/forms/new_folder_form", locals: { workspace: explorer_workspace, folder: folder } %>
+    <%= render partial: "workspace/files/forms/new_roadmap_form", locals: { workspace: explorer_workspace, folder: folder } %>
     <%= render partial: "workspace/files/forms/new_page_form", locals: { workspace: explorer_workspace, folder: folder } %>
   </ul>
 </li>

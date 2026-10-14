@@ -22,6 +22,13 @@ class User < ApplicationRecord
 
   has_secure_password
   has_many :sessions, dependent: :destroy
+
+  # Tasks point at their assignee via `assignee_id`, not `user_id`, so the
+  # foreign key has to be spelled out. Nullified rather than destroyed: the
+  # item belongs to the workspace, so removing a member must orphan the card,
+  # not delete other people's work.
+  has_many :roadmap_tasks, foreign_key: :assignee_id, inverse_of: :assignee, dependent: :nullify
+
   has_and_belongs_to_many :workspaces
   has_and_belongs_to_many :organisations
 
@@ -47,11 +54,6 @@ class User < ApplicationRecord
             if: -> { password.present? }
   validates :password_confirmation, presence: true, if: -> { password.present? }
 
-  # NB: `attribute ... default:` must come *before* `encrypts` — `attribute`
-  # declares a PendingType that would otherwise overwrite the
-  # EncryptedAttributeType installed by `encrypts`, leaving a plain
-  # ActiveModel::Type::String that does not respond to `deterministic?`
-  # (crashes User.deterministic_encrypted_attributes / authenticate_by).
   attribute :first_name, :string, default: ""
   attribute :last_name, :string, default: ""
 

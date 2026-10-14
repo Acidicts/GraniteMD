@@ -38,6 +38,10 @@ const BAD_STYLE_VALUE = /url\s*\(|image-set|expression|@import|javascript:|\\/i;
 
 const isSafeUrl = (u) => {
   const v = u.replace(/[\u0000-\u0020\u007f-\u009f]/g, "");
+  // Protocol-relative URLs inherit the page scheme and hand the fetch to a
+  // third party (tracking pixel / mixed-content vector), so they go with the
+  // dangerous schemes. Plain relative paths stay allowed.
+  if (v.startsWith("//")) return false;
   return !/^[a-z][a-z0-9+.-]*:/i.test(v) || /^(https?|mailto|tel):/i.test(v);
 };
 
@@ -100,7 +104,7 @@ function markdownToHtml(md) {
     s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   const escapeText = (s) =>
     s.replace(/&(?!#?\w+;)/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-  const safeUrl = (u) => (/^\s*(javascript|data|vbscript):/i.test(u) ? "#" : u);
+  const safeUrl = (u) => (/^\s*(\/\/|(javascript|data|vbscript):)/i.test(u) ? "#" : u);
 
   function inline(text) {
     text = text.replace(/`([^`]+)`/g, (_, c) => hold(`<code>${escapeHtml(c)}</code>`));

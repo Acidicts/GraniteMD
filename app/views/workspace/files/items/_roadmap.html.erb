@@ -1,0 +1,49 @@
+<%# locals: roadmap, workspace (optional — falls back to roadmap.workspace) %>
+<% explorer_workspace = local_assigns[:workspace] || roadmap.workspace %>
+<li id="workspace-roadmap-<%= roadmap.id %>"
+    class="workspace-explorer__page-item workspace-explorer__roadmap-item"
+    role="treeitem"
+    aria-label="<%= roadmap.name %>"
+    data-roadmap-id="<%= roadmap.id %>"
+    data-delete-url="<%= delete_workspace_roadmap_path(explorer_workspace, roadmap) %>"
+    data-extension=""
+    data-action="contextmenu->workspace--file-explorer#showContextMenu">
+  <%= link_to workspace_roadmap_path(explorer_workspace, roadmap),
+      class: "workspace-explorer__page-icon-link",
+      tabindex: -1,
+      aria: { hidden: true },
+      data: { turbo_frame: "workspace-editor" } do %>
+    <span class="workspace-explorer__page-icon"><%= roadmap_icon(width: 20, height: 20, color: "var(--text)") %></span>
+  <% end %>
+  <span class="workspace-explorer__page-name-zone">
+    <%= link_to workspace_roadmap_path(explorer_workspace, roadmap),
+        class: "workspace-explorer__page",
+        data: {
+          turbo_frame: "workspace-editor",
+          action: "click->workspace--file-explorer#selectPage",
+          roadmap_id: roadmap.id,
+          "workspace--file-explorer-target": "page"
+        } do %>
+      <span class="workspace-explorer__page-name"><%= roadmap.name.presence || "Untitled" %></span>
+    <% end %>
+    <div class="workspace-explorer__page-rename" hidden>
+      <%= form_with url: rename_workspace_roadmap_path(explorer_workspace, roadmap), scope: :roadmap, method: :patch,
+            data: { action: "submit->workspace--file-explorer#guardRenameSubmit" } do |f| %>
+      <%= f.text_field :name, value: roadmap.name, maxlength: 255, autocomplete: "off",
+            size: [ roadmap.name.to_s.length + 2, 4 ].max,
+            class: "workspace-explorer__rename-input",
+              aria: { label: "Rename #{roadmap.name}" },
+              data: { action: "keydown->workspace--file-explorer#renameKeydown" } %>
+      <% end %>
+    </div>
+  </span>
+  <button type="button"
+          class="workspace-explorer__menu-btn"
+          data-action="click->workspace--file-explorer#showMenu"
+          data-roadmap-id="<%= roadmap.id %>"
+          title="Options for <%= roadmap.name %>"
+          aria-label="Options for <%= roadmap.name %>"
+          aria-haspopup="menu">
+    <%= ellipsis_icon(width: 16, height: 16) %>
+  </button>
+</li>

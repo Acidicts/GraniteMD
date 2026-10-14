@@ -18,10 +18,12 @@
 #
 FactoryBot.define do
   factory :user do
-    email_address { "user@example.com" }
+    # `username` and `email_address` are unique, so they have to be sequenced:
+    # anything creating more than one user per example blows up otherwise.
+    sequence(:email_address) { |n| "user#{n}@example.com" }
     first_name { "Test" }
     last_name { "User" }
-    username { "testuser" }
+    sequence(:username) { |n| "testuser#{n}" }
     password { "Password1!" }
     password_confirmation { "Password1!" }
   end

@@ -1,0 +1,5 @@
+<%# Response to PATCH /workspace/:workspace_id/roadmaps/:id: swap the %>
+<%# roadmap row for a freshly rendered one (view state, new name). %>
+<%= turbo_stream.replace "workspace-roadmap-#{@roadmap.id}",
+      partial: "workspace/files/items/roadmap",
+      locals: { roadmap: @roadmap, workspace: @workspace } %>

@@ -1,0 +1,16 @@
+<div class="category" id="catagory_<%= roadmap_catagory.id %>" data-roadmap-catagory-id="<%= roadmap_catagory.id %>">
+    <div class="category-header">
+        <%= roadmap_catagory.name %>
+        <button type="button"
+                class="btn btn-icon"
+                data-action="workspace--roadmap-editor#newRoadmapItemForm"
+                data-roadmap-editor-toggle
+                title="Add item to <%= roadmap_catagory.name %>"
+                aria-label="Add item to <%= roadmap_catagory.name %>">
+                <%= plus_icon(width: 20, height: 20) %>
+        </button>
+    </div>
+    <div class="catagory-tasks">
+        <%= render partial: "workspace/files/items/roadmap_task", collection: roadmap_catagory.roadmap_tasks, as: :roadmap_task %>
+    </div>
+</div>

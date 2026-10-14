@@ -1,0 +1,61 @@
+<%= turbo_frame_tag "workspace-editor" do %>
+    <% persisted = roadmap.persisted? %>
+    <% save_url = persisted ? save_workspace_roadmap_path(workspace, roadmap) : nil %>
+    <%# Only set when a create request failed and re-rendered this frame; flash %>
+    <%# alerts live in the layout, outside the frame, so errors show in-form. %>
+    <% catagory_errors = @roadmap_catagory&.errors&.any? ? @roadmap_catagory : nil %>
+    <% task_errors = @roadmap_task&.errors&.any? ? @roadmap_task : nil %>
+
+    <div class="workspace-editor__textarea-wrapper__container" data-controller="workspace--roadmap-editor workspace--assignee-picker"
+            data-workspace--roadmap-editor-items-url-value="<%= workspace_roadmap_items_path(workspace, roadmap) %>"
+            data-action="click@window->workspace--roadmap-editor#dismissForms click->workspace--assignee-picker#open">
+        <div class="workspace-editor__textarea-wrapper__header" style="display:flex; flex-direction:row; justify-content:space-between;">
+            <p class="workspace-editor__textarea-wrapper__header-text"><%= roadmap.name %></p>
+            <button data-action="workspace--roadmap-editor#newCatagoryForm"
+                    data-roadmap-editor-toggle
+                    class="btn-login" style="margin:4px;">New Catagory</button>
+        </div>
+
+        <div class="newCatagoryFormContainer<%= " hidden" unless catagory_errors %>" data-workspace--roadmap-editor-target="catagoryForm">
+            <%= form_with model: RoadmapCatagory.new,
+                    url: workspace_roadmap_catagories_path(workspace, roadmap),
+                    method: :post,
+                    class: "newCatagoryForm",
+                    data: { action: "submit->workspace--roadmap-editor#newCatagory" } do |f| %>
+                <% if catagory_errors %>
+                    <%= alert_box(:error, message: catagory_errors.errors.full_messages.to_sentence) %>
+                <% end %>
+                <%= f.label "Catagory Name", class: "form-label" %>
+                <%= f.text_field :name, value: catagory_errors&.name, class: "field input" %>
+                <%= f.submit "Create catagory", class: "btn-login" %>
+            <% end %>
+        </div>
+
+        <div class="newItemFormContainer<%= " hidden" unless task_errors %>" data-workspace--roadmap-editor-target="taskForm">
+            <%= form_with model: RoadmapTask.new,
+                    url: workspace_roadmap_items_path(workspace, roadmap),
+                    method: :post,
+                    class: "newItemForm",
+                    data: { action: "submit->workspace--roadmap-editor#newRoadmapItem" } do |f| %>
+                <% if task_errors %>
+                    <%= alert_box(:error, message: task_errors.errors.full_messages.to_sentence) %>
+                <% end %>
+                <% if @categories.empty? %>
+                    <%= alert_box(:warn, message: "Create a catagory first -- every item has to live under one.") %>
+                <% end %>
+                <%# The "+" button on a category fills this in, so there is no visible picker. %>
+                <%= f.hidden_field :category, value: task_errors&.category %>
+                <%= f.label "Item Name", class: "form-label" %>
+                <%= f.text_field :header, value: task_errors&.header, class: "field input" %>
+                <%= f.label "Item Body", class: "form-label" %>
+                <%= f.text_area :body, value: task_errors&.body, class: "field input" %>
+                <%= f.submit "Create Task", class: "btn-login" %>
+            <% end %>
+        </div>
+
+        <div class="roadmap-catagories" id="roadmap-catagories-<%= roadmap.id %>">
+            <%= render partial: "workspace/files/items/roadmap_catagory", collection: @categories %>
+        </div>
+        <%= render partial: "workspace/files/items/assignee_picker", locals: { workspace: workspace, roadmap: roadmap } %>
+    </div>
+<% end %>

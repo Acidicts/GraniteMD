@@ -1,0 +1,24 @@
+<%# Inline "new roadmap" placeholder row. Revealed by the new-roadmap buttons; %>
+<%# Enter submits, Escape cancels. Locals: workspace, folder (nil for a %>
+<%# blank workspace — the server picks/creates a default folder). %>
+<% form_id = folder ? "new-roadmap-form-#{folder.id}" : "new-roadmap-form-root" %>
+<li id="<%= form_id %>"
+    class="workspace-explorer__new-page-item"
+    data-workspace--file-explorer-target="newRoadmapForm"
+    <% if folder %>data-folder-id="<%= folder.id %>"<% end %>
+    hidden>
+  <%= form_with url: workspace_roadmaps_path(workspace), scope: :roadmap, method: :post,
+        data: { action: "submit->workspace--file-explorer#guardNewRoadmapSubmit", turbo: folder ? true : false } do |f| %>
+    <% if folder %>
+      <%= f.hidden_field :folder_id, value: folder.id %>
+    <% end %>
+    <span class="workspace-explorer__page-icon"><%= roadmap_icon(width: 20, height: 20) %></span>
+    <%= f.text_field :name, placeholder: "Roadmap name…", autocomplete: "off", maxlength: 255,
+          class: "workspace-explorer__new-page-input",
+          aria: { label: folder ? "New roadmap name in #{folder.name}" : "New roadmap name" },
+          data: {
+            action: "keydown->workspace--file-explorer#newRoadmapKeydown",
+            "workspace--file-explorer-target": "newRoadmapInput"
+          } %>
+  <% end %>
+</li>

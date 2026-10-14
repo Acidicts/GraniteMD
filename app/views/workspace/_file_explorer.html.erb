@@ -29,7 +29,7 @@
   </div>
 
   <% if explorer_workspace.folder.present? %>
-    <% if !explorer_workspace.folder.pages.any? && !explorer_workspace.folder.folders.any? %>
+    <% if !explorer_workspace.folder.pages.any? && !explorer_workspace.folder.folders.any? && !explorer_workspace.folder.roadmaps.any? %>
     <div class="workspace-explorer__empty">
       <p>No files yet</p>
       <p style="text-align: center; margin: 0.5rem;">Right click or use the ⋯ menu on the header or a folder to create a new folder or file</p>
@@ -55,9 +55,11 @@
     <% end %>
     <ul id="workspace-tree-root" class="workspace-explorer__tree" role="tree" aria-label="Workspace files">
     <%= render partial: "workspace/files/items/folder", collection: explorer_workspace.folder.folders.order(:name), as: :folder, locals: { workspace: explorer_workspace } %>
+    <%= render partial: "workspace/files/items/roadmap", collection: explorer_workspace.folder.roadmaps.order(:name), as: :roadmap, locals: { workspace: explorer_workspace } %>
     <%= render partial: "workspace/files/items/page", collection: explorer_workspace.folder.pages.order(:name), as: :page, locals: { workspace: explorer_workspace } %>
     <%= render partial: "workspace/files/forms/new_folder_form", locals: { workspace: explorer_workspace, folder: explorer_workspace.folder } %>
     <%= render partial: "workspace/files/forms/new_page_form", locals: { workspace: explorer_workspace, folder: explorer_workspace.folder } %>
+    <%= render partial: "workspace/files/forms/new_roadmap_form", locals: { workspace: explorer_workspace, folder: explorer_workspace.folder } %>
     </ul>
   <% else %>
     <div class="workspace-explorer__empty">
@@ -69,28 +71,59 @@
        role="menu"
        data-workspace--file-explorer-target="contextMenu"
        hidden>
-    <button type="button"
-            class="workspace-explorer__folder-new-file"
-            data-action="workspace--file-explorer#newFileFromContextMenu"
-            title="New file in this folder"
-            aria-label="New file in this folder">
-      <%= new_file_icon(width: 16, height: 16) %> New File
-    </button>
-    <button type="button"
-            class="workspace-explorer__folder-new-file"
-            data-action="workspace--file-explorer#newFolderFromContextMenu"
-            title="New folder in this folder"
-            aria-label="New folder in this folder">
-      <%= folder_closed_icon(width: 16, height: 16) %> New Folder
-    </button>
-    <button type="button"
-            class="workspace-explorer__folder-new-file"
-            data-workspace--file-explorer-target="folderRenameButton"
-            data-action="workspace--file-explorer#renameFolderFromContextMenu"
-            title="Rename this folder"
-            aria-label="Rename this folder">
-      <%= edit_icon(width: 16, height: 16) %> Rename Folder
-    </button>
+    <div class="workspace-explorer__context-menu-group"
+         data-workspace--file-explorer-target="folderMenu">
+      <button type="button"
+              class="workspace-explorer__context-menu-item"
+              data-action="workspace--file-explorer#newFileFromContextMenu"
+              title="New file in this folder"
+              aria-label="New file in this folder">
+        <%= new_file_icon(width: 16, height: 16) %> New File
+      </button>
+      <button type="button"
+              class="workspace-explorer__context-menu-item"
+              data-action="workspace--file-explorer#newFolderFromContextMenu"
+              title="New folder in this folder"
+              aria-label="New folder in this folder">
+        <%= folder_closed_icon(width: 16, height: 16) %> New Folder
+      </button>
+      <button type="button"
+              class="workspace-explorer__context-menu-item"
+              data-action="workspace--file-explorer#newRoadmapFromContextMenu"
+              title="New roadmap in this folder"
+              aria-label="New roadmap in this folder">
+        <%= roadmap_icon(width: 16, height: 16) %> New Roadmap
+      </button>
+      <button type="button"
+              class="workspace-explorer__context-menu-item"
+              data-workspace--file-explorer-target="folderRenameButton"
+              data-action="workspace--file-explorer#renameFolderFromContextMenu"
+              title="Rename this folder"
+              aria-label="Rename this folder">
+        <%= edit_icon(width: 16, height: 16) %> Rename Folder
+      </button>
+    </div>
+    <div class="workspace-explorer__context-menu-group"
+         data-workspace--file-explorer-target="pageMenu"
+         hidden>
+      <button type="button"
+              class="workspace-explorer__context-menu-item"
+              data-action="workspace--file-explorer#renamePageFromContextMenu"
+              title="Rename this file"
+              aria-label="Rename this file">
+        <%= edit_icon(width: 16, height: 16) %> Rename File
+      </button>
+      <a href="#"
+         class="workspace-explorer__context-menu-item"
+         data-workspace--file-explorer-target="pageDeleteButton"
+         data-action="workspace--file-explorer#hideContextMenu"
+         data-turbo-method="delete"
+         data-turbo-confirm="Delete this file? This can't be undone."
+         title="Delete this file"
+         aria-label="Delete this file">
+        <%= delete_icon(width: 16, height: 16) %> Delete File
+      </a>
+    </div>
   </div>
 </div>
 <% end %>

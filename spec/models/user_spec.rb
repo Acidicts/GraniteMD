@@ -92,6 +92,14 @@ RSpec.describe User, type: :model do
       expect { user.destroy }.to change(Session, :count).by(-1)
     end
 
+    it "orphans assigned roadmap tasks instead of deleting them" do
+      user = create(:user)
+      task = create(:roadmap_task, assignee: user)
+
+      expect { user.destroy }.not_to change(RoadmapTask, :count)
+      expect(task.reload.assignee).to be_nil
+    end
+
     it "belongs to many workspaces" do
       user = create(:user)
       workspace = create(:workspace)

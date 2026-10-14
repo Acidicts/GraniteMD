@@ -1,0 +1,8 @@
+<%# Response to POST /workspace/:workspace_id/roadmaps/:id/items: file the new %>
+<%# item under its own category. Stream actions apply to the whole document %>
+<%# even though the editor sits inside a turbo frame, so this lands in place. %>
+<%# Targets @roadmap_catagory rather than the task's `category` column: that %>
+<%# holds a position in the category list, not the DOM id this element needs. %>
+<%= turbo_stream.append "catagory_#{@roadmap_catagory.id}",
+      partial: "workspace/files/items/roadmap_task",
+      locals: { roadmap_task: @roadmap_task } %>

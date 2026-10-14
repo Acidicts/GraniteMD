@@ -27,6 +27,7 @@ class Workspace < ApplicationRecord
   has_many :folders, dependent: :destroy
   has_one :folder, -> { where(parent_id: nil).order(:created_at) }, class_name: "Folder", inverse_of: :workspace
   has_many :pages, through: :folders
+  has_many :roadmaps, through: :folders
 
   has_one_attached :workspace_image do |attachable|
     attachable.variant :thumb, resize_to_limit: [ 300, 200 ], format: :webp, saver: { quality: 75, strip: true }

@@ -1,0 +1,7 @@
+<%# Response to POST /workspace/:workspace_id/roadmaps/:id/catagories: append %>
+<%# the new category to the list at the bottom of the roadmap editor. The %>
+<%# editor lives inside a turbo frame, but stream actions apply to the whole %>
+<%# document, so this lands in place without reloading the frame. %>
+<%= turbo_stream.append "roadmap-catagories-#{@roadmap.id}",
+      partial: "workspace/files/items/roadmap_catagory",
+      locals: { roadmap_catagory: @roadmap_catagory } %>

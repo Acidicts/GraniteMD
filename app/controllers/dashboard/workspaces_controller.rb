@@ -48,6 +48,9 @@ module Dashboard
           return redirect_to dashboard_workspaces_path, alert: "You are not in this organisation"
         end
       end
+      unless valid_workspace_owner?(@workspace)
+        return redirect_to dashboard_workspaces_path, alert: "That owner is not a member of this workspace"
+      end
       @workspace.owner = current_user if @workspace.organisation_id.blank? && @workspace.owner_id.blank?
 
       if @workspace.save
@@ -64,6 +67,9 @@ module Dashboard
     # PATCH/PUT /dashboard/workspaces/:id
     def update
       return unless @workspace&.owner == current_user
+      unless authorized_workspace_change?(workspace_params)
+        return redirect_to dashboard_workspaces_path, alert: "You are not allowed to make that change"
+      end
       if @workspace.update(workspace_params)
         redirect_to dashboard_workspace_path(@workspace), notice: "Workspace was successfully updated.", status: :see_other
       else
@@ -96,6 +102,37 @@ module Dashboard
       permitted = params.require(:workspace).permit(:name, :feature_set, :organisation_id, :owner_id, :workspace_image)
       permitted[:organisation_id] = nil if permitted[:organisation_id].blank?
       permitted
+    end
+
+    # The form only ever offers organisation members (or nobody) as owner, so
+    # a crafted owner_id outside that set must not stick. Personal workspaces
+    # always end up owned by the creator (see #create).
+    def valid_workspace_owner?(workspace)
+      return true if workspace.owner_id.blank?
+      return true if workspace.owner_id == current_user.id
+
+      org = workspace.organisation
+      org.present? && org.users.exists?(workspace.owner_id)
+    end
+
+    # Guards the two ids a crafted update could abuse: the workspace may only
+    # move into an organisation the requester belongs to, and the new owner
+    # must be the requester or a member of the resulting organisation.
+    def authorized_workspace_change?(attrs)
+      if attrs[:organisation_id].present?
+        org = Organisation.find_by(id: attrs[:organisation_id])
+        return false unless org&.users&.include?(current_user)
+      end
+
+      owner_id = attrs[:owner_id].presence&.to_i
+      return true if owner_id.blank? || owner_id == current_user.id
+
+      org = if attrs[:organisation_id].present?
+        Organisation.find_by(id: attrs[:organisation_id])
+      else
+        @workspace.organisation
+      end
+      org.present? && org.users.exists?(owner_id)
     end
   end
 end

@@ -3,6 +3,7 @@ module Dashboard
     allow_unauthenticated_access only: %i[ new create unique_username unique_email ]
     before_action :set_user, only: %i[ edit update ]
     rate_limit to: 10, within: 3.minutes, only: %i[unique_username unique_email], with: -> { redirect_to login_path, alert: "Try again later." }
+    rate_limit to: 10, within: 3.minutes, only: %i[create], with: -> { redirect_to signup_path, alert: "Try again later." }
 
     layout "home", only: %i[ new ]
 

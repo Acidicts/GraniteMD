@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_11_103157) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_14_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -84,6 +84,36 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_11_103157) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["folder_id"], name: "index_pages_on_folder_id"
+  end
+
+  create_table "roadmap_catagories", force: :cascade do |t|
+    t.string "name"
+    t.bigint "roadmap_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["roadmap_id"], name: "index_roadmap_catagories_on_roadmap_id"
+  end
+
+  create_table "roadmap_tasks", force: :cascade do |t|
+    t.string "header"
+    t.text "body"
+    t.integer "category"
+    t.bigint "roadmap_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "assignee_id"
+    t.index ["assignee_id"], name: "index_roadmap_tasks_on_assignee_id"
+    t.index ["roadmap_id"], name: "index_roadmap_tasks_on_roadmap_id"
+  end
+
+  create_table "roadmaps", force: :cascade do |t|
+    t.string "name"
+    t.text "body"
+    t.text "header"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "folder_id", null: false
+    t.index ["folder_id"], name: "index_roadmaps_on_folder_id"
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -285,6 +315,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_11_103157) do
   add_foreign_key "organisations_users", "organisations"
   add_foreign_key "organisations_users", "users"
   add_foreign_key "pages", "folders"
+  add_foreign_key "roadmap_catagories", "roadmaps"
+  add_foreign_key "roadmap_tasks", "roadmaps"
+  add_foreign_key "roadmap_tasks", "users", column: "assignee_id"
+  add_foreign_key "roadmaps", "folders"
   add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_batch_executions", "solid_queue_batches", column: "batch_id", on_delete: :cascade
   add_foreign_key "solid_queue_batch_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

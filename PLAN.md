@@ -44,6 +44,7 @@ Legend: `[x]` done, `[~]` partial, `[ ]` todo.
         - [ ] Workspaces
 
 - [~] Organisation (basic model + `workspaces.organisation_id` optional + member picker partial done; teams/roles/inheritance not done)
+    - [~] Applications (apply form + `OrganisationApplication` lifecycle `pending → approved → queued → created` via `QueueOrgJob` + model specs done; no approval UI — `edit`/`update`/`destroy` are stubs, transitions via console)
     - [ ] Teams
         - [ ] Users
             - [ ] Premade User accounts with password change request
@@ -61,6 +62,7 @@ Legend: `[x]` done, `[~]` partial, `[ ]` todo.
                         - [ ] `[[PAGE ID]]`
                         - [ ] `![[FILE ID]]`
 
+            - [x] Roadmaps (CRUD: create/open/rename-autosave/delete + categories + items with assignee picker + drag-drop reorder via Turbo Streams/JSON; model + request specs)
             - [ ] File Management (not started — only `pfp_image`/`workspace_image` Active Storage uploads exist)
                 - [ ] File
                     - [ ] Workspace ID (User Reference)
@@ -94,4 +96,5 @@ Legend: `[x]` done, `[~]` partial, `[ ]` todo.
         - [x] Sanitized HTML output (tag/attribute allowlists, safe URLs, style scrub)
         - [x] Delete / rename flows
         - [ ] Download Button
+    - [x] Roadmaps (workspace editor: categories, items, assignee picker, drag-drop move; Turbo + JSON; specs)
     - [ ] Files

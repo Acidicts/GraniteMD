@@ -24,6 +24,7 @@ class Folder < ApplicationRecord
   belongs_to :parent, class_name: "Folder", optional: true, inverse_of: :folders
   has_many :folders, class_name: "Folder", foreign_key: :parent_id, dependent: :destroy, inverse_of: :parent
   has_many :pages, dependent: :destroy
+  has_many :roadmaps, dependent: :destroy
 
   before_validation :inherit_workspace_from_parent
 

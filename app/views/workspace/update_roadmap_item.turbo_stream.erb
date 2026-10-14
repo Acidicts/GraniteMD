@@ -1,0 +1,6 @@
+<%# Re-render the task card in place after an inline submit. The card is %>
+<%# wrapped in a roadmap-task-<id> frame, so replacing that id swaps the %>
+<%# whole card without touching the rest of the roadmap. %>
+<%= turbo_stream.replace "roadmap-task-#{@roadmap_task.id}",
+      partial: "workspace/files/items/roadmap_task",
+      locals: { roadmap_task: @roadmap_task } %>

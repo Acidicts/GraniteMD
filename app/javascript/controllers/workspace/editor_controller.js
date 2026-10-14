@@ -5,6 +5,7 @@ export default class extends Controller {
   static values = {
     endpoint: String,
     pageId: Number,
+    paramKey: { type: String, default: "page" },
   };
 
   connect() {
@@ -59,7 +60,7 @@ export default class extends Controller {
         "X-CSRF-Token": this.csrfToken,
       },
       body: JSON.stringify({
-        page: { body },
+        [this.paramKeyValue]: { body },
       }),
       signal: request.signal,
       ...(keepalive ? { keepalive: true } : {}),

@@ -1,0 +1,55 @@
+<%# Shared assignee picker for every unassigned card on this roadmap. %>
+<%# Locals: workspace, roadmap. Lives inside the workspace-editor frame so it %>
+<%# sees the same workspace the cards do; one dialog serves all cards because %>
+<%# Turbo replaces each card's frame on save/move, which would tear down a %>
+<%# per-card dialog. The per-card "Unassigned" pill supplies the PATCH URL via %>
+<%# data-assign-url (see _roadmap_task.html.erb); this form's action is set %>
+<%# from it on open, so the form can never post at the collection endpoint. %>
+<dialog class="roadmap-assignee-dialog"
+        data-workspace--assignee-picker-target="dialog"
+        data-action="click->workspace--assignee-picker#backdrop"
+        aria-labelledby="roadmap-assignee-title">
+  <div class="roadmap-assignee-dialog__panel">
+    <div class="roadmap-assignee-dialog__header">
+      <p class="roadmap-assignee-dialog__title" id="roadmap-assignee-title">Assign item</p>
+      <button type="button"
+              class="btn btn-icon"
+              data-action="workspace--assignee-picker#close"
+              aria-label="Close assign dialog">✕</button>
+    </div>
+
+    <input type="search"
+           class="field input roadmap-assignee-dialog__search"
+           placeholder="Search people…"
+           autocomplete="off"
+           aria-label="Search workspace members"
+           data-workspace--assignee-picker-target="search"
+           data-action="input->workspace--assignee-picker#filter" />
+
+    <% members = workspace.users.order(:username) %>
+    <% if members.any? %>
+      <%= form_with url: workspace_roadmap_items_path(workspace, roadmap),
+            method: :patch,
+            data: { "workspace--assignee-picker-target": "form",
+                    action: "submit->workspace--assignee-picker#submit" } do %>
+        <div class="roadmap-assignee-dialog__list" data-workspace--assignee-picker-target="list" role="listbox" aria-label="Workspace members">
+          <% members.each do |member| %>
+            <button type="submit"
+                    role="option"
+                    name="roadmap_task[assignee_id]"
+                    value="<%= member.id %>"
+                    class="roadmap-assignee-dialog__option"
+                    data-assignee-name="<%= member.username.to_s.downcase %>"
+                    title="Assign to <%= member.username %>">
+              <span class="roadmap-task__assignee-avatar" aria-hidden="true"><%= member.username.first&.upcase %></span>
+              <span class="roadmap-assignee-dialog__option-name"><%= member.username %></span>
+            </button>
+          <% end %>
+        </div>
+      <% end %>
+      <p class="roadmap-assignee-dialog__empty" data-workspace--assignee-picker-target="empty" hidden>No one matches that search.</p>
+    <% else %>
+      <p class="roadmap-assignee-dialog__empty">No one else is in this workspace yet.</p>
+    <% end %>
+  </div>
+</dialog>

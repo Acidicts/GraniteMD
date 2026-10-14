@@ -1,0 +1,32 @@
+<%# In-place edit form for one task card. Renders inside the card's own %>
+<%# roadmap-task-<id> turbo frame, so submitting swaps this form for the %>
+<%# re-rendered card (see update_roadmap_item.turbo_stream.erb). %>
+<%# Locals: workspace, roadmap, roadmap_task (the persisted record). %>
+<%= turbo_frame_tag "roadmap-task-#{roadmap_task.id}" do %>
+  <div class="roadmap-task roadmap-task--editing">
+    <%= form_with url: workspace_roadmap_item_path(workspace, roadmap, roadmap_task),
+          scope: :roadmap_task, method: :patch do |form| %>
+      <% if roadmap_task.errors.any? %>
+        <%= alert_box(:error, message: roadmap_task.errors.full_messages.to_sentence) %>
+      <% end %>
+
+      <%= form.label :header, "Item Name", class: "form-label" %>
+      <%= form.text_field :header, required: true, autofocus: true,
+            class: "field input", aria: { label: "Item name" } %>
+
+      <%= form.label :body, "Item Body", class: "form-label" %>
+      <%= form.text_area :body, rows: 4,
+            class: "field input", aria: { label: "Item body" } %>
+
+      <div class="actions">
+        <%= form.submit "Save", class: "btn btn-primary" %>
+        <%# _top: this leaves the frame rather than trying to load another %>
+        <%# frame into it. Nothing is discarded -- the card is re-rendered %>
+        <%# server-side -- but a full visit is the honest way out. %>
+        <%= link_to "Cancel", workspace_roadmap_path(workspace, roadmap),
+              class: "btn btn-tertiary",
+              data: { turbo_frame: "_top" } %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
