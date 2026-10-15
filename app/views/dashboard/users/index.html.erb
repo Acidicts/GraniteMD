@@ -1,9 +1,36 @@
 <%= stylesheet_link_tag "pages/dashboard/users/index" %>
+<%= stylesheet_link_tag "components/forms" %>
 
-<div class="my-profile-card">
+<div class="my-profile-card" data-controller="dashboard--users--edit-user" data-dashboard--users--edit-user-endpoint-value="<%= dashboard_user_path(current_user) %>">
     <h1>My Profile</h1> 
-    <%= turbo_frame_tag @user do%>
+    <%= turbo_frame_tag "edit_user_#{current_user.id}" do%>
             <div>
+                <%= form_with model: current_user, url: dashboard_user_path(current_user), method: :patch, class: "form-card", data: { "dashboard--users--edit-user-target": "form" } do |f| %>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <%= f.label :first_name, class: "label" %>
+                            <%= f.text_field :first_name, class: "field input" %>
+                        </div>
+                        <div class="form-group">
+                            <%= f.label :last_name, class: "label" %>
+                            <%= f.text_field :last_name, class: "field input" %>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <%= f.label :email, class: "label" %>
+                        <%= f.text_field :email, class: "field input" %>
+                    </div>
+                    <div class="dropzone"
+                        data-controller="components--image-dropzone"
+                        data-action="dragover->components--image-dropzone#dragover dragleave->components--image-dropzone#dragleave drop->components--image-dropzone#drop paste->components--image-dropzone#paste keydown->components--image-dropzone#keydown"
+                        tabindex="0" role="button" aria-label="Upload workspace image">
+                        <%= f.file_field :pfp_image, class: "field file file--dropzone dropzone__input", accept: "image/jpeg,image/png,image/gif,image/webp",
+                            data: { "components--image-dropzone-target": "input",
+                                    action: "change->components--image-dropzone#preview" } %>
+                        <img hidden data-components--image-dropzone-target="preview" class="dropzone__preview" alt="Workspace image preview">
+                        <p class="dropzone__prompt" data-components--image-dropzone-target="prompt">Drag &amp; drop, paste, or click to upload an image</p>
+                    </div>
+                <% end %>
             </div>
     <% end %>
 </div>

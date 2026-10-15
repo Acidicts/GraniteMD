@@ -4,6 +4,12 @@
   font-weight: 600;
 }
 
+.form-card {
+  padding: 1rem;
+  background-color: var(--surface-1);
+  border: var(--border) 1px solid;
+}
+
 .form-grid {
   display: flex;
   flex-direction: row;

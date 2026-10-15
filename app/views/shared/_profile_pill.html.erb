@@ -1,7 +1,7 @@
 <div class="profile-pill">
     <% if current_user && current_user.pfp_image&.attached? %>
         <div class="pfp-image">
-            <%= current_user.pfp_image %>
+            <%= image_tag current_user.pfp_image, width: 32, height: 32, class: "pfp-image" %>
         </div>
         <span class="animated-underline"><%= current_user&.username || "User-##{current_user.id}" %></span>
     <% elsif current_user %>

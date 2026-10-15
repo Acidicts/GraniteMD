@@ -12,7 +12,11 @@
                 <% assignee = roadmap_task.assignee %>
                 <% if assignee %>
                     <span class="roadmap-task__assignee">
-                        <span class="roadmap-task__assignee-avatar" aria-hidden="true"><%= assignee.username.first&.upcase %></span>
+                        <% if assignee&.pfp_image.attached? %>
+                            <%= image_tag assignee.pfp_image, style:"width: 1rem; height: 1rem; border-radius: 50%;"%>
+                        <% else %>
+                            <span class="roadmap-task__assignee-avatar" aria-hidden="true"><%= assignee.username.first&.upcase %></span>
+                        <% end %>
                         <span class="roadmap-task__assignee-name"><%= assignee.username %></span>
                     </span>
                 <% elsif assignable %>

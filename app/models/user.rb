@@ -23,10 +23,6 @@ class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
 
-  # Tasks point at their assignee via `assignee_id`, not `user_id`, so the
-  # foreign key has to be spelled out. Nullified rather than destroyed: the
-  # item belongs to the workspace, so removing a member must orphan the card,
-  # not delete other people's work.
   has_many :roadmap_tasks, foreign_key: :assignee_id, inverse_of: :assignee, dependent: :nullify
 
   has_and_belongs_to_many :workspaces
