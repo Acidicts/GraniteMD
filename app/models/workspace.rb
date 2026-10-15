@@ -90,6 +90,49 @@ class Workspace < ApplicationRecord
     self.pages.sum(Arel.sql("pg_column_size(pages)"))
   end
 
+  # Wikilink target => workspace page path, keyed by exact-case spelling:
+  # each page contributes its bare name plus every suffix of
+  # "<folder>/<...>/<page>". When several pages share an exact key, the
+  # oldest page wins. Case-insensitive fallback lives in #wikilink_url_for
+  # (and the matching JS): the exact key is tried first, then the oldest
+  # key that matches case-insensitively, so [[Install]] prefers "Install"
+  # while [[INSTALL]] still finds it.
+  def page_link_map
+    url_helpers = Rails.application.routes.url_helpers
+    folders_by_id = folders.index_by(&:id)
+    pages.includes(:folder).order("pages.created_at ASC, pages.id ASC").each_with_object({}) do |page, map|
+      name = page.name.to_s.strip
+      next if name.blank?
+
+      url = url_helpers.workspace_page_path(self, page)
+      map[name] ||= url
+
+      segments = folder_path_segments(page.folder, folders_by_id)
+      full = segments + [ name ]
+      segments.each_index do |i|
+        qualified = full[i..].join("/")
+        next if qualified.blank?
+
+        map[qualified] ||= url
+      end
+    end
+  end
+
+  # Resolve a wikilink target to a page path: exact-case match first,
+  # oldest case-insensitive match as fallback (so old lowercase links keep
+  # working). Returns nil when nothing matches.
+  def wikilink_url_for(target)
+    raw = target.to_s.strip
+    return nil if raw.blank?
+
+    map = page_link_map
+    return map[raw] if map.key?(raw)
+
+    lower = raw.downcase
+    map.each { |key, url| return url if key.downcase == lower }
+    nil
+  end
+
   def available_storage
     (self.owner&.available_storage || 0).to_i
   end
@@ -107,6 +150,22 @@ class Workspace < ApplicationRecord
   end
 
   private
+
+  # Folder names from the workspace root down to +folder+ (blank names
+  # skipped). Uses the preloaded index so deep trees don't N+1.
+  def folder_path_segments(folder, folders_by_id)
+    segments = []
+    visited = {}
+    current = folder&.id ? (folders_by_id[folder.id] || folder) : folder
+    while current && !visited[current.id]
+      visited[current.id] = true
+      name = current.name.to_s.strip
+      segments.unshift(name) unless name.blank?
+      parent_id = current.parent_id
+      current = parent_id ? folders_by_id[parent_id] : nil
+    end
+    segments
+  end
 
   def workspace_image_content_type
     return unless workspace_image.attached?

@@ -1,14 +1,149 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static targets = ["input", "body"];
+  static targets = ["input", "body", "suggestions"];
+  static values = { pages: { type: Object, default: {} } };
 
   connect() {
+    this._suggestIndex = 0;
+    this._suggestItems = [];
+    this._trigger = null;
+    this._outsideClick = (event) => {
+      if (!this.hasSuggestionsTarget) return;
+      if (this.element.contains(event.target)) return;
+      this.hideSuggestions();
+    };
+    document.addEventListener("click", this._outsideClick);
     this.update();
   }
 
+  disconnect() {
+    document.removeEventListener("click", this._outsideClick);
+  }
+
   update() {
-    this.bodyTarget.innerHTML = markdownToHtml(this.inputTarget.value);
+    if (this.hasInputTarget && this.hasBodyTarget) {
+      this.bodyTarget.innerHTML = markdownToHtml(this.inputTarget.value, this.pagesMap());
+    }
+    this.refreshSuggestions();
+  }
+
+  // ---------- Wikilink autocomplete ([[...) ----------
+
+  pagesMap() {
+    return this.hasPagesValue ? this.pagesValue || {} : {};
+  }
+
+  currentTrigger() {
+    if (!this.hasInputTarget) return null;
+    const el = this.inputTarget;
+    const caret = el.selectionStart ?? el.value.length;
+    const before = el.value.slice(0, caret);
+    const match = before.match(/\[\[([^\[\]\n|#]*)$/);
+    if (!match) return null;
+    return { query: match[1], start: caret - match[1].length - 2, caret };
+  }
+
+  refreshSuggestions() {
+    if (!this.hasSuggestionsTarget || !this.hasInputTarget) return;
+    const trigger = this.currentTrigger();
+    if (!trigger) {
+      this.hideSuggestions();
+      return;
+    }
+    const q = trigger.query;
+    const lowerQ = q.toLowerCase();
+    const names = Object.keys(this.pagesMap()).filter((name) =>
+      name.toLowerCase().includes(lowerQ)
+    );
+    if (names.length === 0) {
+      this.hideSuggestions();
+      return;
+    }
+    // Caps-sensitive first: exact-case substring matches rank above
+    // case-insensitive ones. Stable sort keeps oldest-first order within
+    // each group.
+    names.sort((a, b) => {
+      const aExact = a.includes(q) ? 0 : 1;
+      const bExact = b.includes(q) ? 0 : 1;
+      return aExact - bExact;
+    });
+    this._trigger = trigger;
+    this._suggestItems = names.slice(0, 8);
+    this._suggestIndex = Math.min(this._suggestIndex, this._suggestItems.length - 1);
+    if (this._suggestIndex < 0) this._suggestIndex = 0;
+    this.renderSuggestions();
+  }
+
+  renderSuggestions() {
+    const box = this.suggestionsTarget;
+    box.innerHTML = "";
+    this._suggestItems.forEach((name, index) => {
+      const option = document.createElement("button");
+      option.type = "button";
+      option.className = "wikilink-suggest__option";
+      if (index === this._suggestIndex) option.classList.add("wikilink-suggest__option--active");
+      option.setAttribute("role", "option");
+      option.setAttribute("aria-selected", index === this._suggestIndex ? "true" : "false");
+      option.dataset.index = index;
+      option.textContent = name;
+      // mousedown fires before textarea blur, so the caret context survives.
+      option.addEventListener("mousedown", (event) => {
+        event.preventDefault();
+        this.chooseSuggestion(index);
+      });
+      box.appendChild(option);
+    });
+    box.hidden = false;
+  }
+
+  hideSuggestions() {
+    this._suggestItems = [];
+    this._suggestIndex = 0;
+    this._trigger = null;
+    if (this.hasSuggestionsTarget) {
+      this.suggestionsTarget.innerHTML = "";
+      this.suggestionsTarget.hidden = true;
+    }
+  }
+
+  chooseSuggestion(index) {
+    const name = this._suggestItems[index];
+    const trigger = this._trigger || this.currentTrigger();
+    if (!name || !trigger || !this.hasInputTarget) {
+      this.hideSuggestions();
+      return;
+    }
+    const el = this.inputTarget;
+    const caret = el.selectionStart ?? trigger.caret;
+    const insert = `[[${name}]]`;
+    el.value = el.value.slice(0, trigger.start) + insert + el.value.slice(caret);
+    const nextCaret = trigger.start + insert.length;
+    el.focus();
+    el.setSelectionRange(nextCaret, nextCaret);
+    this.hideSuggestions();
+    el.dispatchEvent(new Event("input", { bubbles: true }));
+    this.update();
+  }
+
+  onKeyDown(event) {
+    if (!this.hasSuggestionsTarget || this.suggestionsTarget.hidden) return;
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      this._suggestIndex = (this._suggestIndex + 1) % this._suggestItems.length;
+      this.renderSuggestions();
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      this._suggestIndex =
+        (this._suggestIndex - 1 + this._suggestItems.length) % this._suggestItems.length;
+      this.renderSuggestions();
+    } else if (event.key === "Enter" || event.key === "Tab") {
+      event.preventDefault();
+      this.chooseSuggestion(this._suggestIndex);
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      this.hideSuggestions();
+    }
   }
 }
 
@@ -97,7 +232,15 @@ function sanitizeHtml(html) {
 }
 
 // ---------- Converter ----------
-function markdownToHtml(md) {
+function markdownToHtml(md, pages = {}) {
+  const pageMap = pages || {};
+  // Case-insensitive fallback index: the server emits oldest first, so
+  // first-wins keeps the oldest page per lowercased form.
+  const lowerMap = {};
+  for (const key of Object.keys(pageMap)) {
+    const lower = key.toLowerCase();
+    if (!(lower in lowerMap)) lowerMap[lower] = pageMap[key];
+  }
   const stash = [];
   const hold = (html) => `\u0000${stash.push(html) - 1}\u0000`;
   const escapeHtml = (s) =>
@@ -114,6 +257,26 @@ function markdownToHtml(md) {
     );
 
     text = escapeText(text);
+    // Obsidian-style wikilinks. Runs on escaped text after code spans are
+    // stashed (so `[[x]]` and fenced blocks stay literal) and before the
+    // [text](url) rule so the brackets don't interact.
+    text = text.replace(
+      /\[\[([^\[\]\n|#]+)(?:#[^\[\]\n|]*)?(?:\|([^\[\]\n]*))?\]\]/g,
+      (_, target, alias) => {
+        const rawKey = target.trim();
+        // Exact case first, oldest case-insensitive match as fallback so
+        // old links keep working when no exact-case spelling exists.
+        // No alias: show just the page name (last path segment) so
+        // [[Guides/Install]] renders as "Install" but still resolves.
+        const raw = (alias !== undefined ? alias.trim() || target.trim() : target.trim());
+        const label = alias !== undefined ? raw : raw.split("/").pop().trim() || raw;
+        const url = pageMap[rawKey] ?? lowerMap[rawKey.toLowerCase()];
+        if (url) {
+          return `<a class="wikilink" href="${safeUrl(url)}">${label}</a>`;
+        }
+        return `<a class="wikilink wikilink--missing" href="#" title="Page not found">${label}</a>`;
+      }
+    );
     return text
       .replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, (_, alt, src) => `<img src="${safeUrl(src)}" alt="${alt}">`)
       .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, t, href) => `<a href="${safeUrl(href)}">${t}</a>`)

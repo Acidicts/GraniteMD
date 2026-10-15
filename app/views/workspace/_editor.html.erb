@@ -7,6 +7,7 @@
             action: "submit->workspace--editor#handleSubmit",
             "workspace--editor-endpoint-value": save_url,
             "workspace--editor-page-id-value": (page.id if persisted),
+            "markdown-pages-value": workspace.page_link_map.to_json,
         },
         class: "workspace--editor__form" do |f| %>
         <div class="workspace-editor__textarea-wrapper__container">
@@ -28,8 +29,9 @@
                                 data: {
                                 "workspace--editor-target": "textarea",
                                 "markdown-target": "input",
-                                action: "input->workspace--editor#fileChange change->workspace--editor#fileChange input->markdown#update"
+                                action: "input->workspace--editor#fileChange change->workspace--editor#fileChange input->markdown#update click->markdown#update keydown->markdown#onKeyDown"
                                 } %>
+                <div class="wikilink-suggest" data-markdown-target="suggestions" role="listbox" hidden></div>
             </div>
         </div>
     <div class="workspace-editor__status" data-workspace--editor-target="status" role="status" aria-live="polite"></div>
