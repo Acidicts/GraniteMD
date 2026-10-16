@@ -8,6 +8,7 @@
             "workspace--editor-endpoint-value": save_url,
             "workspace--editor-page-id-value": (page.id if persisted),
             "markdown-pages-value": workspace.page_link_map.to_json,
+            "markdown-files-value": workspace.workspace_file_map.to_json,
         },
         class: "workspace--editor__form" do |f| %>
         <div class="workspace-editor__textarea-wrapper__container">
@@ -35,6 +36,34 @@
             </div>
         </div>
     <div class="workspace-editor__status" data-workspace--editor-target="status" role="status" aria-live="polite"></div>
-    <div class="workspace-editor__preview" data-markdown-target="body"></div>
+    <div class="workspace-editor__preview">
+        <button type="button"
+                class="toc-toggle"
+                data-markdown-target="toggle"
+                data-action="click->markdown#toggleToc"
+                aria-expanded="false"
+                aria-label="Headings in this page"
+                title="Headings in this page"
+                hidden>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true" focusable="false">
+                <path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </button>
+        <nav class="toc-panel"
+             data-markdown-target="toc"
+             data-action="keydown->markdown#onTocKeyDown"
+             aria-label="Headings in this page"
+             hidden>
+            <p class="toc-panel__title">On this page</p>
+            <div class="toc-wheel"
+                 data-markdown-target="wheel"
+                 data-action="wheel->markdown#onWheelSpin pointerdown->markdown#onWheelGrab pointermove->markdown#onWheelDrag pointerup->markdown#onWheelRelease pointercancel->markdown#onWheelRelease"
+                 role="group"
+                 aria-label="Headings wheel. Scroll or drag to turn, click a heading to jump.">
+                <div class="toc-wheel__arc" data-markdown-target="arc"></div>
+            </div>
+        </nav>
+        <div class="workspace-editor__preview-body" data-markdown-target="body"></div>
+    </div>
   <% end %>
 <% end %>

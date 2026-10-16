@@ -34,3 +34,33 @@ blockquote {
     background-color: var(--surface-2);
     color: var(--muted);
 }
+
+/* Themed scrollbars (Firefox + WebKit/Chromium). Thin trackless bars in
+   muted that brighten on hover; tokens flip automatically for dark mode. */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: var(--muted) transparent;
+}
+
+*::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: var(--muted);
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text);
+    border: 2px solid transparent;
+    background-clip: content-box;
+}

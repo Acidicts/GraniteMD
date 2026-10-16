@@ -27,6 +27,7 @@ class Workspace < ApplicationRecord
   has_many :folders, dependent: :destroy
   has_one :folder, -> { where(parent_id: nil).order(:created_at) }, class_name: "Folder", inverse_of: :workspace
   has_many :pages, through: :folders
+  has_many :workspace_files, through: :folders
   has_many :roadmaps, through: :folders
 
   has_one_attached :workspace_image do |attachable|
@@ -126,6 +127,48 @@ class Workspace < ApplicationRecord
     return nil if raw.blank?
 
     map = page_link_map
+    return map[raw] if map.key?(raw)
+
+    lower = raw.downcase
+    map.each { |key, url| return url if key.downcase == lower }
+    nil
+  end
+
+  # Embed target => ActiveStorage blob path, keyed exactly like
+  # #page_link_map (bare name plus folder-path suffixes, exact case,
+  # oldest wins). Only files with an upload are listed: without a blob
+  # there is nothing to embed. Powers ![[file]] embeds in the preview.
+  def workspace_file_map
+    url_helpers = Rails.application.routes.url_helpers
+    folders_by_id = folders.index_by(&:id)
+    workspace_files.includes(:folder, File_attachment: :blob)
+                   .order("workspace_files.created_at ASC, workspace_files.id ASC")
+                   .each_with_object({}) do |workspace_file, map|
+      name = workspace_file.name.to_s.strip
+      next if name.blank?
+      next unless workspace_file.File.attached?
+
+      url = url_helpers.rails_blob_path(workspace_file.File, only_path: true)
+      map[name] ||= url
+
+      segments = folder_path_segments(workspace_file.folder, folders_by_id)
+      full = segments + [ name ]
+      segments.each_index do |i|
+        qualified = full[i..].join("/")
+        next if qualified.blank?
+
+        map[qualified] ||= url
+      end
+    end
+  end
+
+  # Resolve an embed target to a blob path, with the same exact-first /
+  # oldest-insensitive-fallback semantics as #wikilink_url_for.
+  def workspace_file_url_for(target)
+    raw = target.to_s.strip
+    return nil if raw.blank?
+
+    map = workspace_file_map
     return map[raw] if map.key?(raw)
 
     lower = raw.downcase
