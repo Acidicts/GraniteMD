@@ -1,2 +1,142 @@
-<h1>Dashboard#index</h1>
-<p>Find me in app/views/dashboard/index.html.erb</p>
+<% content_for :title, "Dashboard" %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "pages/dashboard/index", "data-turbo-track": "reload" %>
+<% end %>
+
+<%
+  workspaces = current_user.workspaces.order(updated_at: :desc)
+  organisations = current_user.organisations.order(name: :asc)
+  workspace_ids = current_user.workspaces.select(:id)
+  recent_pages = Page.joins(folder: :workspace).where(folders: { workspace_id: workspace_ids }).order(updated_at: :desc).limit(6).includes(folder: :workspace)
+  total_pages = Page.joins(folder: :workspace).where(folders: { workspace_id: workspace_ids }).count
+  used_storage = current_user.used_storage.to_i
+  total_storage = current_user.total_storage.to_i
+  storage_pct = total_storage.zero? ? 0 : [ (used_storage.to_f / total_storage * 100).round(1), 100 ].min
+%>
+
+<div class="dashboard">
+  <div class="dashboard__header">
+    <div>
+      <h1 class="dashboard__title">Your Dashboard</h1>
+    </div>
+  </div>
+
+  <div class="dashboard__stats">
+    <div class="dashboard__stat">
+      <p class="dashboard__stat-value"><%= organisations.count %></p>
+      <p class="dashboard__stat-label"><%= "Organisation".pluralize(organisations.count) %></p>
+    </div>
+    <div class="dashboard__stat">
+      <p class="dashboard__stat-value"><%= workspaces.count %></p>
+      <p class="dashboard__stat-label"><%= "Workspace".pluralize(workspaces.count) %></p>
+    </div>
+    <div class="dashboard__stat">
+      <p class="dashboard__stat-value"><%= human_storage_size(used_storage) %></p>
+      <p class="dashboard__stat-label">of <%= human_storage_size(total_storage) %> used</p>
+    </div>
+  </div>
+
+  <% if workspaces.any? %>
+    <div class="workspaces">
+      <div class="workspace-header">
+        <h3>Workspaces <span class="workspace-header-muted">(<%= workspaces.count %>)</span></h3>
+        <div class="workspace-header-actions">
+          <%= link_to "View all", dashboard_workspaces_path, class: "btn btn-secondary workspace-header-new-link" %>
+          <%= link_to "New Workspace", new_dashboard_workspace_path, class: "btn btn-primary workspace-header-new-link" %>
+        </div>
+      </div>
+      <div class="workspaces-grid" id="workspaces">
+        <%= render partial: "dashboard/workspace", collection: workspaces.limit(8) %>
+      </div>
+    </div>
+  <% else %>
+    <div class="workspaces__empty">
+      <p class="workspaces__empty-title">No workspaces yet</p>
+      <p class="workspaces__empty-text">Create your first workspace to start writing.</p>
+      <%= link_to "Create Workspace", new_dashboard_workspace_path, class: "btn btn-primary" %>
+    </div>
+    <div class="workspaces-grid" id="workspaces">
+    </div>
+  <% end %>
+
+  <div class="dashboard__lower">
+    <section class="dashboard__panel dashboard__recent">
+      <div class="dashboard__panel-header">
+        <h3>Recent pages</h3>
+        <% if workspaces.any? %>
+          <%= link_to "View workspaces", dashboard_workspaces_path, class: "dashboard__panel-link" %>
+        <% end %>
+      </div>
+      <% if recent_pages.any? %>
+        <ul class="dashboard__recent-list">
+          <% recent_pages.each do |page| %>
+            <% ws = page.folder.workspace %>
+            <li class="dashboard__recent-item">
+              <%= link_to workspace_page_path(ws, page), class: "dashboard__recent-link" do %>
+                <span class="dashboard__recent-name"><%= page.name.presence || "Untitled page" %></span>
+                <span class="dashboard__recent-meta"><%= ws.name %> &middot; <%= time_ago_in_words(page.updated_at) %> ago</span>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <div class="dashboard__empty">
+          <p class="dashboard__empty-title">No pages yet</p>
+          <p class="dashboard__empty-text">
+            <% if workspaces.any? %>
+              Open a workspace and create your first page.
+            <% else %>
+              Create a workspace first, then add pages to it.
+            <% end %>
+          </p>
+        </div>
+      <% end %>
+    </section>
+
+    <section class="dashboard__panel dashboard__orgs">
+      <div class="dashboard__panel-header">
+        <h3>Organisations</h3>
+        <%= link_to "View all", dashboard_organisations_path, class: "dashboard__panel-link" %>
+      </div>
+      <% if organisations.any? %>
+        <ul class="dashboard__orgs-list">
+          <% organisations.limit(5).each do |organisation| %>
+            <li class="dashboard__orgs-item">
+              <%= link_to organisation.name, dashboard_organisation_path(organisation), class: "dashboard__orgs-link" %>
+              <span class="dashboard__orgs-meta"><%= pluralize(organisation.workspaces.count, "workspace") %> &middot; <%= pluralize(organisation.users.count, "member") %></span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <div class="dashboard__empty">
+          <p class="dashboard__empty-title">No organisations yet</p>
+          <p class="dashboard__empty-text">Group workspaces and collaborate with a team.</p>
+          <%= link_to "Create Organisation", new_dashboard_organisation_path, class: "btn btn-secondary" %>
+        </div>
+      <% end %>
+    </section>
+
+    <div class="dashboard__side">
+      <section class="dashboard__panel dashboard__storage">
+        <div class="dashboard__panel-header">
+          <h3>Storage</h3>
+        </div>
+        <p class="dashboard__storage-text"><strong><%= human_storage_size(used_storage) %></strong> of <%= human_storage_size(total_storage) %> &middot; <%= storage_pct %>% used</p>
+        <div class="dashboard__storage-bar" role="progressbar" aria-valuenow="<%= storage_pct %>" aria-valuemin="0" aria-valuemax="100">
+          <div class="dashboard__storage-fill" style="width: <%= storage_pct %>%;"></div>
+        </div>
+      </section>
+
+      <section class="dashboard__panel dashboard__actions">
+        <div class="dashboard__panel-header">
+          <h3>Quick actions</h3>
+        </div>
+        <div class="dashboard__actions-list">
+          <%= link_to "New Workspace", new_dashboard_workspace_path, class: "btn btn-primary" %>
+          <%= link_to "Browse Workspaces", dashboard_workspaces_path, class: "btn btn-secondary" %>
+          <%= link_to "Manage Organisations", dashboard_organisations_path, class: "btn btn-secondary" %>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

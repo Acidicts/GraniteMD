@@ -213,6 +213,19 @@ body {
     background: var(--selection);
 }
 
+.nav .dashboard-icon-logo {
+    text-decoration: none;
+    color: var(--text);
+}
+
+.nav .dashboard-icon-logo svg {
+    transition: scale 0.3s ease;
+}
+
+.nav .dashboard-icon-logo:hover svg {
+    scale: 1.15;
+}
+
 
 .pfp-image {
     width: 32px;

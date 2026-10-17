@@ -25,9 +25,11 @@
       <div class="nav-rail">
         <div class="nav-clip">
           <nav class="nav" data-layouts--hide-application-target="nav" aria-label="Primary">
-            <div class="nav-logo">
-              <%= logo_svg(width: 32, height: 32) %> Granite <span class="granite-highlighted">MD</span>
-            </div>
+            <%= link_to dashboard_path, class: "dashboard-icon-logo" do %>
+              <div class="nav-logo">
+                <%= logo_svg(width: 32, height: 32) %> Granite <span class="granite-highlighted">MD</span>
+              </div>
+            <% end %>
             <%= link_to "Workspaces", dashboard_workspaces_path, class: "btn-nav" %>
             <%= link_to "Organisations", dashboard_organisations_path, class: "btn-nav" %>
             <%= link_to "Settings", dashboard_path, class: "btn-nav" %>
