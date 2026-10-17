@@ -41,6 +41,11 @@
     font-weight: 600;
 }
 
+.workspace-explorer__page-extention-accent {
+    color: var(--accent);
+    font-weight: 600;
+}
+
 .workspace-explorer__header {
     display: flex;
     align-items: center;
@@ -596,6 +601,51 @@
     border: 1px solid var(--border);
 }
 
+/* ![[file.pdf]] embeds render as a file card (object/embed/iframe are
+   sanitizer-dropped) that opens the PDF in a new tab. */
+.workspace-editor__preview .embed--file {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 100%;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--text);
+}
+
+.workspace-editor__preview .embed--file::before {
+    content: "PDF";
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.25rem;
+    background: var(--surface-2);
+}
+
+/* ![[file.csv]] embeds hydrate into a compact table (see hydrateCsvEmbeds).
+   Wide tables scroll inside the preview column instead of blowing it out. */
+.workspace-editor__preview table.embed--table {
+    display: block;
+    overflow-x: auto;
+    max-width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.workspace-editor__preview .embed--table th,
+.workspace-editor__preview .embed--table td {
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--border);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.workspace-editor__preview .embed--table thead th {
+    background-color: var(--surface-2);
+}
+
 .roadmap-catagories {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
@@ -974,4 +1024,47 @@ button.roadmap-task__assignee--empty:hover {
 .wikilink-suggest__option--active {
     background-color: var(--surface-2);
     border-color: var(--border);
+}
+
+.file-preview__image {
+    max-height: 70vh;
+    max-width: 90%;
+    aspect-ratio: auto;
+
+    padding: 0 5%;
+}
+
+.file-preview__table-wrapper {
+    overflow: auto;
+    max-width: 100%;
+    max-height: 70vh;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+}
+
+.file-preview__table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.85rem;
+}
+
+.file-preview__table th,
+.file-preview__table td {
+    padding: 0.4rem 0.6rem;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    white-space: nowrap;
+}
+
+.file-preview__table thead th {
+    background-color: var(--surface-2);
+    font-weight: 700;
+    position: sticky;
+    top: 0;
+}
+
+.file-preview__fallback,
+.file-preview__note {
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
 }

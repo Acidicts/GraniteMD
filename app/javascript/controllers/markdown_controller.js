@@ -31,9 +31,37 @@ export default class extends Controller {
   update() {
     if (this.hasInputTarget && this.hasBodyTarget) {
       this.bodyTarget.innerHTML = markdownToHtml(this.inputTarget.value, this.pagesMap(), this.filesMap());
+      this.hydrateCsvEmbeds();
     }
     this.refreshSuggestions();
     this.renderToc();
+  }
+
+  // Fill in ![[file.csv]] embed tables. markdownToHtml is synchronous, so
+  // CSV bodies load here, after the preview HTML is in the DOM. Results
+  // are cached per URL (shared across keystrokes); a detached table or a
+  // failed fetch resolves to the same file card PDFs use.
+  hydrateCsvEmbeds() {
+    if (!this.hasBodyTarget) return;
+    if (!this._csvCache) this._csvCache = new Map();
+    for (const table of this.bodyTarget.querySelectorAll("table[data-csv-src]")) {
+      const src = table.getAttribute("data-csv-src");
+      const label = table.getAttribute("data-csv-label") || "CSV file";
+      if (!src) continue;
+      if (!this._csvCache.has(src)) {
+        this._csvCache.set(src, fetch(src).then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.text();
+        }).then((text) => {
+          const clipped = text.length > CSV_EMBED_MAX_BYTES;
+          const parsed = parseCsvPreview(clipped ? text.slice(0, CSV_EMBED_MAX_BYTES) : text, CSV_EMBED_MAX_ROWS);
+          return { ...parsed, truncated: parsed.truncated || clipped };
+        }).catch(() => null));
+      }
+      this._csvCache.get(src).then((parsed) => {
+        if (table.isConnected) fillCsvEmbed(table, parsed, src, label);
+      });
+    }
   }
 
   // ---------- Wikilink autocomplete ([[...) ----------
@@ -602,7 +630,10 @@ function sanitizeHtml(html) {
 
       for (const attr of [...el.attributes]) {
         const name = attr.name.toLowerCase();
-        if (!GLOBAL_ATTRS.has(name) && !(TAG_ATTRS[tag] || []).includes(name)) {
+        // data-csv-* hooks on CSV embed tables are inert (never interpreted
+        // by the browser) and only read back by hydrateCsvEmbeds below.
+        const isCsvHook = tag === "table" && name.startsWith("data-csv-");
+        if (!isCsvHook && !GLOBAL_ATTRS.has(name) && !(TAG_ATTRS[tag] || []).includes(name)) {
           el.removeAttribute(attr.name);
         } else if ((name === "href" || name === "src") && !isSafeUrl(attr.value)) {
           el.removeAttribute(attr.name);
@@ -625,6 +656,101 @@ function sanitizeHtml(html) {
 
   walk(doc.body);
   return doc.body.innerHTML;
+}
+
+// ---------- CSV embeds (![[file.csv]]) ----------
+const CSV_EMBED_MAX_ROWS = 10;
+const CSV_EMBED_MAX_BYTES = 524288;
+
+// Minimal CSV parser for previews: commas, quotes ("" escapes), CRLF and
+// quoted newlines. Returns { header, body, truncated }; lenient by design
+// (a clipped or quirky file still shows something rather than erroring).
+function parseCsvPreview(text, maxDataRows) {
+  const rows = [];
+  let row = [], field = "", inQuotes = false;
+  const endField = () => { row.push(field); field = ""; };
+  const endRow = () => { rows.push(row); row = []; };
+  for (let i = 0; i < text.length && rows.length <= maxDataRows + 1; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; }
+        else inQuotes = false;
+      } else field += c;
+    } else if (c === '"') inQuotes = true;
+    else if (c === ",") endField();
+    else if (c === "\r") { /* CRLF pairs close on \n */ }
+    else if (c === "\n") {
+      endField();
+      if (row.length > 1 || row[0] !== "") endRow();
+      else row = [];
+    } else field += c;
+  }
+  if (field !== "" || row.length > 0) { endField(); endRow(); }
+  return {
+    header: rows[0] ?? [],
+    body: rows.slice(1, 1 + maxDataRows),
+    truncated: rows.length > maxDataRows + 1,
+  };
+}
+
+// Fill a CSV placeholder table in place (built with DOM APIs, so cell
+// content needs no extra escaping). A null parse degrades to the PDF-style
+// file card, which also handles cross-origin blob hosts that block fetch.
+function fillCsvEmbed(table, parsed, src, label) {
+  const doc = table.ownerDocument;
+  if (!parsed) {
+    const link = doc.createElement("a");
+    link.className = "embed embed--file";
+    link.href = src;
+    link.target = "_blank";
+    link.title = label;
+    link.textContent = label;
+    table.replaceWith(link);
+    return;
+  }
+  const width = Math.max(parsed.header.length, ...parsed.body.map((r) => r.length), 1);
+  const pad = (cells) => cells.concat(Array(Math.max(0, width - cells.length)).fill(""));
+  const thead = doc.createElement("thead");
+  const headRow = doc.createElement("tr");
+  for (const text of pad(parsed.header)) {
+    const th = doc.createElement("th");
+    th.setAttribute("scope", "col");
+    th.textContent = text;
+    headRow.appendChild(th);
+  }
+  thead.appendChild(headRow);
+  const tbody = doc.createElement("tbody");
+  if (parsed.header.length === 0 && parsed.body.length === 0) {
+    const tr = doc.createElement("tr");
+    const td = doc.createElement("td");
+    td.textContent = "Empty CSV file.";
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+  }
+  for (const cells of parsed.body) {
+    const tr = doc.createElement("tr");
+    for (const text of pad(cells)) {
+      const td = doc.createElement("td");
+      td.textContent = text;
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  if (parsed.truncated) {
+    const tr = doc.createElement("tr");
+    const td = doc.createElement("td");
+    td.setAttribute("colspan", String(width));
+    td.textContent = `Showing the first ${parsed.body.length} rows. `;
+    const link = doc.createElement("a");
+    link.href = src;
+    link.target = "_blank";
+    link.textContent = "Open the full file";
+    td.appendChild(link);
+    tr.appendChild(td);
+    tbody.appendChild(tr);
+  }
+  table.replaceChildren(thead, tbody);
 }
 
 // ---------- Converter ----------
@@ -679,8 +805,10 @@ function markdownToHtml(md, pages = {}, files = {}) {
 
     text = escapeText(text);
     // Obsidian-style embeds (![[file]]). Runs before plain wikilinks since
-    // every embed contains a [[...]] pair. Resolved files become images;
-    // missing ones reuse the missing-link style so they stay clickable.
+    // every embed contains a [[...]] pair. Image uploads become images;
+    // PDFs become a file card that opens in a new tab (object/embed/iframe
+    // are sanitizer-dropped, and a PDF in an <img> renders broken).
+    // Missing files reuse the missing-link style so they stay clickable.
     text = text.replace(
       /!\[\[([^\[\]\n|#]+)(?:#[^\[\]\n|]*)?(?:\|([^\[\]\n]*))?\]\]/g,
       (_, target, alias) => {
@@ -689,6 +817,15 @@ function markdownToHtml(md, pages = {}, files = {}) {
         const label = raw.split("/").pop().trim() || raw;
         const url = fileMap[rawKey] ?? fileLowerMap[rawKey.toLowerCase()];
         if (url) {
+          if (/\.pdf$/i.test(rawKey)) {
+            return `<a class="embed embed--file" href="${safeUrl(url)}" target="_blank" title="${label}">${label}</a>`;
+          }
+          // CSVs hydrate into a compact table after render (see
+          // hydrateCsvEmbeds). The placeholder carries inert data-csv-*
+          // hooks, which the sanitizer below explicitly allows on tables.
+          if (/\.csv$/i.test(rawKey)) {
+            return `<table class="embed embed--table" data-csv-src="${safeUrl(url)}" data-csv-label="${label}"><tbody><tr><td>Loading preview…</td></tr></tbody></table>`;
+          }
           return `<img class="embed" src="${safeUrl(url)}" alt="${label}">`;
         }
         return `<a class="wikilink wikilink--missing" href="#" title="File not found">${label}</a>`;

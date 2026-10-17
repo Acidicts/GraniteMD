@@ -141,14 +141,14 @@ class Workspace < ApplicationRecord
   def workspace_file_map
     url_helpers = Rails.application.routes.url_helpers
     folders_by_id = folders.index_by(&:id)
-    workspace_files.includes(:folder, File_attachment: :blob)
+    workspace_files.includes(:folder, file_attachment: :blob)
                    .order("workspace_files.created_at ASC, workspace_files.id ASC")
                    .each_with_object({}) do |workspace_file, map|
       name = workspace_file.name.to_s.strip
       next if name.blank?
-      next unless workspace_file.File.attached?
+      next unless workspace_file.file.attached?
 
-      url = url_helpers.rails_blob_path(workspace_file.File, only_path: true)
+      url = url_helpers.rails_blob_path(workspace_file.file, only_path: true)
       map[name] ||= url
 
       segments = folder_path_segments(workspace_file.folder, folders_by_id)

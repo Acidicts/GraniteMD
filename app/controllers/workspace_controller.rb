@@ -1,5 +1,5 @@
 class WorkspaceController < ApplicationController
-  before_action :set_workspace, only: %i[ show new_file new_roadmap new_folder ]
+  before_action :set_workspace, only: %i[ show new_file new_workspace_file new_roadmap new_folder ]
 
   def show
     @workspace.ensure_root_folder
@@ -24,6 +24,17 @@ class WorkspaceController < ApplicationController
     render partial: "workspace/editor", locals: { page: page, workspace: page.workspace }
   end
   alias_method :changeFile, :change_file
+
+  def workspace_file
+    workspace_file = WorkspaceFile.find_by(id: params[:id])
+    return redirect_to dashboard_workspaces_path, alert: "We couldn't find that file" if workspace_file.nil?
+    if params[:workspace_public_id].present? && !workspace_matches?(workspace_file.folder.workspace, params[:workspace_public_id])
+      return redirect_to dashboard_workspaces_path, alert: "We couldn't find that file"
+    end
+    return redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace" unless workspace_file.workspace.users.exists?(current_user.id)
+
+    render partial: "workspace/file_preview", locals: { workspace_file: workspace_file, workspace: workspace_file.workspace }
+  end
 
   def change_roadmap
     roadmap = Roadmap.find_by(id: params[:id])
@@ -68,6 +79,43 @@ class WorkspaceController < ApplicationController
       end
     else
       redirect_to workspace_path(workspace), alert: @page.errors.full_messages.to_sentence
+    end
+  end
+
+  def new_workspace_file
+    workspace = @workspace
+
+    folder_id = params.dig(:workspace_file, :folder_id) || params[:folder_id]
+    folder = workspace.folders.find_by(id: folder_id) if folder_id.present?
+    if folder.nil?
+      if folder_id.present?
+        return redirect_to workspace_path(workspace), alert: "Choose a folder for the upload"
+      end
+      folder = workspace.ensure_root_folder
+    end
+    if folder.nil? || !folder.persisted?
+      return redirect_to workspace_path(workspace), alert: "Choose a folder for the upload"
+    end
+
+    uploaded = params.dig(:workspace_file, :file)
+    if uploaded.blank?
+      return redirect_to workspace_path(workspace), alert: "Choose a file to upload"
+    end
+
+    name = params.dig(:workspace_file, :name).to_s.strip
+    name = uploaded.original_filename.to_s.strip if name.blank?
+
+    @workspace = workspace
+    @workspace_file = folder.workspace_files.build(name: name)
+    @workspace_file.file.attach(uploaded)
+
+    if @workspace_file.save
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to workspace_path(workspace), notice: "File uploaded" }
+      end
+    else
+      redirect_to workspace_path(workspace), alert: @workspace_file.errors.full_messages.to_sentence
     end
   end
 

@@ -1,0 +1,6 @@
+<%# Response to POST /workspace/:workspace_id/files: reload the whole file %>
+<%# explorer via Turbo. Uploaded files have no editor view (preview is %>
+<%# a later item), so only the explorer frame is replaced. %>
+<%= turbo_stream.replace "workspace-file-explorer",
+      partial: "workspace/file_explorer",
+      locals: { workspace: @workspace } %>

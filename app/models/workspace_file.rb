@@ -16,7 +16,7 @@ class WorkspaceFile < ApplicationRecord
   belongs_to :folder
   has_one :workspace, through: :folder
 
-  has_one_attached :File
+  has_one_attached :file
 
   validates :name, presence: true
 end

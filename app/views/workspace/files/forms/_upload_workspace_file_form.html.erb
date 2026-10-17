@@ -1,0 +1,28 @@
+<%# Inline "upload file" placeholder row. Revealed by the upload buttons; %>
+<%# Escape cancels, choosing a file submits. Locals: workspace, folder (nil %>
+<%# for a blank workspace — the server picks/creates a default folder). %>
+<% form_id = folder ? "upload-workspace-file-form-#{folder.id}" : "new-workspace-file-form-root" %>
+<li id="<%= form_id %>"
+    class="workspace-explorer__new-page-item"
+    data-workspace--file-explorer-target="newWorkspaceFileForm"
+    <% if folder %>data-folder-id="<%= folder.id %>"<% end %>
+    hidden>
+  <%= form_with url: workspace_files_path(workspace), scope: :workspace_file, method: :post,
+        data: { action: "submit->workspace--file-explorer#guardNewWorkspaceFileSubmit", turbo: folder ? true : false } do |f| %>
+    <% if folder %>
+      <%= f.hidden_field :folder_id, value: folder.id %>
+    <% end %>
+    <span class="workspace-explorer__page-icon"><%= file_icon(width: 20, height: 20) %></span>
+    <div class="dropzone"
+        data-controller="components--image-dropzone"
+        data-action="dragover->components--image-dropzone#dragover dragleave->components--image-dropzone#dragleave drop->components--image-dropzone#drop paste->components--image-dropzone#paste keydown->components--image-dropzone#keydown"
+        tabindex="0" role="button" aria-label="Upload workspace image">
+        <%= f.file_field :file, class: "field file file--dropzone dropzone__input", accept: "image/jpeg,image/png,image/gif,image/webp,application/pdf,text/csv",
+            data: { "components--image-dropzone-target": "input",
+                    "workspace--file-explorer-target": "newWorkspaceFileInput",
+                    action: "change->components--image-dropzone#preview change->workspace--file-explorer#submitWorkspaceFileForm keydown->workspace--file-explorer#workspaceFileKeydown" } %>
+        <img hidden data-components--image-dropzone-target="preview" class="dropzone__preview" alt="Workspace image preview">
+        <p class="dropzone__prompt" data-components--image-dropzone-target="prompt">Drag &amp; drop, paste</p>
+    </div>
+  <% end %>
+</li>

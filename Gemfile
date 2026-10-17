@@ -35,6 +35,9 @@ gem "erb", ">= 6.0.4"
 gem "ruby-vips"
 gem "image_processing", "~> 1.2"
 
+# CSV parsing (standard library up to Ruby 3.3; a bundled gem since 3.4)
+gem "csv"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 

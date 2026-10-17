@@ -56,8 +56,10 @@
     <%= render partial: "workspace/files/items/folder", collection: subfolders, as: :folder, locals: { workspace: explorer_workspace } %>
     <%= render partial: "workspace/files/items/roadmap", collection: roadmaps, as: :roadmap, locals: { workspace: explorer_workspace } %>
     <%= render partial: "workspace/files/items/page", collection: pages, as: :page, locals: { workspace: explorer_workspace } %>
+    <%= render partial: "workspace/files/items/workspace_file", collection: folder.workspace_files.order(:name), as: :workspace_file, locals: { workspace: explorer_workspace } %>
     <%= render partial: "workspace/files/forms/new_folder_form", locals: { workspace: explorer_workspace, folder: folder } %>
     <%= render partial: "workspace/files/forms/new_roadmap_form", locals: { workspace: explorer_workspace, folder: folder } %>
     <%= render partial: "workspace/files/forms/new_page_form", locals: { workspace: explorer_workspace, folder: folder } %>
+    <%= render partial: "workspace/files/forms/upload_workspace_file_form", locals: { workspace: explorer_workspace, folder: folder } %>
   </ul>
 </li>

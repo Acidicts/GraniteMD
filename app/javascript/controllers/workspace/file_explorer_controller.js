@@ -5,7 +5,7 @@ import { Controller } from "@hotwired/stimulus"
 // Page navigation itself is a Turbo-frame link; this controller only
 // manages the visual active state and notifies listeners.
 export default class extends Controller {
-  static targets = ["folder", "folderChildren", "folderOpenIcon", "folderClosedIcon", "page", "newPageForm", "newPageInput", "newFolderForm", "newFolderInput", "newRoadmapForm", "newRoadmapInput", "contextMenu", "folderMenu", "pageMenu", "folderRenameButton", "pageDeleteButton"]
+  static targets = ["folder", "folderChildren", "folderOpenIcon", "folderClosedIcon", "page", "newPageForm", "newPageInput", "newFolderForm", "newFolderInput", "newRoadmapForm", "newRoadmapInput", "newWorkspaceFileForm", "newWorkspaceFileInput", "contextMenu", "folderMenu", "pageMenu", "folderRenameButton", "pageDeleteButton"]
 
   // Expand or collapse the folder containing the clicked toggle button.
   toggleFolder(event) {
@@ -83,6 +83,37 @@ export default class extends Controller {
     this.hideContextMenu()
   }
 
+  // "Upload file" button in the header/empty state: reveals the inline
+  // upload form for the button's folder id. Mirrors showNewFileForm.
+  showWorkspaceFileForm(event) {
+    this.#revealWorkspaceFileForm(event.currentTarget.dataset.folderId)
+  }
+
+  // "Upload file" button inside the right-click context menu: uses the
+  // folder id stored when the menu was opened, then closes the menu.
+  uploadWorkspaceFileFromContextMenu() {
+    const folderId = this.hasContextMenuTarget ? this.contextMenuTarget.dataset.id : null
+    this.#revealWorkspaceFileForm(folderId)
+    this.hideContextMenu()
+  }
+
+  // Escape cancels the upload placeholder.
+  workspaceFileKeydown(event) {
+    if (event.key !== "Escape") return
+    event.preventDefault()
+    this.#hideWorkspaceFileForm(event.target.closest("li"))
+  }
+
+  // Auto-submit the upload form as soon as a file is chosen — via the
+  // native dialog, drag & drop, or paste. The dropzone dispatches a
+  // bubbling change event for all three, so one handler covers them.
+  submitWorkspaceFileForm(event) {
+    const input = event.target.closest('input[type="file"]') ?? event.target
+    if (!input.files || input.files.length === 0) return
+    const form = input.closest("form")
+    if (form) form.requestSubmit()
+  }
+
   // Escape cancels the placeholder; Enter submits natively.
   newFolderKeydown(event) {
     if (event.key !== "Escape") return
@@ -112,6 +143,15 @@ export default class extends Controller {
     if (input && input.value.trim() === "") {
       event.preventDefault()
       this.#hideNewRoadmapForm(event.target.closest("li"))
+    }
+  }
+
+  // Submitting without a chosen file cancels instead of posting.
+  guardNewWorkspaceFileSubmit(event) {
+    const input = event.target.querySelector('input[type="file"]')
+    if (!input || !input.files || input.files.length === 0) {
+      event.preventDefault()
+      this.#hideWorkspaceFileForm(event.target.closest("li"))
     }
   }
 
@@ -384,6 +424,36 @@ export default class extends Controller {
     item.hidden = true
     const input = item.querySelector("input")
     if (input) input.value = ""
+  }
+
+  #hideWorkspaceFileForm(item) {
+    if (!item) return
+    item.hidden = true
+    const input = item.querySelector('input[type="file"]')
+    if (input) input.value = ""
+  }
+
+  #revealWorkspaceFileForm(folderId) {
+    const form = folderId
+      ? this.newWorkspaceFileFormTargets.find((el) => el.dataset.folderId === folderId)
+      : this.newWorkspaceFileFormTargets.find((el) => !el.dataset.folderId)
+    if (!form) return
+
+    const folder = form.closest('[data-workspace--file-explorer-target="folder"]')
+    if (folder) this.#setFolderExpanded(folder, true)
+
+    // Hide any other open upload placeholder so only one is visible at a time.
+    this.newWorkspaceFileFormTargets.forEach((el) => {
+      if (el !== form) {
+        el.hidden = true
+        const other = el.querySelector('input[type="file"]')
+        if (other) other.value = ""
+      }
+    })
+
+    form.hidden = false
+    const input = form.querySelector('input[type="file"]')
+    if (input) input.focus()
   }
 
   #hideRenameForm(item) {

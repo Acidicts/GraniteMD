@@ -34,6 +34,8 @@ Rails.application.routes.draw do
     get "/:workspace_public_id", action: :show, as: :workspace
     get "/:workspace_public_id/pages/new", to: redirect { |params, _req| "/workspace/#{params[:workspace_public_id]}" }, as: :new_workspace_page
     post "/:workspace_public_id/pages", action: :new_file, as: :workspace_pages
+    post "/:workspace_public_id/files", action: :new_workspace_file, as: :workspace_files
+    get "/:workspace_public_id/files/:id", action: :workspace_file, as: :workspace_file
     post "/:workspace_public_id/roadmaps", action: :new_roadmap, as: :workspace_roadmaps
     get "/:workspace_public_id/roadmaps/:id", action: :change_roadmap, as: :workspace_roadmap
     # Rename form and autosave share one PATCH endpoint (like pages);

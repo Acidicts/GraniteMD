@@ -1,0 +1,51 @@
+<%= turbo_frame_tag "workspace-editor" do %>
+    <% extension = File.extname(workspace_file.name.to_s).delete_prefix(".").downcase %>
+    <h2><%= File.basename(workspace_file.name.to_s, ".*") %><% if extension.present? %><span class="workspace-explorer__page-extention-accent">.</span><span class="workspace-explorer__page-extention"><%= extension %></span><% end %></h2>
+
+    <% if [ "png", "jpeg", "jpg", "webp" ].include?(extension) %>
+        <%= image_tag workspace_file.file, class: "file-preview__image" %>
+    <% elsif "pdf" == extension %>
+        <embed src="<%= url_for(workspace_file.file) %>" type="application/pdf" width="100%" height="100%" />
+    <% elsif "csv" == extension %>
+        <% if !workspace_file.file.attached? %>
+            <p class="file-preview__fallback">This file has no upload to preview.</p>
+        <% else %>
+            <% preview = csv_preview(workspace_file) %>
+            <% if preview.nil? %>
+                <p class="file-preview__fallback">Couldn't preview this CSV file. <%= link_to "Download it", rails_blob_path(workspace_file.file, disposition: "attachment") %> to view it.</p>
+            <% elsif preview[:headers].empty? && preview[:rows].empty? %>
+                <p class="file-preview__fallback">This CSV file is empty. <%= link_to "Download it", rails_blob_path(workspace_file.file, disposition: "attachment") %> to view it.</p>
+            <% else %>
+                <div class="file-preview__table-wrapper">
+                    <table class="file-preview__table">
+                        <thead>
+                            <tr>
+                                <% preview[:headers].each do |header| %>
+                                    <th scope="col"><%= header %></th>
+                                <% end %>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% preview[:rows].each do |row| %>
+                                <tr>
+                                    <% row.each do |cell| %>
+                                        <td><%= cell %></td>
+                                    <% end %>
+                                </tr>
+                            <% end %>
+                        </tbody>
+                    </table>
+                </div>
+                <% if preview[:truncated] %>
+                    <p class="file-preview__note">Showing the first <%= WorkspaceHelper::CSV_PREVIEW_MAX_ROWS %> rows. <%= link_to "Download the full file", rails_blob_path(workspace_file.file, disposition: "attachment") %> to see everything.</p>
+                <% end %>
+            <% end %>
+        <% end %>
+    <% else %>
+        <% if workspace_file.file.attached? %>
+            <p class="file-preview__fallback">No preview available for this file type. <%= link_to "Download it", rails_blob_path(workspace_file.file, disposition: "attachment") %> to view it.</p>
+        <% else %>
+            <p class="file-preview__fallback">This file has no upload to preview.</p>
+        <% end %>
+    <% end %>
+<% end %>

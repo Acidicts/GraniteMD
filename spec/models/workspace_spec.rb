@@ -176,7 +176,7 @@ RSpec.describe Workspace, type: :model do
 
   describe "#workspace_file_map" do
     def attach_upload(workspace_file, filename: "photo.png")
-      workspace_file.File.attach(
+      workspace_file.file.attach(
         io: StringIO.new("fake-image-bytes"),
         filename: filename,
         content_type: "image/png"
@@ -185,7 +185,7 @@ RSpec.describe Workspace, type: :model do
     end
 
     def blob_path(workspace_file)
-      Rails.application.routes.url_helpers.rails_blob_path(workspace_file.File, only_path: true)
+      Rails.application.routes.url_helpers.rails_blob_path(workspace_file.file, only_path: true)
     end
 
     it "maps exact-case file names with uploads to blob paths" do
@@ -238,7 +238,7 @@ RSpec.describe Workspace, type: :model do
 
   describe "#workspace_file_url_for" do
     def attach_upload(workspace_file, filename: "photo.png")
-      workspace_file.File.attach(
+      workspace_file.file.attach(
         io: StringIO.new("fake-image-bytes"),
         filename: filename,
         content_type: "image/png"
@@ -247,7 +247,7 @@ RSpec.describe Workspace, type: :model do
     end
 
     def blob_path(workspace_file)
-      Rails.application.routes.url_helpers.rails_blob_path(workspace_file.File, only_path: true)
+      Rails.application.routes.url_helpers.rails_blob_path(workspace_file.file, only_path: true)
     end
 
     it "resolves exact case, then falls back case-insensitively to the oldest" do
