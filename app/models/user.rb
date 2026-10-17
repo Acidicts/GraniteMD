@@ -72,6 +72,10 @@ class User < ApplicationRecord
     DEFAULT_STORAGE - self.used_storage.to_i.bytes
   end
 
+  def total_storage
+    DEFAULT_STORAGE
+  end
+
   def used_storage
     self.workspaces.sum(&:get_storage_use)
   end

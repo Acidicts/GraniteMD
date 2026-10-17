@@ -88,7 +88,9 @@ class Workspace < ApplicationRecord
   end
 
   def get_storage_use
-    self.pages.sum(Arel.sql("pg_column_size(pages)"))
+    row_bytes = self.pages.sum(Arel.sql("pg_column_size(pages)")) + self.roadmaps.sum(Arel.sql("pg_column_size(roadmaps)")) + self.workspace_files.sum(Arel.sql("pg_column_size(workspace_files)"))
+    blob_bytes = self.workspace_files.joins(file_attachment: :blob).sum("active_storage_blobs.byte_size")
+    row_bytes + blob_bytes
   end
 
   # Wikilink target => workspace page path, keyed by exact-case spelling:
