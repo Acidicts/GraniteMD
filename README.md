@@ -101,3 +101,11 @@ docker run --rm \
 
 ### Credits
 - RSpec Shard code and .github/actions/setup-[db/ruby] in ci.yml from [hackclub/hcb](https://github.com/hackclub/hcb)
+
+
+### AI was used to:
+- fix bugs
+- adjust styling of css
+- fix my stimulus targets
+- refactor code
+- fix route.rb
