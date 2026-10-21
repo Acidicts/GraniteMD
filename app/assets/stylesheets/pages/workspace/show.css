@@ -823,16 +823,56 @@
     font-weight: 400;
 }
 
-/* The empty pill is a button that opens the picker, so it resets the native
-   button chrome back to the pill look and signals clickability. */
-button.roadmap-task__assignee {
+/* The pill opens the picker, so it resets native button chrome back to the
+   pill look and signals clickability. It is a div with role="button" (a
+   native <button> cannot contain the clear <button>), so the reset applies
+   to the div as well. */
+button.roadmap-task__assignee,
+div.roadmap-task__assignee {
     font: inherit;
     cursor: pointer;
+}
+
+div.roadmap-task__assignee:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
 }
 
 button.roadmap-task__assignee--empty:hover {
     border-color: var(--text);
     color: var(--text);
+}
+
+/* Clear ("x") control pinned to the pill's trailing edge: it bleeds to the
+   pill border via negative margins so it reads as one flush control, with a
+   hairline divider and the pill's own right-side rounding (the pill clips
+   with overflow: hidden). Rendered only when an assignee is set -- the empty
+   "Unassigned" pill never includes it. */
+.roadmap-task__assignee-clear {
+    align-self: stretch;
+    display: inline-flex;
+    align-items: center;
+
+    margin: -0.1rem -0.45rem -0.1rem 0;
+    padding: 0.1rem 0.45rem;
+    border: 0;
+    border-left: 1px solid var(--border);
+    border-radius: 0 999px 999px 0;
+
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.roadmap-task__assignee-clear:hover {
+    background-color: var(--surface-2);
+    color: var(--text);
+}
+
+.roadmap-task__assignee--empty .roadmap-task__assignee-clear {
+    display: none;
 }
 
 /* Stands in for an avatar: the initials alone identify the assignee without
@@ -971,6 +1011,75 @@ button.roadmap-task__assignee--empty:hover {
     margin: 0;
     color: var(--muted);
     font-size: 0.85rem;
+}
+
+/* Overlay assignee menu: the pill button (current assignee or "Unassigned")
+   opens an inline member list, like the board cards' picker dialog. Inline
+   rather than a second dialog so a pick joins the overlay's own autosave
+   path instead of fighting the shared picker. Option rows reuse the shared
+   picker option styles (including their [hidden] filter handling). */
+.roadmap-task__assignee-picker {
+    position: relative;
+}
+
+.roadmap-assignee-menu {
+    position: absolute;
+    z-index: 30;
+    top: calc(100% + 0.25rem);
+    left: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
+    box-sizing: border-box;
+    width: min(18rem, 80vw);
+    max-height: 18rem;
+    overflow-y: auto;
+    padding: 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 0.6rem;
+
+    background-color: var(--surface);
+    color: var(--text);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+}
+
+.roadmap-assignee-menu[hidden] {
+    display: none;
+}
+
+.roadmap-assignee-menu__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.roadmap-assignee-menu__clear {
+    color: var(--muted);
+    font-style: italic;
+}
+
+/* Task overlay: one native dialog per roadmap, filled with the clicked card's
+   overlay frame. Native dialog gives Escape, focus containment, and the
+   ::backdrop dimming without extra JS. */
+.roadmap-task-overlay-dialog {
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+
+    background-color: var(--surface);
+    color: var(--text);
+}
+
+.roadmap-task-overlay-dialog::backdrop {
+    background-color: rgb(0 0 0 / 0.4);
+}
+
+.roadmap-task-overlay-dialog .roadmap-task {
+    box-sizing: border-box;
+    width: min(28rem, 90vw);
+    border: 0;
 }
 
 /* Obsidian-style [[ wikilink autocomplete popup. Anchored to the editor

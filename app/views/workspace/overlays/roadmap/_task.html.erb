@@ -1,0 +1,132 @@
+<%# Locals: roadmap_task (the persisted record). When rendered without a task %>
+<%# (the empty shell in the roadmap editor that click fills in), only the %>
+<%# frame is emitted. %>
+<%= turbo_frame_tag "roadmap-task-overlay" do %>
+  <% if local_assigns[:roadmap_task].present? %>
+    <%# An unsaved task has no roadmap, so the workspace and the assign URL are %>
+    <%# resolved defensively -- the editor only ever renders saved cards, but %>
+    <%# this partial is also rendered directly. %>
+    <% roadmap = roadmap_task.roadmap %>
+    <% workspace = roadmap&.workspace %>
+    <div class="roadmap-task roadmap-task--editing" data-roadmap-task-id="<%= roadmap_task.id %>">
+        <div class="roadmap-task__header">
+            <div class="roadmap-task__header-assignee-info">
+                <% if workspace %>
+                    <% org_name = workspace.organisation&.name %>
+                    <% label = org_name.presence || workspace.name %>
+                    <span class="roadmap-task__workspace" title="<%= label %>"><%= label %></span>
+                <% end %>
+            </div>
+            <div class="actions">
+                <button type="button"
+                        class="btn btn-icon"
+                        data-action="workspace--roadmap-editor#closeOverlay"
+                        aria-label="Close task details">✕</button>
+            </div>
+        </div>
+        <% save_url = (workspace&.persisted? && roadmap&.persisted?) ? workspace_roadmap_item_path(workspace, roadmap, roadmap_task) : nil %>
+        <% members = workspace ? workspace.users.order(:username) : User.none %>
+        <%= form_with model: roadmap_task, url: (save_url || "#"), method: :patch,
+                data: {
+                controller: "workspace--roadmap-task-editor",
+                action: "submit->workspace--roadmap-task-editor#handleSubmit click@window->workspace--roadmap-task-editor#dismissMenu",
+                "workspace--roadmap-task-editor-endpoint-value": save_url,
+                "workspace--roadmap-task-editor-task-id-value": roadmap_task.id,
+                "workspace--roadmap-task-editor-delay-value": 3000,
+            },
+                class: "roadmap-task__edit-form" do |f| %>
+            <%= f.label :assignee_id, "Assignee", class: "form-label" %>
+            <% current_assignee = roadmap_task.assignee %>
+            <div class="roadmap-task__assignee-picker">
+                <%= f.hidden_field :assignee_id,
+                        data: { "workspace--roadmap-task-editor-target": "assignee" } %>
+                <div role="button"
+                        tabindex="0"
+                        class="roadmap-task__assignee<%= " roadmap-task__assignee--empty" unless current_assignee %>"
+                        data-workspace--roadmap-task-editor-target="pill"
+                        data-action="click->workspace--roadmap-task-editor#toggleMenu keydown->workspace--roadmap-task-editor#pillKeydown"
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                        title="Assign this item">
+                    <% if current_assignee %>
+                        <% if current_assignee&.pfp_image.attached? %>
+                            <%= image_tag current_assignee.pfp_image, style: "width: 1rem; height: 1rem; border-radius: 50%;" %>
+                        <% else %>
+                            <span class="roadmap-task__assignee-avatar" aria-hidden="true"><%= current_assignee.username.first&.upcase %></span>
+                        <% end %>
+                        <span class="roadmap-task__assignee-name"><%= current_assignee.username %></span>
+                        <button type="button" class="roadmap-task__assignee-clear" data-action="click->workspace--roadmap-task-editor#clear" aria-label="Unassign" title="Unassign">×</button>
+                    <% else %>
+                        Unassigned
+                    <% end %>
+                </div>
+                <div class="roadmap-assignee-menu"
+                     hidden
+                     role="listbox"
+                     aria-label="Assign item"
+                     data-workspace--roadmap-task-editor-target="menu">
+                    <input type="search"
+                           class="field input roadmap-assignee-dialog__search"
+                           placeholder="Search people…"
+                           autocomplete="off"
+                           aria-label="Search workspace members"
+                           data-workspace--roadmap-task-editor-target="search"
+                           data-action="input->workspace--roadmap-task-editor#filter keydown->workspace--roadmap-task-editor#menuKeydown" />
+                    <div class="roadmap-assignee-menu__list" data-workspace--roadmap-task-editor-target="list">
+                        <button type="button"
+                                role="option"
+                                class="roadmap-assignee-dialog__option roadmap-assignee-menu__clear"
+                                data-action="click->workspace--roadmap-task-editor#choose"
+                                data-assignee-id=""
+                                data-assignee-name="unassigned"
+                                data-assignee-display=""
+                                aria-selected="<%= current_assignee.nil? %>">
+                            Unassigned
+                        </button>
+                        <% members.each do |member| %>
+                            <button type="button"
+                                    role="option"
+                                    class="roadmap-assignee-dialog__option"
+                                    data-action="click->workspace--roadmap-task-editor#choose"
+                                    data-assignee-id="<%= member.id %>"
+                                    data-assignee-name="<%= member.username.to_s.downcase %>"
+                                    data-assignee-display="<%= member.username %>"
+                                    data-assignee-initial="<%= member.username.first&.upcase %>"
+                                    aria-selected="<%= member.id == roadmap_task.assignee_id %>"
+                                    title="Assign to <%= member.username %>">
+                                <span class="roadmap-task__assignee-avatar" aria-hidden="true">
+                                    <% if member.pfp_image.attached? %>
+                                        <%= image_tag member.pfp_image, style: "width: 1rem; height: 1rem; border-radius: 50%;" %>
+                                    <% else %>
+                                        <%= member.username.first&.upcase %>
+                                    <% end %>
+                                </span>
+                                <span class="roadmap-assignee-dialog__option-name"><%= member.username %></span>
+                            </button>
+                        <% end %>
+                    </div>
+                    <p class="roadmap-assignee-dialog__empty" data-workspace--roadmap-task-editor-target="empty" hidden>No one matches that search.</p>
+                </div>
+            </div>
+
+            <%= f.label :header, "Item Name", class: "form-label" %>
+            <%= f.text_field :header, required: true,
+                    class: "field input", aria: { label: "Item name" },
+                    data: {
+                    "workspace--roadmap-task-editor-target": "header",
+                    action: "input->workspace--roadmap-task-editor#schedule change->workspace--roadmap-task-editor#schedule"
+                    } %>
+
+            <%= f.label :body, "Item Body", class: "form-label" %>
+            <%= f.text_area :body, rows: 4,
+                    class: "field input", aria: { label: "Item body" },
+                    data: {
+                    "workspace--roadmap-task-editor-target": "body",
+                    action: "input->workspace--roadmap-task-editor#schedule change->workspace--roadmap-task-editor#schedule"
+                    } %>
+
+            <div class="workspace-editor__status" data-workspace--roadmap-task-editor-target="status" role="status" aria-live="polite"></div>
+        <% end %>
+    </div>
+  <% end %>
+<% end %>

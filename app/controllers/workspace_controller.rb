@@ -176,6 +176,17 @@ class WorkspaceController < ApplicationController
     end
   end
 
+  def get_roadmap_item
+    roadmap = find_authorized_roadmap
+    return if roadmap.nil?
+    roadmap_task = roadmap.roadmap_tasks.find_by(id: params[:item_id])
+    if roadmap_task.nil?
+      return redirect_to workspace_roadmap_path(roadmap.workspace, roadmap), alert: "We couldn't find that item"
+    end
+
+    render partial: "workspace/overlays/roadmap/task", locals: { roadmap_task: roadmap_task }
+  end
+
   def new_roadmap_item
     roadmap = find_authorized_roadmap
     return if roadmap.nil?

@@ -20,6 +20,7 @@
 #
 class Organisation < ApplicationRecord
   belongs_to :organisation_application, optional: true
+  DEFAULT_STORAGE = 50.megabytes
 
   attribute :name, :string
 
@@ -35,6 +36,10 @@ class Organisation < ApplicationRecord
   # mirroring Workspace#to_param.
   def to_param
     public_id.presence || id&.to_s
+  end
+
+  def total_storage
+    DEFAULT_STORAGE
   end
 
   private

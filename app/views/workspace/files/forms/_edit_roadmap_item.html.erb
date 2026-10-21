@@ -24,8 +24,7 @@
         <%# frame into it. Nothing is discarded -- the card is re-rendered %>
         <%# server-side -- but a full visit is the honest way out. %>
         <%= link_to "Cancel", workspace_roadmap_path(workspace, roadmap),
-              class: "btn btn-tertiary",
-              data: { turbo_frame: "_top" } %>
+              class: "btn btn-tertiary" %>
       </div>
     <% end %>
   </div>

@@ -51,6 +51,7 @@ Rails.application.routes.draw do
     post "/:workspace_public_id/roadmaps/:id/items", action: :new_roadmap_item, as: :workspace_roadmap_items
     # Drag-and-drop re-categorising hits this. The task id is in the path so the
     # action can scope the lookup to this roadmap.
+    get "/:workspace_public_id/roadmaps/:id/items/overlay/:item_id", action: :get_roadmap_item, as: :get_workspace_roadmap_item
     get "/:workspace_public_id/roadmaps/:id/items/:item_id", action: :edit_roadmap_item, as: :edit_workspace_roadmap_item
     patch "/:workspace_public_id/roadmaps/:id/items/:item_id", action: :update_roadmap_item, as: :workspace_roadmap_item
     # The edit form and the drag/drop move share this one PATCH endpoint (as

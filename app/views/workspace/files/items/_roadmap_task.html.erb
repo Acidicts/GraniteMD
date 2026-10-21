@@ -6,7 +6,7 @@
     <% roadmap = roadmap_task.roadmap %>
     <% workspace = roadmap&.workspace %>
     <% assignable = roadmap_task.persisted? && roadmap&.persisted? && workspace&.persisted? %>
-    <div class="roadmap-task" data-roadmap-task-id="<%= roadmap_task.id %>" draggable=true>
+    <div class="roadmap-task" data-roadmap-task-id="<%= roadmap_task.id %>" id="roadmap_task_<%= roadmap_task.id %>" data-action="click->workspace--roadmap-editor#openOverlay" draggable=true>
         <div class="roadmap-task__header" draggable=true>
             <div class="roadmap-task__header-assignee-info" draggable=true>
                 <% assignee = roadmap_task.assignee %>
@@ -53,6 +53,5 @@
             </div>
         </div>
         <%= roadmap_task.header %>
-        <%= roadmap_task.body %>
     </div>
 <% end %>

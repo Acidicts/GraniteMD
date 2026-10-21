@@ -41,7 +41,13 @@
                     class="roadmap-assignee-dialog__option"
                     data-assignee-name="<%= member.username.to_s.downcase %>"
                     title="Assign to <%= member.username %>">
-              <span class="roadmap-task__assignee-avatar" aria-hidden="true"><%= member.username.first&.upcase %></span>
+              <span class="roadmap-task__assignee-avatar" aria-hidden="true">
+                  <% if member.pfp_image.attached? %>
+                      <%= image_tag member.pfp_image, style: "width: 1rem; height: 1rem; border-radius: 50%;" %>
+                  <% else %>
+                      <%= member.username.first&.upcase %>
+                  <% end %>
+              </span>
               <span class="roadmap-assignee-dialog__option-name"><%= member.username %></span>
             </button>
           <% end %>

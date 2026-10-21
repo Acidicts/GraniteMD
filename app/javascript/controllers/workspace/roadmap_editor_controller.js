@@ -1,9 +1,12 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  static targets = ["catagoryForm", "taskForm"];
+  static targets = ["catagoryForm", "taskForm", "overlayDialog"];
   // .../roadmaps/:id/items -- the move endpoint is this plus the task id.
-  static values = { itemsUrl: String };
+  static values = { 
+    itemsUrl: String,
+    roadmapItemUrl: String
+   };
 
   connect() {
     this.dragged = null;
@@ -29,6 +32,74 @@ export default class extends Controller {
     // lands after the frame is gone would fail against a stale catagory.
     this.moveRequest?.abort();
     this.moveRequest = null;
+  }
+
+  // Opens the task overlay for the clicked card. The base URL is the
+  // collection plus "/overlay" (see _roadmap_editor.html.erb); the task id is
+  // appended to hit GET .../items/overlay/:item_id, whose HTML replaces the
+  // frame inside the overlay dialog, which is then shown modally.
+  openOverlay(event) {
+    // Interactive elements keep their native behavior (edit link, assignee
+    // pill) -- only a click on the card itself opens the overlay.
+    if (event.target?.closest?.("button, a, input, textarea, dialog")) return;
+    const card = event.target?.closest?.(".roadmap-task");
+    const id = card?.dataset?.roadmapTaskId;
+    if (!id || !this.hasRoadmapItemUrlValue || !this.hasOverlayDialogTarget) return;
+
+    fetch(`${this.roadmapItemUrlValue}/${id}`, {
+      headers: {
+        Accept: "text/html",
+        "X-CSRF-Token": this.csrfToken,
+      },
+    })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Overlay load failed: ${response.status}`);
+        return response.text();
+      })
+      .then((html) => {
+        // The editor renders an empty "roadmap-task-overlay" frame shell;
+        // swap it for the fetched frame (same id) carrying the task.
+        const frame = document.getElementById("roadmap-task-overlay");
+        if (frame) frame.outerHTML = html;
+        if (!this.overlayDialogTarget.open) this.overlayDialogTarget.showModal();
+      })
+      .catch((error) => {
+        console.error("Loading item overlay failed", error);
+      });
+  }
+
+  closeOverlay() {
+    this.flushOverlaySave();
+    if (!this.hasOverlayDialogTarget) return;
+    if (this.overlayDialogTarget.open) this.overlayDialogTarget.close();
+  }
+
+  // Native dialog dismissal (Escape, or any close() not routed through
+  // closeOverlay) still needs to flush the editor's debounce.
+  overlayClosed() {
+    this.flushOverlaySave();
+  }
+
+  // Clicking off the overlay (backdrop, X, Escape) saves any pending edit
+  // immediately instead of waiting out the 3s debounce.
+  flushOverlaySave() {
+    if (!this.hasOverlayDialogTarget) return;
+    const editorElement = this.overlayDialogTarget.querySelector(
+      '[data-controller~="workspace--roadmap-task-editor"]',
+    );
+    if (!editorElement) return;
+    this.application?.getControllerForElementAndIdentifier?.(
+      editorElement,
+      "workspace--roadmap-task-editor",
+    )?.flush?.();
+  }
+
+  // The dialog's box is filled by the overlay frame, so a click that reaches
+  // the dialog itself is by definition on the backdrop the browser draws.
+  overlayBackdrop(event) {
+    if (!this.hasOverlayDialogTarget) return;
+    if (event.target !== this.overlayDialogTarget) return;
+    this.closeOverlay();
   }
 
   dragStart(event) {

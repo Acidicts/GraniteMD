@@ -8,6 +8,7 @@
 
     <div class="workspace-editor__textarea-wrapper__container" data-controller="workspace--roadmap-editor workspace--assignee-picker"
             data-workspace--roadmap-editor-items-url-value="<%= workspace_roadmap_items_path(workspace, roadmap) %>"
+            data-workspace--roadmap-editor-roadmap-item-url-value="<%= workspace_roadmap_items_path(workspace, roadmap) %>/overlay"
             data-action="click@window->workspace--roadmap-editor#dismissForms click->workspace--assignee-picker#open">
         <div class="workspace-editor__textarea-wrapper__header" style="display:flex; flex-direction:row; justify-content:space-between;">
             <p class="workspace-editor__textarea-wrapper__header-text"><%= roadmap.name %></p>
@@ -57,5 +58,15 @@
             <%= render partial: "workspace/files/items/roadmap_catagory", collection: @categories %>
         </div>
         <%= render partial: "workspace/files/items/assignee_picker", locals: { workspace: workspace, roadmap: roadmap } %>
+        <%# Task overlay shell: one native dialog per roadmap, shared by every %>
+        <%# card (same reason as the assignee picker -- Turbo replaces card %>
+        <%# frames on every move/save). Clicking a card fetches its overlay %>
+        <%# into the frame below and calls showModal on this dialog. %>
+        <dialog class="roadmap-task-overlay-dialog"
+                data-workspace--roadmap-editor-target="overlayDialog"
+                data-action="click->workspace--roadmap-editor#overlayBackdrop close->workspace--roadmap-editor#overlayClosed"
+                aria-label="Task details">
+            <%= render partial: "workspace/overlays/roadmap/task" %>
+        </dialog>
     </div>
 <% end %>

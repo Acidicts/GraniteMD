@@ -194,6 +194,11 @@ class Workspace < ApplicationRecord
     nil
   end
 
+  def get_owner
+    return self.organisation if self.organisation.present?
+    self.owner
+  end
+
   private
 
   # Folder names from the workspace root down to +folder+ (blank names

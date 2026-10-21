@@ -122,6 +122,21 @@ RSpec.describe "Workspace roadmap editor", type: :request do
       expect(response.body).to include('class="btn btn-icon"')
       expect(response.body).to include(%(aria-label="Add item to #{catagory.name}"))
     end
+
+    # Clicking a card opens the shared overlay dialog, so each card has to
+    # carry the open action and the editor has to render the dialog shell
+    # (with an empty overlay frame) plus the item URL the fetch appends to.
+    it "wires task cards to the overlay dialog" do
+      catagory = RoadmapCatagory.create!(roadmap: roadmap, name: "Done")
+      RoadmapTask.create!(roadmap: roadmap, header: "ship it", category: catagory.id, assignee: user)
+
+      get workspace_roadmap_path(workspace.public_id, roadmap)
+
+      expect(response.body).to include("workspace--roadmap-editor#openOverlay")
+      expect(response.body).to include("roadmap-task-overlay-dialog")
+      expect(response.body).to include(%(<turbo-frame id="roadmap-task-overlay">))
+      expect(response.body).to include("#{workspace_roadmap_items_path(workspace, roadmap)}/overlay")
+    end
   end
 
   describe "POST /:workspace_public_id/roadmaps/:id/catagories (new_catagory)" do
@@ -471,6 +486,51 @@ RSpec.describe "Workspace roadmap editor", type: :request do
       delete logout_path
 
       get edit_workspace_roadmap_item_path(workspace.public_id, roadmap, task)
+
+      expect(response).to redirect_to(login_path)
+    end
+  end
+
+  describe "GET /:workspace_public_id/roadmaps/:id/items/overlay/:item_id (get_roadmap_item)" do
+    before { sign_in user }
+
+    let!(:catagory) { RoadmapCatagory.create!(roadmap: roadmap, name: "Done") }
+    let!(:task) { RoadmapTask.create!(roadmap: roadmap, header: "ship it", body: "with tests",
+                                      category: catagory.id, assignee: user) }
+
+    # Clicking a card fetches this HTML into the overlay dialog's frame, so it
+    # must carry the task's details inside a matching frame.
+    it "renders the overlay frame with the task header and body" do
+      get get_workspace_roadmap_item_path(workspace.public_id, roadmap, task)
+
+      expect(response).to be_successful
+      expect(response.body).to include(%(<turbo-frame id="roadmap-task-overlay">))
+      expect(response.body).to include("ship it")
+      expect(response.body).to include("with tests")
+    end
+
+    it "redirects when the item is not on this roadmap" do
+      elsewhere = RoadmapTask.create!(roadmap: Roadmap.create!(name: "Other", folder: folder),
+                                      header: "elsewhere", category: catagory.id, assignee: user)
+
+      get get_workspace_roadmap_item_path(workspace.public_id, roadmap, elsewhere)
+
+      expect(response).to redirect_to(workspace_roadmap_path(workspace, roadmap))
+    end
+
+    it "redirects a user who is not a member of the workspace" do
+      delete logout_path
+      sign_in create(:user)
+
+      get get_workspace_roadmap_item_path(workspace.public_id, roadmap, task)
+
+      expect(response).to redirect_to(dashboard_workspaces_path)
+    end
+
+    it "redirects when not signed in" do
+      delete logout_path
+
+      get get_workspace_roadmap_item_path(workspace.public_id, roadmap, task)
 
       expect(response).to redirect_to(login_path)
     end
