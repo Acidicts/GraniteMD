@@ -39,8 +39,10 @@ RSpec.describe "Workspace roadmap editor", type: :request do
       expect(response.body).to include('class="roadmap-task__header-assignee-info"')
       expect(response.body).to include('id="roadmap-task-')
       expect(response.body).to include("ship it")
-      expect(response.body).to include("with tests")
       expect(response.body).to include('aria-label="Drag to reorder"')
+      # Cards are header-only: the body is fetched into the overlay dialog on
+      # click, so it must not be baked into the board.
+      expect(response.body).not_to include("with tests")
     end
 
     # The pencil navigates the card's own frame, so the edit action has to answer
