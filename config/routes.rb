@@ -34,6 +34,11 @@ Rails.application.routes.draw do
     get "/:workspace_public_id", action: :show, as: :workspace
     get "/:workspace_public_id/pages/new", to: redirect { |params, _req| "/workspace/#{params[:workspace_public_id]}" }, as: :new_workspace_page
     post "/:workspace_public_id/pages", action: :new_file, as: :workspace_pages
+    # Quick switcher: the page index the browser fuzzy-matches titles
+    # against, and the full-text search over page bodies. Both are
+    # declared before "pages/:id" so their literal segments win.
+    get "/:workspace_public_id/pages/index", action: :pages_index, as: :workspace_pages_index
+    get "/:workspace_public_id/pages/search", action: :search_pages, as: :search_workspace_pages
     post "/:workspace_public_id/files", action: :new_workspace_file, as: :workspace_files
     get "/:workspace_public_id/files/:id", action: :workspace_file, as: :workspace_file
     post "/:workspace_public_id/roadmaps", action: :new_roadmap, as: :workspace_roadmaps

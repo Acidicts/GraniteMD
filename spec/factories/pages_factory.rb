@@ -2,16 +2,18 @@
 #
 # Table name: pages
 #
-#  id         :bigint           not null, primary key
-#  body       :text
-#  name       :string
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  folder_id  :bigint           not null
+#  id            :bigint           not null, primary key
+#  body          :text
+#  name          :string
+#  search_vector :tsvector
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  folder_id     :bigint           not null
 #
 # Indexes
 #
-#  index_pages_on_folder_id  (folder_id)
+#  index_pages_on_folder_id      (folder_id)
+#  index_pages_on_search_vector  (search_vector) USING gin
 #
 # Foreign Keys
 #

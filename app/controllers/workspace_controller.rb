@@ -1,10 +1,40 @@
 class WorkspaceController < ApplicationController
-  before_action :set_workspace, only: %i[ show new_file new_workspace_file new_roadmap new_folder ]
+  before_action :set_workspace, only: %i[ show new_file new_workspace_file new_roadmap new_folder search_pages pages_index ]
 
   def show
     @workspace.ensure_root_folder
 
     render "workspace/show"
+  end
+
+  # Quick switcher: page titles are fuzzy-matched in the browser against
+  # the index the workspace page already carries, so the server only
+  # answers the full-text half of the search -- the words that appear
+  # inside a page body rather than in its title.
+  def search_pages
+    query = params[:q].to_s.first(500)
+    pages = @workspace.pages.search(query, limit: 20).includes(:folder)
+    paths = @workspace.page_paths(pages)
+
+    render json: {
+      results: pages.map do |page|
+        {
+          id: page.id,
+          name: page.name.to_s.strip,
+          path: paths[page.id],
+          url: workspace_page_path(@workspace, page),
+          snippet: page.search_snippet(query)
+        }
+      end
+    }
+  end
+
+  # The page index the switcher fuzzy-matches against: the same map the
+  # wikilink autocomplete uses, plus the workspace files it offers next
+  # to the pages. It is fetched again when the switcher opens, so pages
+  # created or renamed after this page was loaded are still found.
+  def pages_index
+    render json: { pages: @workspace.page_link_map, files: @workspace.file_index }
   end
 
   def update

@@ -223,21 +223,44 @@ export default class extends Controller {
   selectPage(event) {
     const selected = event.currentTarget
 
-    this.pageTargets.forEach((page) => {
-      const active = page === selected
-      page.classList.toggle("is-active", active)
-      if (active) {
-        page.setAttribute("aria-current", "page")
-      } else {
-        page.removeAttribute("aria-current")
-      }
-    })
+    this.#markActive(selected)
 
     this.dispatch("page-select", {
       detail: { id: selected.dataset.pageId },
       bubbles: true,
       cancelable: false
     })
+  }
+
+  connect() {
+    this._openPage = (event) => this.activatePage(event.detail?.id, event.detail?.kind)
+    document.addEventListener("workspace:open-page", this._openPage)
+  }
+
+  disconnect() {
+    document.removeEventListener("workspace:open-page", this._openPage)
+  }
+
+  // Highlight the page or file the quick switcher opened. The switcher
+  // navigates the editor frame without going through the explorer's own
+  // links, so the tree would otherwise keep marking the old row as
+  // active.
+  activatePage(id, kind) {
+    if (!id) return
+    const item = this.#switcherItemFor(String(id), kind)
+    if (!item) return
+
+    const link = item.querySelector(".workspace-explorer__page")
+    if (link) this.#markActive(link)
+    item.scrollIntoView({ block: "nearest" })
+
+    // Fold every ancestor folder open so the opened row is actually
+    // visible; its rows stay in the DOM behind the `hidden` flag.
+    let folder = item.closest('[data-workspace--file-explorer-target="folder"]')
+    while (folder) {
+      this.#setFolderExpanded(folder, true)
+      folder = folder.parentElement?.closest('[data-workspace--file-explorer-target="folder"]')
+    }
   }
 
   // Open the menu from a ⋯ button, anchored below the button like in VS
@@ -310,6 +333,19 @@ export default class extends Controller {
   // Expand every folder in the tree.
   expandAll() {
     this.folderTargets.forEach((item) => this.#setFolderExpanded(item, true))
+  }
+
+  // Mark one page row as the active one and clear the others.
+  #markActive(selected) {
+    this.pageTargets.forEach((page) => {
+      const active = page === selected
+      page.classList.toggle("is-active", active)
+      if (active) {
+        page.setAttribute("aria-current", "page")
+      } else {
+        page.removeAttribute("aria-current")
+      }
+    })
   }
 
   #setFolderExpanded(item, expanded) {
@@ -511,6 +547,16 @@ export default class extends Controller {
     const selector = kind === "roadmap"
       ? `.workspace-explorer__roadmap-item[data-roadmap-id="${id}"]`
       : `.workspace-explorer__page-item[data-page-id="${id}"]`
+    return this.element.querySelector(selector)
+  }
+
+  // The row of the page or file the quick switcher opened. Page ids and
+  // file ids come from different tables and can be the same number, so
+  // the row is found by its own id ("workspace-page-12" /
+  // "workspace-file-12") instead of the shared data-page-id attribute.
+  #switcherItemFor(id, kind) {
+    if (!id) return null
+    const selector = kind === "file" ? `#workspace-file-${id}` : `#workspace-page-${id}`
     return this.element.querySelector(selector)
   }
 

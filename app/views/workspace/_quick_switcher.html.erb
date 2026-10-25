@@ -1,0 +1,36 @@
+<%# Quick switcher (Ctrl+K / Cmd+K): fuzzy title match over the page %>
+<%# index plus a full-text search over the page bodies. %>
+<dialog class="workspace-switcher__dialog"
+        aria-label="Search pages"
+        data-workspace--quick-switcher-target="dialog"
+        data-action="click->workspace--quick-switcher#backdrop">
+  <div class="workspace-switcher__panel">
+    <div class="workspace-switcher__field">
+      <%= search_icon(width: 16, height: 16, color: "var(--muted)") %>
+      <input type="text"
+             class="workspace-switcher__input"
+             placeholder="Search pages…"
+             autocomplete="off"
+             autocapitalize="off"
+             spellcheck="false"
+             role="combobox"
+             aria-expanded="false"
+             aria-controls="workspace-switcher-results"
+             aria-autocomplete="list"
+             aria-label="Search pages"
+             data-workspace--quick-switcher-target="input"
+             data-action="input->workspace--quick-switcher#search keydown->workspace--quick-switcher#navigate">
+    </div>
+    <div class="workspace-switcher__results"
+         id="workspace-switcher-results"
+         role="listbox"
+         aria-label="Search results"
+         data-workspace--quick-switcher-target="results"></div>
+    <p class="workspace-switcher__empty" data-workspace--quick-switcher-target="empty" hidden>No matching pages</p>
+    <div class="workspace-switcher__footer">
+      <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+      <span><kbd>↵</kbd> open</span>
+      <span><kbd>esc</kbd> close</span>
+    </div>
+  </div>
+</dialog>

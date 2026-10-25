@@ -174,6 +174,50 @@ RSpec.describe Workspace, type: :model do
     end
   end
 
+  describe "#file_index" do
+    def attach_upload(workspace_file, filename: "photo.png")
+      workspace_file.file.attach(
+        io: StringIO.new("fake-image-bytes"),
+        filename: filename,
+        content_type: "image/png"
+      )
+      workspace_file
+    end
+
+    it "lists the files with an upload, their folder and their preview url" do
+      workspace = create(:workspace)
+      folder = create(:folder, workspace: workspace, name: "Assets", parent: workspace.folder)
+      file = attach_upload(create(:workspace_file, name: "photo.png", folder: folder))
+      preview_url = Rails.application.routes.url_helpers.workspace_file_path(workspace, file)
+      expected = [ { id: file.id, name: "photo.png", folder: "Assets", url: preview_url } ]
+
+      expect(workspace.file_index).to eq(expected)
+    end
+
+    it "skips files without an upload" do
+      workspace = create(:workspace)
+      folder = create(:folder, workspace: workspace, name: "Assets", parent: workspace.folder)
+      create(:workspace_file, name: "missing.png", folder: folder)
+
+      expect(workspace.file_index).to eq([])
+    end
+
+    it "leaves the workspace root out of the folder" do
+      workspace = create(:workspace)
+      file = attach_upload(create(:workspace_file, name: "photo.png", folder: workspace.folder))
+
+      expect(workspace.file_index.first[:folder]).to eq("")
+    end
+
+    it "does not list the files of another workspace" do
+      workspace = create(:workspace)
+      other = create(:workspace)
+      attach_upload(create(:workspace_file, name: "photo.png", folder: create(:folder, workspace: other)))
+
+      expect(workspace.file_index).to eq([])
+    end
+  end
+
   describe "#workspace_file_map" do
     def attach_upload(workspace_file, filename: "photo.png")
       workspace_file.file.attach(

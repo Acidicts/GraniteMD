@@ -15,6 +15,14 @@
        data-folder-id="<%= root_folder.id %>"
        <% end %>>
     <span class="workspace-explorer__title"><%= explorer_workspace&.name.presence || "Files" %></span>
+    <button type="button"
+            class="workspace-explorer__search-btn"
+            data-action="click->workspace--quick-switcher#open"
+            title="Search pages (Ctrl+K)"
+            aria-label="Search pages (Ctrl+K)">
+      <%= search_icon(width: 16, height: 16) %>
+      <span class="workspace-explorer__search-btn-label">Search</span>
+    </button>
     <% if root_folder.present? %>
       <button type="button"
               class="workspace-explorer__menu-btn"

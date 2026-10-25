@@ -408,4 +408,18 @@ end
                 width: width, height: height,
                 role: "img", aria: { label: label })
   end
+
+  SEARCH_ICON_PATH = "M10.5 3a7.5 7.5 0 1 0 4.55 13.46l4.24 4.25a1 1 0 0 0 1.42-1.42l-4.25-4.24A7.5 7.5 0 0 0 10.5 3Zm0 2a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11Z".freeze
+
+  def search_icon(width: 24, height: 24, color: "currentColor", label: "Search")
+    content_tag(:svg,
+                tag.path(d: SEARCH_ICON_PATH, fill: color),
+                xmlns: "http://www.w3.org/2000/svg",
+                viewBox: "0 0 24 24",
+                fill: "none",
+                preserveAspectRatio: "xMidYMid meet",
+                width: width,
+                height: height,
+                role: "img", aria: { label: label })
+  end
 end

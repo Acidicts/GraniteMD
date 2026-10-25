@@ -1,7 +1,13 @@
 <%= stylesheet_link_tag "pages/workspace/show.css" %>
 <%= stylesheet_link_tag "components/forms.css" %>
 
-<div class="workspace_page">
+<div class="workspace_page"
+     data-controller="workspace--quick-switcher"
+     data-workspace--quick-switcher-pages-value="<%= @workspace.page_link_map.to_json %>"
+     data-workspace--quick-switcher-files-value="<%= @workspace.file_index.to_json %>"
+     data-workspace--quick-switcher-search-url-value="<%= search_workspace_pages_path(@workspace) %>"
+     data-workspace--quick-switcher-index-url-value="<%= workspace_pages_index_path(@workspace) %>">
     <%= render "workspace/file_explorer", workspace: @workspace %>
     <%= render "workspace/editor", page: Page.new, workspace: @workspace %>
+    <%= render "workspace/quick_switcher", workspace: @workspace %>
 </div>

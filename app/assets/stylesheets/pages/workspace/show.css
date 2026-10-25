@@ -1177,3 +1177,171 @@ button.roadmap-task__assignee--empty:hover {
     font-size: 0.85rem;
     margin-top: 0.5rem;
 }
+
+/* Quick switcher (Ctrl+K / Cmd+K). A native dialog gives the overlay,
+   the Escape key and the focus handling without any of it in JS. */
+.workspace-switcher__dialog {
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+
+    background-color: var(--surface-1);
+    color: var(--text);
+
+    width: min(38rem, 92vw);
+    max-height: min(32rem, 80vh);
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+}
+
+.workspace-switcher__dialog::backdrop {
+    background-color: rgb(0 0 0 / 0.4);
+}
+
+.workspace-switcher__panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    box-sizing: border-box;
+    padding: 0.5rem;
+}
+
+.workspace-switcher__field {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    padding: 0.25rem 0.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.workspace-switcher__input {
+    flex: 1;
+    min-width: 0;
+
+    border: none;
+    outline: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    padding: 0.35rem 0;
+}
+
+.workspace-switcher__results {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    max-height: 22rem;
+    overflow-y: auto;
+}
+
+.workspace-switcher__result {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+
+    box-sizing: border-box;
+    padding: 0.4rem 0.55rem;
+    border: 1px solid transparent;
+    border-radius: 0.5rem;
+
+    color: var(--text);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.workspace-switcher__result:hover,
+.workspace-switcher__result--active {
+    background-color: var(--surface-2);
+    border-color: var(--border);
+}
+
+.workspace-switcher__result-name {
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.workspace-switcher__result-folder {
+    font-size: 0.75rem;
+    color: var(--muted);
+}
+
+.workspace-switcher__result-snippet {
+    font-size: 0.8rem;
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.workspace-switcher__result mark {
+    background-color: var(--selection);
+    color: inherit;
+    border-radius: 0.15rem;
+    padding: 0 0.05rem;
+}
+
+.workspace-switcher__empty {
+    margin: 0;
+    padding: 0.75rem 0.55rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+}
+
+.workspace-switcher__footer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+
+    padding: 0.35rem 0.55rem 0.1rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.75rem;
+}
+
+.workspace-switcher__footer kbd {
+    font-family: inherit;
+    font-size: 0.7rem;
+    padding: 0 0.25rem;
+    margin-right: 0.15rem;
+    border: 1px solid var(--border);
+    border-radius: 0.25rem;
+    background-color: var(--surface-2);
+}
+
+/* The search button in the explorer header: it opens the quick switcher,
+   which the Ctrl+K shortcut does as well. */
+.workspace-explorer__search-btn {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+
+    padding: 0.2rem 0.4rem;
+    border: 1px solid var(--border);
+    border-radius: 0.375rem;
+
+    background-color: var(--surface-1);
+    color: inherit;
+    font: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+    opacity: 0.75;
+}
+
+.workspace-explorer__search-btn:hover,
+.workspace-explorer__search-btn:focus-visible {
+    opacity: 1;
+    background-color: var(--surface-2);
+}
+
+@media (max-width: 40rem) {
+    .workspace-explorer__search-btn-label {
+        display: none;
+    }
+}
