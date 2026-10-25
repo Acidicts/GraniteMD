@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_17_115436) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_21_101500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -83,7 +83,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_17_115436) do
     t.bigint "folder_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.virtual "search_vector", type: :tsvector, as: "to_tsvector('simple'::regconfig, (((COALESCE(name, ''::character varying))::text || ' '::text) || COALESCE(body, ''::text)))", stored: true
     t.index ["folder_id"], name: "index_pages_on_folder_id"
+    t.index ["search_vector"], name: "index_pages_on_search_vector", using: :gin
   end
 
   create_table "roadmap_catagories", force: :cascade do |t|
