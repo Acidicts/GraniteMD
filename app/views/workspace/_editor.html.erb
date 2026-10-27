@@ -20,18 +20,21 @@
                 <% end %>
             </div>
             <div class="workspace-editor__textarea-wrapper">
-                <%= f.textarea :body,
-                                class: "workspace-editor__textarea",
-                                wrap: "off",
-                                spellcheck: false,
-                                rows: 1,
-                                disabled: !persisted,
-                                placeholder: (persisted ? "" : ""),
-                                data: {
-                                "workspace--editor-target": "textarea",
-                                "markdown-target": "input",
-                                action: "input->workspace--editor#fileChange change->workspace--editor#fileChange input->markdown#update click->markdown#update keydown->markdown#onKeyDown"
-                                } %>
+                <div class="workspace-editor__input-stack">
+                    <pre class="workspace-editor__highlight" data-workspace--editor-target="highlight" aria-hidden="true"></pre>
+                    <%= f.textarea :body,
+                                    class: "workspace-editor__textarea",
+                                    wrap: "off",
+                                    spellcheck: false,
+                                    rows: 1,
+                                    disabled: !persisted,
+                                    placeholder: (persisted ? "" : ""),
+                                    data: {
+                                    "workspace--editor-target": "textarea",
+                                    "markdown-target": "input",
+                                    action: "input->workspace--editor#fileChange change->workspace--editor#fileChange input->markdown#update click->markdown#update keydown->markdown#onKeyDown"
+                                    } %>
+                </div>
                 <div class="wikilink-suggest" data-markdown-target="suggestions" role="listbox" hidden></div>
             </div>
         </div>

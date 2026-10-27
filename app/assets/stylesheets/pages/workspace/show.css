@@ -350,6 +350,47 @@
     background-color: transparent;
 }
 
+.workspace-editor__input-stack {
+    display: grid;
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    /* Percentage heights inside the stack resolve against this, so the
+       textarea still fills the panel for short files. */
+    min-height: 100%;
+}
+
+.workspace-editor__input-stack > * { grid-area: 1/1 }
+
+.workspace-editor__highlight {
+    margin: 0;
+    padding: 8px;
+    white-space: pre;
+    font: inherit;
+    pointer-events: none;
+    color: var(--text);
+}
+
+.workspace-editor__highlight .md-syntax {
+    color: var(--muted);
+}
+
+.workspace-editor__highlight .md-accent {
+    color: var(--accent);
+}
+
+.workspace-editor__highlight .md-link {
+    font-weight: 600;
+    color: var(--link);
+}
+
+/* Editor headings stay monospace/same-size as the textarea — muted block. */
+.workspace-editor__highlight :is(h1, h2, h3, h4, h5, h6) {
+    font: inherit;
+    margin: 0;
+    color: var(--muted);
+}
+
 .workspace-editor__textarea-wrapper::before {
     content: var(--line-numbers, "1");
     position: sticky;
@@ -365,7 +406,6 @@
 }
 
 .workspace-editor__textarea {
-    flex: 1;
     min-width: 0;
     min-height: 100%;             /* fills the wrapper even for short files */
     box-sizing: border-box;       /* so scrollHeight matches the height we set */
@@ -378,7 +418,21 @@
     white-space: pre;
     font: inherit;                /* same metrics as the gutter */
     background: transparent;
-    color: inherit;
+    color: transparent;
+    caret-color: var(--text);
+}
+
+/* The real glyphs come from the highlight layer, but if that layer never
+   rendered (no JS, missing target) the textarea must stay readable. */
+.workspace-editor__highlight:empty ~ .workspace-editor__textarea {
+    color: var(--text);
+}
+
+/* The textarea's own glyphs are transparent, so an opaque UA selection
+   background would paint straight over the highlight layer and hide the
+   selected text. Keep the selection translucent so those glyphs show through. */
+.workspace-editor__textarea::selection {
+    background-color: rgb(from var(--selection) r g b / 0.55);
 }
 
 /* Disabled form controls swallow mouse events entirely, so the click never

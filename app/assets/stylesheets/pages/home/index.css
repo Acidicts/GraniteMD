@@ -189,11 +189,11 @@
 
 .editor-file-editor-markdown-code .bold {
     font-weight: 800;
-    color: black;
+    color: var(--text);
 }
 
 .editor-file-editor-markdown-code .text {
-    color: black;
+    color: var(--text);
 }
 
 .editor-file-preview blockquote > :first-child,
