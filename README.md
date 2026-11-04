@@ -69,7 +69,7 @@ This uses databases, and email smtp to run
 	    volumes:
 	      - postgres_data:/var/lib/postgresql/data
 	    healthcheck:
-	      test: ["CMD-SHELL", "pg_isready -U postgres -d issued_production"]
+	      test: ["CMD-SHELL", "pg_isready -U postgres -d granitemd_production"]
 	      interval: 5s
 	      timeout: 5s
 	      retries: 10
