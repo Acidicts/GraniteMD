@@ -82,10 +82,12 @@ Rails.application.routes.draw do
     get "profile/edit", to: "users#edit"
   end
 
-  # scope "admin", as: "admin", module: "admin" do
-  #   scope "superadmin", as: "superadmin", module: "superadmin" do
-  #   end
-  # end
+  scope "admin", as: "admin", module: "admin" do
+    scope "superadmin", as: "superadmin", module: "superadmin" do
+      get "dashboard" => "dashboard#index", as: :dashboard
+    end
+    get "dashboard" => "dashboard#index", as: :dashboard
+  end
 
   mount MissionControl::Jobs::Engine, at: "/jobs"
   get "up"    => "rails/health#show", as: :rails_health_check
