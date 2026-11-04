@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-  # mount MissionControl::Jobs::Engine, at: "/jobs"
   root "home#index", as: :home
 
   controller :home do
@@ -83,5 +82,11 @@ Rails.application.routes.draw do
     get "profile/edit", to: "users#edit"
   end
 
-  get "up" => "rails/health#show", as: :rails_health_check
+  # scope "admin", as: "admin", module: "admin" do
+  #   scope "superadmin", as: "superadmin", module: "superadmin" do
+  #   end
+  # end
+
+  mount MissionControl::Jobs::Engine, at: "/jobs"
+  get "up"    => "rails/health#show", as: :rails_health_check
 end

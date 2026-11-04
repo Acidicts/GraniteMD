@@ -45,13 +45,13 @@ class PasswordsController < ApplicationController
   end
 
   def send_reset_instructions(user)
-    helpers.send_email(
-      user.email_address,
-      "Password Reset",
-      "A password reset was requested for your GraniteMD account. " \
-      "<a href='#{edit_password_url(user.generate_token_for(:password_reset))}'>Choose a new password</a>. " \
-      "This link expires #{User::PASSWORD_RESET_TOKEN_TTL.inspect} after it was sent. " \
-      "If you did not request it, no changes have been made and you can ignore this email."
-    )
+    EmailMailer.send_email(
+      to: user.email_address,
+      subject: "Password Reset Request",
+      body: "<p>A password reset was requested for your GraniteMD account.</p>
+      <a href='#{edit_password_url(user.generate_token_for(:password_reset))}'>Choose a new password</a>
+      <p>This link expires #{User::PASSWORD_RESET_TOKEN_TTL.inspect} after it was sent.</p>
+      <p>If you did not request it, no changes have been made and you can ignore this email.</p>"
+    ).deliver_later(priority: 1)
   end
 end

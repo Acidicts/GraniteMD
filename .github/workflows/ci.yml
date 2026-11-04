@@ -238,3 +238,15 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Coolify redeploy
+        env:
+          WEBHOOK: ${{ secrets.COOLIFY_WEBHOOK }}
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+        run: |
+          curl --fail-with-body --silent --show-error \
+            -X POST "$WEBHOOK" \
+            -H "Authorization: Bearer $COOLIFY_TOKEN"

@@ -118,4 +118,71 @@ RSpec.describe User, type: :model do
       expect { user.destroy }.to change { workspace.users.reload.count }.by(-1)
     end
   end
+
+  describe "greet email" do
+    include ActiveJob::TestHelper
+    include ActionMailer::TestHelper
+
+    before do
+      allow(ENV).to receive(:fetch).and_call_original
+      allow(ENV).to receive(:fetch).with("APP_HOST").and_return("https://example.com")
+    end
+
+    it "enqueues the welcome email when greet_email is true" do
+      expect {
+        create(:user, email_address: "sam@example.com", greet_email: true)
+      }.to have_enqueued_mail(EmailMailer, :send_email).with(
+        a_hash_including(
+          to: "sam@example.com",
+          subject: "Welcome to GraniteMD"
+        )
+      )
+    end
+
+    it "links to the dashboard with a well-formed URL" do
+      expect {
+        create(:user, greet_email: true)
+      }.to have_enqueued_mail(EmailMailer, :send_email).with(
+        a_hash_including(body: a_string_including('<a href="https://example.com/dashboard">here</a>'))
+      )
+    end
+
+    it "does not send when greet_email is omitted" do
+      expect { create(:user) }.not_to have_enqueued_mail(EmailMailer, :send_email)
+    end
+
+    it "does not send when greet_email is false" do
+      expect {
+        create(:user, greet_email: false)
+      }.not_to have_enqueued_mail(EmailMailer, :send_email)
+    end
+
+    it "treats the string 'false' as false (e.g. from params)" do
+      expect {
+        create(:user, greet_email: "false")
+      }.not_to have_enqueued_mail(EmailMailer, :send_email)
+    end
+
+    it "does not send on update" do
+      user = create(:user, greet_email: true)
+      clear_enqueued_jobs
+
+      expect {
+        user.update!(first_name: "Sam")
+      }.not_to have_enqueued_mail(EmailMailer, :send_email)
+    end
+
+    it "does not send if the record fails to save" do
+      user = build(:user, password: "short", password_confirmation: "short", greet_email: true)
+
+      expect { user.save }.not_to have_enqueued_mail(EmailMailer, :send_email)
+      expect(user).not_to be_persisted
+    end
+
+    it "does not persist the flag" do
+      user = create(:user, greet_email: true)
+
+      expect(User.find(user.id).greet_email).to be(false)
+    end
+  end
 end

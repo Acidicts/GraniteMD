@@ -82,6 +82,9 @@ module Granitemd
 
     config.hosts << Granitemd.app_host(env_key: "APP_URL", default: "localhost")
 
+    # config/initializers/mission_control.rb (or config/application.rb)
+    config.mission_control.jobs.base_controller_class = "Admin::Superadmin::JobsController"
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files

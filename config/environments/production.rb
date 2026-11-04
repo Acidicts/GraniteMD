@@ -91,4 +91,9 @@ Rails.application.configure do
   smtp_settings[:authentication] = ENV.fetch("SMTP_AUTHENTICATION", "plain").to_sym if smtp_settings[:user_name]
 
   config.action_mailer.smtp_settings = smtp_settings
+
+  # Mission Control ships with HTTP basic auth enabled but no credentials set,
+  # which returns a bare 401. In production, rely on the app's own session login
+  # (its controller inherits ApplicationController) instead.
+  config.mission_control.jobs.http_basic_auth_enabled = false
 end

@@ -53,4 +53,14 @@ Rails.application.configure do
   # Emails are collected in ActionMailer::Base.deliveries instead of being sent.
   config.action_mailer.delivery_method = :test
   config.action_mailer.default_url_options = { host: "www.example.com" }
+
+  # Mission Control ships with HTTP basic auth enabled but no credentials set,
+  # which returns a bare 401. In tests, rely on the app's own session login
+  # (its controller inherits ApplicationController) instead.
+  config.mission_control.jobs.http_basic_auth_enabled = false
+
+  # Mission Control's server expects a queue adapter that implements its
+  # MissionControl::Jobs::Adapter interface (e.g. `activating`). Rails' :test
+  # adapter does not, so point Mission Control at the in-memory async adapter.
+  config.mission_control.jobs.adapters = [ :async ]
 end

@@ -60,13 +60,18 @@ class User < ApplicationRecord
   validate :pfp_image_content_type
   validate :pfp_image_size
 
+  attribute :greet_email, :boolean, default: false
+  after_create_commit :send_greet_email, if: :greet_email
 
-  attribute :role, :integer, default: 0
   enum :role, {
     user:       0, # Standard User
     admin:      1, # Operations (Org Approval)
     superadmin: 2  # Creates Admin
-  }
+  }, default: :user
+
+  def admin?
+    super || superadmin?
+  end
 
   def available_storage
     DEFAULT_STORAGE - self.used_storage.to_i.bytes
@@ -95,5 +100,19 @@ class User < ApplicationRecord
     if pfp_image.byte_size >= 2.megabytes
       errors.add(:base, "must be less than 2MB")
     end
+  end
+
+  private
+
+  def send_greet_email
+    EmailMailer.send_email(
+      to: email_address,
+      subject: "Welcome to GraniteMD",
+      body: "Welcome to GraniteMD get started <a href=\"#{dashboard_url}\">here</a>"
+    ).deliver_later(priority: 5)
+  end
+
+  def dashboard_url
+    URI.join(ENV.fetch("APP_HOST") { Granitemd.app_host(env_key: "APP_HOST", default: "granitemd.bing-bong.uk") }, "dashboard").to_s
   end
 end

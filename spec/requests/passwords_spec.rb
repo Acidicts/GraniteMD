@@ -13,6 +13,8 @@ RSpec.describe "Password resets", type: :request do
   end
 
   before do
+    # Keep the delivery and job assertions below scoped to password resets.
+    user
     ActionMailer::Base.deliveries.clear
     clear_enqueued_jobs
   end
@@ -34,6 +36,7 @@ RSpec.describe "Password resets", type: :request do
 
       expect(response).to redirect_to(login_path)
       expect(ActionMailer::Base.deliveries.size).to eq(1)
+      expect(ActionMailer::Base.deliveries.last.subject).to eq("Password Reset Request")
 
       token = token_from_last_email
       expect(token).to be_present
