@@ -245,12 +245,12 @@ jobs:
     steps:
       - name: Trigger Coolify redeploy
         env:
-          WEBHOOK: ${{ secrets.COOLIFY_WEBHOOK }}
+          WEBHOOK: ${{ secrets.COOLIFY_NETWORK }}
           COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
         run: |
           set -euo pipefail
           if [ -z "${WEBHOOK:-}" ]; then
-            echo "COOLIFY_WEBHOOK secret is not set" >&2
+            echo "COOLIFY_NETWORK secret is not set" >&2
             exit 1
           fi
           args=(-X POST "$WEBHOOK" --silent --show-error --fail-with-body)
