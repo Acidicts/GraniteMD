@@ -1,3 +1,4 @@
+# config/queue.yml
 default: &default
   dispatchers:
     - polling_interval: 1
@@ -6,12 +7,9 @@ default: &default
     - queues: "*"
       threads: 3
       processes: <%= ENV.fetch("JOB_CONCURRENCY", 1) %>
-      polling_interval: 1
+      polling_interval: 0.1
 
 development:
-  <<: *default
-
-test:
   <<: *default
 
 production:

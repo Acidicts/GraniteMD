@@ -36,7 +36,7 @@ plugin :tmp_restart
 
 # Run Solid Queue inside Puma in development so `bin/rails server` also
 # processes jobs (production uses `bin/jobs` as a separate process).
-plugin :solid_queue if Rails.env.development?
+plugin :solid_queue if ENV["SOLID_QUEUE_IN_PUMA"] || Rails.env.development?
 
 # Specify the PID file. Defaults to tmp/pids/server.pid in development.
 # In other environments, only set the PID file if requested.
