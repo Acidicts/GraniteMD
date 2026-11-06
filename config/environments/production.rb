@@ -80,6 +80,7 @@ Rails.application.configure do
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = true
   config.action_mailer.default_url_options = { host: app_host, protocol: "https" }
+  config.action_mailer.asset_host = "https://#{app_host}"
   smtp_settings = {
     address: ENV["SMTP_HOST"].presence || "localhost",
     port: ENV["SMTP_PORT"].presence&.to_i || 587,

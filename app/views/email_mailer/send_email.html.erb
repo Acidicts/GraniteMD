@@ -1,1 +1,4 @@
-<%= sanitize @body %>
+<% content_for :content do %>
+  <%= sanitize @body %>
+<% end %>
+<%= render template: "mailer/email_template" %>

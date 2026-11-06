@@ -53,6 +53,7 @@ Rails.application.configure do
   # Emails are collected in ActionMailer::Base.deliveries instead of being sent.
   config.action_mailer.delivery_method = :test
   config.action_mailer.default_url_options = { host: "www.example.com" }
+  config.action_mailer.asset_host = "http://www.example.com"
 
   # Mission Control ships with HTTP basic auth enabled but no credentials set,
   # which returns a bare 401. In tests, rely on the app's own session login

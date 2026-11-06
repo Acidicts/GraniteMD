@@ -59,7 +59,15 @@ Rails.application.configure do
   # Email delivery: real SMTP when SMTP_HOST is set, otherwise write files to tmp/mails.
   config.action_mailer.perform_deliveries = true
   config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+  dev_host = Granitemd.app_host(default: "localhost")
+  dev_protocol = ENV["APP_HOST"].to_s.strip.start_with?("https") ? "https" : "http"
+  if dev_host == "localhost"
+    config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+    config.action_mailer.asset_host = "http://localhost:3000"
+  else
+    config.action_mailer.default_url_options = { host: dev_host, protocol: dev_protocol }
+    config.action_mailer.asset_host = "#{dev_protocol}://#{dev_host}"
+  end
 
   if ENV["SMTP_HOST"].present?
     config.action_mailer.delivery_method = :smtp

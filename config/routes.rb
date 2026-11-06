@@ -6,6 +6,7 @@ Rails.application.routes.draw do
     get "faq"     => :faq,     as: :home_faq
     get "about"   => :about,   as: :home_about
     get "team"    => :team,    as: :home_team
+    get "test"    => :test,    as: :test
   end
 
   controller :sessions do

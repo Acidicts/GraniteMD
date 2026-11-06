@@ -67,4 +67,9 @@ class HomeController < ApplicationController
 
   def team
   end
+
+  def test
+    @body = "<p>Preview body — replace with test HTML</p>"
+    render "email_mailer/send_email", layout: "mailer"
+  end
 end
