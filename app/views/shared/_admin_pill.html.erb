@@ -1,0 +1,5 @@
+<div class="admin-pill-split">
+  <%= link_to "", admin_dashboard_path, class: "admin-pill-segment admin-pill-main", aria: { label: "Admin dashboard" } %>
+  <span class="admin-pill-label" aria-hidden="true">Admin</span>
+  <button type="button" class="admin-pill-segment admin-pill-toggle" aria-label="Open admin menu" data-action="click->layouts--admin-pill#clicked click@window->layouts--admin-pill#close"></button>
+</div>

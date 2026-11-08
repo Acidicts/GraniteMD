@@ -36,17 +36,13 @@
             <%= link_to "Organisations", dashboard_organisations_path, class: "btn-nav" %>
             <%= link_to "Settings", dashboard_path, class: "btn-nav" %>
             <% if current_user.admin? %>
-              <% if current_url == admin_dashboard_url %>
-                <div data-controller="layouts--admin-pill" data-action="click->layouts--admin-pill#clicked click@window->layouts--admin-pill#close">
-                  <a class="btn btn-primary">Admin</a>
-                  <div class="admin-pill-links hidden" data-layouts--admin-pill-target="links">
-                    <%= link_to "My Profile", dashboard_users_path, class: "btn btn-tertiary" %>
-                    <%= link_to "Logout", logout_path, class: "btn btn-tertiary", data: { turbo_method: :delete } %>
-                  </div>
+              <div data-controller="layouts--admin-pill">
+                <%= render "shared/admin_pill" %>
+                <div class="admin-pill-links hidden" data-layouts--admin-pill-target="links">
+                  <%= link_to "My Profile", dashboard_users_path, class: "btn btn-tertiary" %>
+                  <%= link_to "Logout", logout_path, class: "btn btn-tertiary", data: { turbo_method: :delete } %>
                 </div>
-              <% else %>
-                <%= link_to "Admin", admin_dashboard_path, class: "btn btn-primary" %>
-              <% end %>
+              </div>
             <% end %>
             <div data-controller="layouts--profile-pill" data-action="click->layouts--profile-pill#clicked click@window->layouts--profile-pill#close">
               <%= render "shared/profile_pill" %>

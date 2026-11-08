@@ -173,6 +173,8 @@ body {
 .nav [data-controller="layouts--admin-pill"] {
     display: flex;
     flex-direction: column;
+    width: calc(100% - 12px);
+    align-self: center;
 }
 
 .nav [data-controller="layouts--admin-pill"] > .btn {
