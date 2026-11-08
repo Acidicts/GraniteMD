@@ -15,6 +15,7 @@
   line-height: 1;
   text-decoration: none;
   cursor: pointer;
+  box-sizing: border-box;
   transition: background-color 0.12s, border-color 0.12s, color 0.12s;
 }
 
@@ -34,7 +35,7 @@
   border-color: var(--accent);
   color: var(--on-accent);
 }
-.btn-primary:hover:not(:disabled) {
+.btn-primary:hover:not(:disabled):not([aria-disabled="true"]) {
   background: var(--accent-hover);
   border-color: var(--accent-hover);
 }
@@ -49,7 +50,7 @@
   border-color: var(--muted);
   color: var(--text);
 }
-.btn-secondary:hover:not(:disabled) {
+.btn-secondary:hover:not(:disabled):not([aria-disabled="true"]) {
   background: var(--selection);
 }
 .btn-secondary:disabled {
@@ -61,7 +62,7 @@
 .btn-tertiary {
   color: var(--accent);
 }
-.btn-tertiary:hover:not(:disabled) {
+.btn-tertiary:hover:not(:disabled):not([aria-disabled="true"]) {
   background: var(--selection);
   text-decoration: underline;
 }
@@ -74,7 +75,7 @@
   border-color: var(--danger-text);
   color: var(--danger-text);
 }
-.btn-danger:hover:not(:disabled) {
+.btn-danger:hover:not(:disabled):not([aria-disabled="true"]) {
   background: var(--danger-tint);
 }
 .btn-danger:disabled {
@@ -102,13 +103,20 @@
   margin: 0;
   transition: background-color 0.12s, border-color 0.12s, color 0.12s;
 }
-.btn-nav:hover:not(:disabled) {
+.btn-nav:hover:not(:disabled):not([aria-disabled="true"]) {
   background: var(--selection);
 }
-.btn-primary:disabled {
-  background: var(--border);
-  border-color: var(--border);
+.btn-nav:disabled,
+.btn-nav[aria-disabled="true"] {
   color: var(--muted);
+  cursor: not-allowed;
+}
+
+/* Compact (e.g. nav-rail pills) */
+.btn-compact {
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
 }
 
 /* Icon-only (e.g. <%= button_to ..., class: "btn btn-icon" do %><%= delete_icon %><% end %>) */
@@ -122,7 +130,7 @@
   border-radius: 8px;
   color: var(--muted);
 }
-.btn-icon:hover:not(:disabled) {
+.btn-icon:hover:not(:disabled):not([aria-disabled="true"]) {
   background: var(--selection);
   color: var(--text);
 }
@@ -172,7 +180,7 @@ form.button_to {
   border-color: var(--accent);
   color: var(--on-accent);
 }
-.btn-login:hover:not(:disabled) {
+.btn-login:hover:not(:disabled):not([aria-disabled="true"]) {
   background: var(--accent-hover);
   border-color: var(--accent-hover);
 }
@@ -204,7 +212,7 @@ form.button_to {
   border-color: var(--info-title);
   color: var(--info-title);
 }
-.btn-info:hover:not(:disabled) {
+.btn-info:hover:not(:disabled):not([aria-disabled="true"]) {
   background: var(--info-accent);
   border-color: var(--info-accent);
   color: var(--info-title);
@@ -213,4 +221,26 @@ form.button_to {
   background: var(--border);
   border-color: var(--border);
   color: var(--muted);
+}
+
+/* Discrete disabled: keeps the variant's own colours instead of the
+   greyed-out :disabled look. Works on <a> too, where :disabled never
+   matches, so also match [disabled] / [aria-disabled]. Must come after
+   the variant :disabled rules to win on equal specificity. */
+.btn-disabled-discrete:disabled,
+.btn-disabled-discrete[disabled],
+.btn-disabled-discrete[aria-disabled="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+  cursor: default;
+  opacity: 1;
+}
+
+.btn-disabled-discrete[disabled]:hover,
+.btn-disabled-discrete:disabled:hover,
+.btn-disabled-discrete[aria-disabled="true"]:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
 }

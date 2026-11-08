@@ -100,6 +100,16 @@
     font-size: 0.9rem;
 }
 
+.dashboard__panel-title {
+    display: block;
+    font-size: 1.17em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: bold;
+}
+
 .dashboard__header-actions {
     display: flex;
     gap: 0.5rem;

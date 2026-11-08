@@ -39,7 +39,7 @@
   <% if workspaces.any? %>
     <div class="workspaces">
       <div class="workspace-header">
-        <h3>Workspaces <span class="workspace-header-muted">(<%= workspaces.count %>)</span></h3>
+        <h2 class="dashboard__panel-title">Workspaces <span class="workspace-header-muted">(<%= workspaces.count %>)</span></h2>
         <div class="workspace-header-actions">
           <%= link_to "View all", dashboard_workspaces_path, class: "btn btn-secondary workspace-header-new-link" %>
           <%= link_to "New Workspace", new_dashboard_workspace_path, class: "btn btn-primary workspace-header-new-link" %>
@@ -62,7 +62,7 @@
   <div class="dashboard__lower">
     <section class="dashboard__panel dashboard__recent">
       <div class="dashboard__panel-header">
-        <h3>Recent pages</h3>
+        <h2 class="dashboard__panel-title">Recent pages</h2>
         <% if workspaces.any? %>
           <%= link_to "View workspaces", dashboard_workspaces_path, class: "dashboard__panel-link" %>
         <% end %>
@@ -95,7 +95,7 @@
 
     <section class="dashboard__panel dashboard__orgs">
       <div class="dashboard__panel-header">
-        <h3>Organisations</h3>
+        <h2 class="dashboard__panel-title">Organisations</h2>
         <%= link_to "View all", dashboard_organisations_path, class: "dashboard__panel-link" %>
       </div>
       <% if organisations.any? %>
@@ -119,17 +119,17 @@
     <div class="dashboard__side">
       <section class="dashboard__panel dashboard__storage">
         <div class="dashboard__panel-header">
-          <h3>Storage</h3>
+          <h2 class="dashboard__panel-title">Storage</h2>
         </div>
         <p class="dashboard__storage-text"><strong><%= human_storage_size(used_storage) %></strong> of <%= human_storage_size(total_storage) %> &middot; <%= storage_pct %>% used</p>
-        <div class="dashboard__storage-bar" role="progressbar" aria-valuenow="<%= storage_pct %>" aria-valuemin="0" aria-valuemax="100">
+        <div class="dashboard__storage-bar" role="progressbar" aria-label="Storage usage" aria-valuenow="<%= storage_pct %>" aria-valuemin="0" aria-valuemax="100">
           <div class="dashboard__storage-fill" style="width: <%= storage_pct %>%;"></div>
         </div>
       </section>
 
       <section class="dashboard__panel dashboard__actions">
         <div class="dashboard__panel-header">
-          <h3>Quick actions</h3>
+          <h2 class="dashboard__panel-title">Quick actions</h2>
         </div>
         <div class="dashboard__actions-list">
           <%= link_to "New Workspace", new_dashboard_workspace_path, class: "btn btn-primary" %>
