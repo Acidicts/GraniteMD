@@ -864,7 +864,7 @@ function markdownToHtml(md, pages = {}, files = {}) {
     const task = text.match(/^\[([ xX]?)\]\s+(.*)$/);
     if (!task) return `<li>${inline(text)}</li>`;
     const checked = task[1].toLowerCase() === "x" ? " checked" : "";
-    return `<li class="task"><input type="checkbox" disabled${checked}> ${inline(task[2])}</li>`;
+    return `<li class="task"><input type="checkbox" aria-label="preview-checkbox" disabled${checked}> ${inline(task[2])}</li>`;
   };
 
   const HTML_BLOCK =
