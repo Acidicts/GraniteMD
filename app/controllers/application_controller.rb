@@ -5,9 +5,8 @@ class ApplicationController < ActionController::Base
   layout "application"
 
   helper_method :current_user
-
-  before_action :current_url
-  before_action :current_path
+  helper_method :current_url
+  helper_method :current_path
 
   def current_user
     @current_user ||= resume_session&.user

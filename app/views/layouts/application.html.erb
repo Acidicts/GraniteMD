@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title><%= content_for(:title) || "GraniteMD" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="GraniteMD">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="description" content="An all in one markdown editing suite with workspaces and other features including organisations, roadmaps and more to come. Inspired by Obsidian MD, Made for the Web.">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= yield :head %>
@@ -33,6 +34,19 @@
             <%= link_to "Workspaces", dashboard_workspaces_path, class: "btn-nav" %>
             <%= link_to "Organisations", dashboard_organisations_path, class: "btn-nav" %>
             <%= link_to "Settings", dashboard_path, class: "btn-nav" %>
+            <% if current_user.admin? %>
+              <% if current_url == admin_dashboard_url %>
+                <div data-controller="layouts--admin-pill" data-action="click->layouts--admin-pill#clicked click@window->layouts--admin-pill#close">
+                  <a class="btn btn-primary">Admin</a>
+                  <div class="admin-pill-links hidden" data-layouts--admin-pill-target="links">
+                    <%= link_to "My Profile", dashboard_users_path, class: "btn btn-tertiary" %>
+                    <%= link_to "Logout", logout_path, class: "btn btn-tertiary", data: { turbo_method: :delete } %>
+                  </div>
+                </div>
+              <% else %>
+                <%= link_to "Admin", admin_dashboard_path, class: "btn btn-primary" %>
+              <% end %>
+            <% end %>
             <div data-controller="layouts--profile-pill" data-action="click->layouts--profile-pill#clicked click@window->layouts--profile-pill#close">
               <%= render "shared/profile_pill" %>
               <div class="profile-pill-links hidden" data-layouts--profile-pill-target="links">

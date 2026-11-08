@@ -173,6 +173,48 @@ body {
     }
 }
 
+.nav [data-controller="layouts--admin-pill"] {
+    display: flex;
+    flex-direction: column;
+}
+
+.nav [data-controller="layouts--admin-pill"] > .btn {
+    width: 100%;
+}
+
+.nav .admin-pill-links {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+
+    transform: translateX(100%) translateY(-10%);
+
+    background: var(--surface-2);
+    border-radius: 32px;
+    box-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+
+    width: fit-content;
+    padding: 2px;
+}
+
+.nav .admin-pill-links a {
+    text-decoration: none;
+    color: var(--muted);
+    padding: 8px 16px;
+    border-radius: 0;
+    transition: background-color 0.12s, color 0.12s;
+}
+
+.nav .admin-pill-links a:first-child {
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+}
+
+.nav .admin-pill-links a:last-child {
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+}
+
 .nav .profile-pill-links {
     display: flex;
     flex-direction: column;
