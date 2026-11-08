@@ -1,6 +1,3 @@
-@import url("../themes/colour-theme.css");
-@import url("../themes/misc.css");
-
 body {
     display: flex;
     position: absolute;
