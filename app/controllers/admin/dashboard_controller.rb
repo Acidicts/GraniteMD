@@ -1,4 +1,6 @@
 class Admin::DashboardController < ApplicationController
+  layout "admin/admin"
+
   before_action :require_admin
 
   def index; end

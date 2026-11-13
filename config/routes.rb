@@ -88,6 +88,11 @@ Rails.application.routes.draw do
       get "dashboard" => "dashboard#index", as: :dashboard
     end
     get "dashboard" => "dashboard#index", as: :dashboard
+    get "overview" => "dashboard#index", as: :overview
+    get "users" => "dashboard#index", as: :users
+    get "pages" => "dashboard#index", as: :pages
+    get "activity" => "dashboard#index", as: :activity
+    get "settings" => "dashboard#index", as: :settings
   end
 
   mount MissionControl::Jobs::Engine, at: "/jobs"

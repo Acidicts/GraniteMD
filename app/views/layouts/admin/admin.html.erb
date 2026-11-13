@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title><%= content_for(:title) || "GraniteMD Admin" %></title>
+        <meta name="viewport" content="width=device-width,initial-scale=1">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="application-name" content="GraniteMD">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="description" content="An all in one markdown editing suite with workspaces and other features including organisations, roadmaps and more to come. Inspired by Obsidian MD, Made for the Web.">
+        <%= csrf_meta_tags %>
+        <%= csp_meta_tag %>
+        <%= yield :head %>
+        <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
+        <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
+        <link rel="icon" href="/icon.png" type="image/png">
+        <link rel="icon" href="/icon.svg" type="image/svg+xml">
+        <link rel="apple-touch-icon" href="/icon.png">
+
+        <%= stylesheet_link_tag "themes/colour-theme", "themes/misc", "data-turbo-track": "reload" %>
+        <%= stylesheet_link_tag "layouts/admin/admin", "layouts/shared", "data-turbo-track": "reload" %>
+        <%= stylesheet_link_tag "components/buttons", "components/alerts", "data-turbo-track": "reload" %>
+        <%= javascript_importmap_tags %>
+    </head>
+    <body>
+        <%= flash_alerts %>
+        <div class="app-shell">
+            <div class="nav-rail">
+                <div class="nav-rail-links">
+                    <%= link_to dashboard_path, class: "dashboard-icon-logo" do %>
+                        <div class="nav-logo">
+                            <%= logo_svg(width: 36, height: 36) %> Granite <span class="granite-highlighted">MD</span>
+                        </div>
+                    <% end %>
+                    <div class="nav-links">
+                        <div class="nav-links-default">
+                            <%= link_to "Workspaces", dashboard_workspaces_path, class: "btn-nav" %>
+                            <%= link_to "Organisations", dashboard_organisations_path, class: "btn-nav" %>
+                            <%= link_to "Settings", dashboard_path, class: "btn-nav" %>
+                        </div>
+
+                        <div class="nav-links-admin" data-controller="admin--dropdown" data-admin--dropdown-autoopen-value="true">
+                            <div class="admin-tag-pill"
+                                role="button"
+                                tabindex="0"
+                                aria-haspopup="true"
+                                aria-expanded="false"
+                                data-admin--dropdown-target="button"
+                                data-action="click->admin--dropdown#toggle keydown.enter->admin--dropdown#toggle keydown.space->admin--dropdown#toggle:prevent">
+                                <div class="admin-tag lexend">
+                                    ADMIN
+                                </div>
+                                <span class="admin-tag-dropdown" data-admin--dropdown-target="rotating" aria-hidden="true">›</span>
+                            </div>
+
+                            <div class="admin-menu" data-admin--dropdown-target="menu" role="menu">
+                                <%= link_to "Overview", admin_overview_path, class: "btn-admin" %>
+                                <%= link_to "Users", admin_overview_path, class: "btn-admin" %>
+                                <%= link_to "Pages", admin_overview_path, class: "btn-admin" %>
+                                <%= link_to "Activity", admin_overview_path, class: "btn-admin" %>
+                                <%= link_to "Settings", admin_overview_path, class: "btn-admin" %>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="nav-user-profile" data-controller="admin--dropdown" data-admin--dropdown-autoopen-value="false">
+                    <div class="nav-user-profile-button" 
+                            role="button"
+                            tabindex="0"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                            data-admin--dropdown-target="button"
+                            data-action="click->admin--dropdown#toggle keydown.enter->admin--dropdown#toggle keydown.space->admin--dropdown#toggle:prevent">
+                        <div class="pfp-image">
+                            <% if current_user&.pfp_image&.attached? %>
+                                    <%= image_tag current_user.pfp_image, width: 32, height: 32, class: "pfp-image" %>
+                            <% elsif current_user %>
+                                <%= profile_svg(width: 32, height: 32, color: "var(--accent)", background: "#00000000") %>
+                            <% end %>
+                        </div>
+                        <span class="nav-user-profile__username"><%= current_user&.username %></span>
+                        <span class="admin-tag-dropdown" data-admin--dropdown-target="rotating" aria-hidden="true">›</span>
+                    </div>
+                    <div class="nav-user-profile__links" data-admin--dropdown-target="menu" role="menu">
+                        <%= link_to "Overview", admin_overview_path, class: "btn-admin" %>
+                        <%= link_to "Users", admin_overview_path, class: "btn-admin" %>
+                    </div>
+                </div>
+            </div>
+            <div class="content">
+                <%= yield %>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,3 +1,36 @@
+/* Fonts */
+@font-face {
+    font-family: "Sour Gummy";
+    src: url("../SourGummy-VariableFont_wdth,wght.ttf") format("truetype");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Sour Gummy";
+    src: url("../SourGummy-Italic-VariableFont_wdth,wght.ttf") format("truetype");
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Lexend";
+    src: url("../Lexend-VariableFont_wght.ttf") format("truetype");
+    font-weight: 100 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+.sour-gummy {
+    font-family: "Sour Gummy", monospace;
+}
+
+.lexend {
+    font-family: "Lexend", monospace;
+}
+
 /* Profile Pill */
 .profile-pill {
     display: flex;

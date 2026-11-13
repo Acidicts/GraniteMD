@@ -39,8 +39,7 @@
               <div data-controller="layouts--admin-pill">
                 <%= render "shared/admin_pill" %>
                 <div class="admin-pill-links hidden" data-layouts--admin-pill-target="links">
-                  <%= link_to "My Profile", dashboard_users_path, class: "btn btn-tertiary" %>
-                  <%= link_to "Logout", logout_path, class: "btn btn-tertiary", data: { turbo_method: :delete } %>
+                  
                 </div>
               </div>
             <% end %>
