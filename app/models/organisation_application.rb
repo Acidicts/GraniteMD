@@ -49,7 +49,7 @@ class OrganisationApplication < ApplicationRecord
     self.class::QueueOrgJob.set(wait: 3.hours).perform_later(id)
   end
 
-  def create_org  
+  def create_org
     ActiveRecord::Base.transaction do
       organisation = Organisation.new(name: self.name)
       organisation.users << self.owner
