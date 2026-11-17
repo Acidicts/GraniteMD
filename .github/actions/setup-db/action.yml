@@ -10,11 +10,12 @@ runs:
       #
       # The client major version sets a hard ceiling on the server image the
       # rspec job may use: `pg_dump` aborts with "server version mismatch" when
-      # the server is newer than the client. Keep the client major aligned with
-      # the Postgres service image used in CI to avoid dumps that include
-      # server-version-specific settings (for example, transaction_timeout on
-      # newer clients) that older servers cannot restore.
-      run: sudo apt-get install -y libpq-dev postgresql-client-15
+      # the server is newer than the client. Prefer a client major aligned with
+      # the Postgres service image used in CI, but fall back to the distro's
+      # default client when that specific version is unavailable on the runner.
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libpq-dev postgresql-client-15 || sudo apt-get install -y libpq-dev postgresql-client
     - name: Detect postgres server version
       id: pg-version
       shell: bash
