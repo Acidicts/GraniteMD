@@ -27,6 +27,8 @@ class Folder < ApplicationRecord
   has_many :workspace_files, dependent: :destroy
   has_many :roadmaps, dependent: :destroy
 
+  has_many :audits, as: :auditable, dependent: :destroy
+
   before_validation :inherit_workspace_from_parent
 
   private

@@ -53,12 +53,25 @@ module Dashboard
       end
       @workspace.owner = current_user if @workspace.organisation_id.blank? && @workspace.owner_id.blank?
 
-      if @workspace.save
-        @workspace.users << @workspace.owner if @workspace.owner
-        @workspace.users << current_user unless @workspace.users.include?(current_user)
+      begin
+        ActiveRecord::Base.transaction do
+          @workspace.save!
+          @workspace.users << @workspace.owner if @workspace.owner
+          @workspace.users << current_user unless @workspace.users.include?(current_user)
+          @workspace.audits.create!(
+            user: current_user,
+            action: "created workspace",
+            details: {
+              name: @workspace.name,
+              feature_set: @workspace.feature_set,
+              organisation_id: @workspace.organisation_id,
+              owner_id: @workspace.owner_id
+            }
+          )
+        end
 
         redirect_to dashboard_workspace_path(@workspace), notice: "Workspace was successfully created."
-      else
+      rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotSaved
         @org_locked = false
         render :new, status: :unprocessable_content
       end

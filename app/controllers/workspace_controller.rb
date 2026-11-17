@@ -102,7 +102,18 @@ class WorkspaceController < ApplicationController
       return redirect_to workspace_path(workspace), alert: "File name can't be blank"
     end
 
-    if @page.save
+    saved = ActiveRecord::Base.transaction do
+      @page.save && @page.audits.create!(
+        user: current_user,
+        action: "created page",
+        details: {
+          workspace_id: @workspace.id,
+          page_name: @page.name
+        }
+      )
+    end
+
+    if saved
       respond_to do |format|
         format.turbo_stream
         format.html { redirect_to workspace_path(workspace), notice: "File created" }

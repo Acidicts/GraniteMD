@@ -21,6 +21,8 @@ class OrganisationApplication < ApplicationRecord
   validates :pitch, presence: true
   validates :owner_id, presence: true
 
+  has_many :audits, as: :auditable, dependent: :destroy
+
   enum :status, {
     pending: 0,
     approved: 1,
@@ -47,11 +49,17 @@ class OrganisationApplication < ApplicationRecord
     self.class::QueueOrgJob.set(wait: 3.hours).perform_later(id)
   end
 
-  def create_org
-    organisation = Organisation.new(name: self.name)
-    organisation.users << self.owner
-    organisation.save!
-    self.update(organisation: organisation, status: :created)
+  def create_org  
+    ActiveRecord::Base.transaction do
+      organisation = Organisation.new(name: self.name)
+      organisation.users << self.owner
+      organisation.save!
+      organisation.audits.new(user: nil, action: "created organisation", details: {
+        name: organisation.name,
+        owner: self.owner&.id
+      }).save!
+      self.update(organisation: organisation, status: :created)
+    end
   end
 
   def owner

@@ -24,6 +24,8 @@ class Workspace < ApplicationRecord
   belongs_to :owner, class_name: "User", optional: true
   has_and_belongs_to_many :users
 
+  has_many :audits, as: :auditable, dependent: :destroy
+
   has_many :folders, dependent: :destroy
   has_one :folder, -> { where(parent_id: nil).order(:created_at) }, class_name: "Folder", inverse_of: :workspace
   has_many :pages, through: :folders

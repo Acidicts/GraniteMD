@@ -23,6 +23,8 @@ class Page < ApplicationRecord
   belongs_to :folder
   has_one :workspace, through: :folder
 
+  has_many :audits, as: :auditable, dependent: :destroy
+
   validates :name, presence: true
 
   attribute :body, default: ""

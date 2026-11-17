@@ -27,6 +27,8 @@ class Organisation < ApplicationRecord
   has_and_belongs_to_many :users
   has_many :workspaces
 
+  has_many :audits, as: :auditable, dependent: :destroy
+
   normalizes :public_id, with: ->(u) { u.strip.downcase }
   validates :public_id, uniqueness: { case_sensitive: false }
 
