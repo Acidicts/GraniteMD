@@ -56,8 +56,10 @@ module Dashboard
       begin
         ActiveRecord::Base.transaction do
           @workspace.save!
-          @workspace.users << @workspace.owner if @workspace.owner
-          @workspace.users << current_user unless @workspace.users.include?(current_user)
+          member_ids = [ @workspace.owner_id, current_user.id ].compact.uniq
+          member_ids.each do |member_id|
+            @workspace.users << User.find(member_id) unless @workspace.users.exists?(id: member_id)
+          end
           @workspace.audits.create!(
             user: current_user,
             action: "created workspace",
@@ -105,7 +107,7 @@ module Dashboard
       if @workspace.nil?
         return redirect_to dashboard_workspaces_path, alert: "We couldn't find that workspace"
       end
-      return if @workspace.users.exists?(current_user.id)
+      return if @workspace.owner_id == current_user.id || @workspace.users.exists?(current_user.id)
 
       redirect_to dashboard_path
     end

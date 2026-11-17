@@ -13,7 +13,7 @@ module Dashboard
     end
 
     def edit
-      if params[:id].present? && current_user.id.to_i != params[:id].to_i && !current_user.admin?
+      if params[:id].present? && current_user.id.to_i != params[:id].to_i && !current_user&.admin?
         alert(warn: "You do not have access to this user")
         return redirect_to dashboard_path
       end
@@ -37,7 +37,7 @@ module Dashboard
     end
 
     def update
-      if params[:id].present? && current_user.id.to_i != params[:id].to_i && !current_user.admin?
+      if params[:id].present? && current_user.id.to_i != params[:id].to_i && !current_user&.admin?
         alert(warn: "You do not have access to this user")
         return redirect_to dashboard_path
       end

@@ -40,7 +40,7 @@ class WorkspaceController < ApplicationController
   def update
     @workspace = Workspace.find_by_id_or_public_id(params[:public_id] || params[:workspace_public_id])
     return redirect_to dashboard_workspaces_path, alert: "We couldn't find that workspace" if @workspace.nil?
-    redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace" unless @workspace.users.exists?(current_user.id)
+    redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace" unless workspace_accessible?(@workspace)
   end
 
   def change_file
@@ -49,7 +49,7 @@ class WorkspaceController < ApplicationController
     if params[:workspace_public_id].present? && !workspace_matches?(page.folder.workspace, params[:workspace_public_id])
       return redirect_to dashboard_workspaces_path, alert: "We couldn't find that page"
     end
-    return redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace" unless page.workspace.users.exists?(current_user.id)
+    return redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace" unless workspace_accessible?(page.workspace)
 
     render partial: "workspace/editor", locals: { page: page, workspace: page.workspace }
   end
@@ -61,7 +61,7 @@ class WorkspaceController < ApplicationController
     if params[:workspace_public_id].present? && !workspace_matches?(workspace_file.folder.workspace, params[:workspace_public_id])
       return redirect_to dashboard_workspaces_path, alert: "We couldn't find that file"
     end
-    return redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace" unless workspace_file.workspace.users.exists?(current_user.id)
+    return redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace" unless workspace_accessible?(workspace_file.workspace)
 
     render partial: "workspace/file_preview", locals: { workspace_file: workspace_file, workspace: workspace_file.workspace }
   end
@@ -72,7 +72,7 @@ class WorkspaceController < ApplicationController
     if params[:workspace_public_id].present? && !workspace_matches?(roadmap.folder.workspace, params[:workspace_public_id])
       return redirect_to dashboard_workspaces_path, alert: "We couldn't find that roadmap"
     end
-    return redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace" unless roadmap.workspace.users.exists?(current_user.id)
+    return redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace" unless workspace_accessible?(roadmap.workspace)
 
     @categories = roadmap.roadmap_catagory
 
@@ -555,7 +555,11 @@ class WorkspaceController < ApplicationController
 
     return nil unless raw.match?(/\A\d+\z/)
 
-    roadmap.workspace.users.find_by(id: raw.to_i)
+    id = raw.to_i
+    workspace = roadmap.workspace
+    return workspace.users.find_by(id: id) if workspace.owner_id == id
+
+    workspace.users.find_by(id: id)
   end
 
   def render_item_update_error(roadmap, message)
@@ -570,9 +574,13 @@ class WorkspaceController < ApplicationController
     @workspace = Workspace.find_by_id_or_public_id(params[:workspace_public_id])
     if @workspace.nil?
       redirect_to dashboard_workspaces_path, alert: "We couldn't find that workspace"
-    elsif !@workspace.users.exists?(current_user.id)
+    elsif !workspace_accessible?(@workspace)
       redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace"
     end
+  end
+
+  def workspace_accessible?(workspace)
+    workspace.owner_id == current_user.id || workspace.users.exists?(current_user.id)
   end
 
   def workspace_matches?(workspace, identifier)
@@ -590,7 +598,7 @@ class WorkspaceController < ApplicationController
       redirect_to dashboard_workspaces_path, alert: "We couldn't find that page"
       return nil
     end
-    unless page.workspace.users.exists?(current_user.id)
+    unless workspace_accessible?(page.workspace)
       redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace"
       return nil
     end
@@ -607,7 +615,7 @@ class WorkspaceController < ApplicationController
       redirect_to dashboard_workspaces_path, alert: "We couldn't find that folder"
       return nil
     end
-    unless folder.workspace.users.exists?(current_user.id)
+    unless workspace_accessible?(folder.workspace)
       redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace"
       return nil
     end
@@ -624,7 +632,7 @@ class WorkspaceController < ApplicationController
       redirect_to dashboard_workspaces_path, alert: "We couldn't find that roadmap"
       return nil
     end
-    unless roadmap.workspace.users.exists?(current_user.id)
+    unless workspace_accessible?(roadmap.workspace)
       redirect_to dashboard_workspaces_path, alert: "You do not have access to this workspace"
       return nil
     end
