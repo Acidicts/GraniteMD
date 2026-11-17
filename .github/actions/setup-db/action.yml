@@ -10,10 +10,11 @@ runs:
       #
       # The client major version sets a hard ceiling on the server image the
       # rspec job may use: `pg_dump` aborts with "server version mismatch" when
-      # the server is newer than the client. Ubuntu's default package tracks the
-      # runner image's bundled PostgreSQL. To move the service to a newer major,
-      # install postgresql-client-<N> here in the same step.
-      run: sudo apt-get install -y libpq-dev postgresql-client
+      # the server is newer than the client. Keep the client major aligned with
+      # the Postgres service image used in CI to avoid dumps that include
+      # server-version-specific settings (for example, transaction_timeout on
+      # newer clients) that older servers cannot restore.
+      run: sudo apt-get install -y libpq-dev postgresql-client-15
     - name: Detect postgres server version
       id: pg-version
       shell: bash
@@ -59,9 +60,12 @@ runs:
         if [ "${{ steps.schema-cache.outputs.cache-hit }}" = "true" ] && [ -s /tmp/schema.sql ]; then
           echo "Restoring cached schema dump..."
           createdb granite_test
-          psql -d granite_test -v ON_ERROR_STOP=1 -f /tmp/schema.sql > /dev/null
+          # Strip transaction_timeout for compatibility with Postgres servers that
+          # predate it (e.g. PG15) in case a cached dump was produced by a newer
+          # pg_dump client.
+          sed '/transaction_timeout/d' /tmp/schema.sql | psql -d granite_test -v ON_ERROR_STOP=1 > /dev/null
         else
           echo "Cache miss; loading schema via Rails..."
           bundle exec rails db:create db:schema:load
-          pg_dump --no-owner --no-privileges --no-comments granite_test > /tmp/schema.sql
+          pg_dump --no-owner --no-privileges --no-comments granite_test | sed '/transaction_timeout/d' > /tmp/schema.sql
         fi
