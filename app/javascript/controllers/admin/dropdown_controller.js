@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["menu", "button", "rotating"]
-  static values = { autoopen: { type: Boolean, default: false } }
+  static values = { autoopen: { type: Boolean, default: false }, outsideclose: { type: Boolean, default: false } }
 
   connect() {
     this.outsideClick = this.outsideClick.bind(this)
@@ -23,14 +23,18 @@ export default class extends Controller {
   open() {
     this.buttonTarget.setAttribute("aria-expanded", "true")
     this.element.classList.add("is-open")
-    document.addEventListener("click", this.outsideClick)
+    if (this.outsidecloseValue) {
+      document.addEventListener("click", this.outsideClick)
+    }
     document.addEventListener("keydown", this.escape)
   }
 
   close() {
     this.buttonTarget.setAttribute("aria-expanded", "false")
     this.element.classList.remove("is-open")
-    document.removeEventListener("click", this.outsideClick)
+    if (this.outsidecloseValue) {
+      document.removeEventListener("click", this.outsideClick)
+    }
     document.removeEventListener("keydown", this.escape)
   }
 
@@ -43,7 +47,9 @@ export default class extends Controller {
   }
 
   disconnect() {
-    document.removeEventListener("click", this.outsideClick)
+    if (this.outsidecloseValue) {
+      document.removeEventListener("click", this.outsideClick)
+    }
     document.removeEventListener("keydown", this.escape)
   }
 }

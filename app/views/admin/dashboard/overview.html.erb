@@ -1,0 +1,125 @@
+<%= stylesheet_link_tag "pages/admin/overview" %>
+
+<div class="options">
+    <div class="header">
+        <h1>Overview</h1>
+        <h4>The general operation overview here</h4>
+    </div>
+</div>
+
+<div class="operation-data-container">
+    <div class="operation-data">
+        <h3>Users</h3>
+        <div class="stat">
+            <%= @stats[0][0] %>
+        </div>
+        <span class="stat-note"><%= @stats[0][1] %> new this week</span>
+    </div>
+    <div class="operation-data">
+        <h3>Workspaces</h3>
+        <div class="stat">
+            <%= @stats[1][0] %>
+        </div>
+        <span class="stat-note"><%= @stats[1][1] %> belong to organisations</span>
+    </div>
+    <div class="operation-data">
+        <h3>Pages</h3>
+        <div class="stat">
+            <%= @stats[2][0] %>
+        </div>
+        <span class="stat-note"><%= @stats[2][1] %> new this week</span>
+    </div>
+    <div class="operation-data">
+        <h3>Applications Pending</h3>
+        <div class="stat">
+            <%= @stats[3][0] %>
+        </div>
+        <% if (oldest_app = @stats[3][1]) %>
+            <%= time_ago_in_words(oldest_app.created_at) %> longest wait time
+        <% else %>
+            No pending applications
+        <% end %>
+    </div>
+</div>
+
+<div class="section-2">
+    <div class="organisation-applications">
+        <div class="organisation-applications__header">
+            <h2>Organisation applications</h2>
+            <% if @pending_applications_count.positive? %>
+            <span class="admin-badge admin-badge--danger"><%= @pending_applications_count %> pending</span>
+            <% end %>
+        </div>
+
+        <div class="pending-applications">
+            <% if @pending_applications.any? %>
+            <% @pending_applications.each do |application| %>
+                <% owner = @application_owners[application.owner_id] %>
+                <article class="pending-application">
+                <div class="pending-application__main">
+                    <h3 class="pending-application__name"><%= application.name %></h3>
+                    <p class="pending-application__owner">
+                    <% if owner %>
+                        <%= owner.first_name %> <%= owner.last_name %> (@<%= owner.username %>)
+                    <% else %>
+                        Unknown owner
+                    <% end %>
+                    </p>
+                    <p class="pending-application__pitch"><%= truncate(application.pitch, length: 140) %></p>
+                </div>
+
+                <div class="pending-application__side">
+                    <time class="pending-application__time" datetime="<%= application.created_at.iso8601 %>">
+                    <%= time_ago_in_words(application.created_at) %> ago
+                    </time>
+                    <div class="pending-application__actions">
+                    <%= button_to "Approve", approve_admin_organisation_application_path(application),
+                            method: :patch, class: "btn btn-primary pending-application__btn" %>
+                    <%= button_to "Reject", reject_admin_organisation_application_path(application),
+                            method: :patch, class: "btn btn-secondary pending-application__btn" %>
+                    </div>
+                </div>
+                </article>
+            <% end %>
+            <% else %>
+            <p class="pending-applications__empty">No applications waiting for review.</p>
+            <% end %>
+        </div>
+    </div>
+    
+    <div class="system-stats">
+        <h2 class="admin-system-card__title">System</h2>
+
+        <div class="admin-system-card__storage">
+            <div class="admin-system-card__row">
+                <span>Storage used</span>
+                <strong><%= @storage_percent %>%</strong>
+            </div>
+            <div class="admin-meter" role="progressbar" aria-label="Storage used"
+                    aria-valuemin="0" aria-valuemax="100" aria-valuenow="<%= @storage_percent %>">
+                <div class="admin-meter__fill" style="width: <%= @storage_percent %>%"></div>
+            </div>
+            <p class="admin-system-card__hint">
+                <%= number_to_human_size(@storage_used) %> of <%= number_to_human_size(@storage_limit) %>
+            </p>
+        </div>
+
+        <div class="admin-system-card__row">
+            <span>Queued jobs</span>
+            <strong><%= number_with_delimiter(@queued_jobs) %></strong>
+        </div>
+
+        <div class="admin-system-card__row">
+            <span>Failed jobs</span>
+            <% if @failed_jobs.positive? %>
+                <span class="admin-badge admin-badge--danger"><%= number_with_delimiter(@failed_jobs) %> failed</span>
+            <% else %>
+                <span class="admin-badge admin-badge--ok">None</span>
+            <% end %>
+        </div>
+
+        <div class="admin-system-card__row">
+            <span>Active sessions</span>
+            <strong><%= number_with_delimiter(@active_sessions) %></strong>
+        </div>
+</div>

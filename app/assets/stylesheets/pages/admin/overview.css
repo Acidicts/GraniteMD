@@ -1,0 +1,211 @@
+.options {
+    display: flex;
+    flex-direction: row;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+}
+
+.operation-data-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+
+    font-family: "Lexend"
+}
+
+.operation-data {
+    display: flex;
+    flex-direction: column;
+    
+    background-color: var(--surface-1);
+    border: var(--border) 1px solid;
+    padding: 1rem;
+    border-radius: 1rem;
+}
+
+.operation-data h3 {
+    color: var(--muted);
+}
+
+.operation-data .stat {
+    font-size: 4rem;
+}
+
+.operation-data .stat-note {
+    color: var(--muted);
+}
+
+.section-2 {
+    display: grid;
+    grid-template-columns: 4fr 1fr;
+    margin-top: 2rem;
+    gap: 1rem;
+}
+
+.system-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.admin-system-card__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.admin-system-card__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-system-card__storage {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.admin-system-card__hint {
+  margin: 0;
+  color: var(--muted);
+}
+
+.admin-meter {
+  height: 8px;
+  background: var(--surface-1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.admin-meter__fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+}
+
+.admin-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.admin-badge--ok {
+  background: color-mix(in srgb, var(--link) 18%, transparent);
+  color: var(--link);
+}
+
+.admin-badge--danger {
+  background: var(--danger-tint);
+  color: var(--danger-text);
+}
+
+.organisation-applications {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.organisation-applications__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.organisation-applications__header h2 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.pending-applications {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.pending-application {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--surface-1);
+}
+
+.pending-application:last-child {
+  border-bottom: 0;
+}
+
+.pending-application__main {
+  min-width: 0;
+}
+
+.pending-application__name {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pending-application__owner,
+.pending-application__time,
+.pending-applications__empty {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.pending-application__pitch {
+  margin: 6px 0 0;
+  font-size: 13px;
+}
+
+.pending-application__side {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex: none;
+}
+
+.pending-application__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.pending-application__btn {
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+}
+
+.pending-applications__empty {
+  padding: 24px 20px;
+  text-align: center;
+}
+
+@media (max-width: 800px) {
+  .pending-application {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pending-application__side {
+    align-items: flex-start;
+  }
+}

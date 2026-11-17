@@ -1,0 +1,29 @@
+require 'rails_helper'
+
+RSpec.describe "Admin::OrganisationApplications", type: :request do
+  describe "PATCH /admin/organisation-applications/:id/approve" do
+    it "approves the application" do
+      admin = create(:user, role: :admin)
+      application = create(:organisation_application, status: :pending)
+
+      sign_in admin
+      patch approve_admin_organisation_application_path(application)
+
+      expect(response).to have_http_status(:redirect)
+      expect(application.reload.status).to eq("approved")
+    end
+  end
+
+  describe "PATCH /admin/organisation-applications/:id/reject" do
+    it "rejects the application" do
+      admin = create(:user, role: :admin)
+      application = create(:organisation_application, status: :pending)
+
+      sign_in admin
+      patch reject_admin_organisation_application_path(application)
+
+      expect(response).to have_http_status(:redirect)
+      expect(application.reload.status).to eq("rejected")
+    end
+  end
+end

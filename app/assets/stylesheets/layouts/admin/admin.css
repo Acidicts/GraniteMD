@@ -1,3 +1,13 @@
+turbo-frame#admin_frame_content {
+  display: block;
+  transition: opacity 350ms ease;
+  opacity: 1;
+}
+
+turbo-frame#admin_frame_content.is-fading {
+  opacity: 0;
+}
+
 html,
 body {
     padding: 0;
@@ -277,4 +287,10 @@ body {
 
 .nav-user-profile__links .btn-admin:hover {
   background: var(--selection);
+}
+
+.content {
+    padding: 2rem;
+    color: var(--text);
+    width: 100%;
 }

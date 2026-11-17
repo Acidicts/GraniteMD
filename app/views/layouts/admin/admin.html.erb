@@ -53,17 +53,16 @@
                             </div>
 
                             <div class="admin-menu" data-admin--dropdown-target="menu" role="menu">
-                                <%= link_to "Overview", admin_overview_path, class: "btn-admin" %>
-                                <%= link_to "Users", admin_overview_path, class: "btn-admin" %>
-                                <%= link_to "Pages", admin_overview_path, class: "btn-admin" %>
-                                <%= link_to "Activity", admin_overview_path, class: "btn-admin" %>
-                                <%= link_to "Settings", admin_overview_path, class: "btn-admin" %>
+                                <%= link_to "Overview", admin_overview_path, class: "btn-admin", data: { turbo_frame: "admin_frame_content", turbo_action: "advance" } %>
+                                <%= link_to "Users", admin_users_path, class: "btn-admin", data: { turbo_frame: "admin_frame_content", turbo_action: "advance" } %>
+                                <%= link_to "Pages", admin_pages_path, class: "btn-admin", data: { turbo_frame: "admin_frame_content", turbo_action: "advance" } %>
+                                <%= link_to "Activity", admin_activity_path, class: "btn-admin", data: { turbo_frame: "admin_frame_content", turbo_action: "advance" } %>
+                                <%= link_to "Settings", admin_settings_path, class: "btn-admin", data: { turbo_frame: "admin_frame_content", turbo_action: "advance" } %>
                             </div>
                         </div>
                     </div>
-                    
                 </div>
-                <div class="nav-user-profile" data-controller="admin--dropdown" data-admin--dropdown-autoopen-value="false">
+                <div class="nav-user-profile" data-controller="admin--dropdown" data-admin--dropdown-autoopen-value="false" data-admin--dropdown-outsideclose-value="true">
                     <div class="nav-user-profile-button" 
                             role="button"
                             tabindex="0"
@@ -83,12 +82,14 @@
                     </div>
                     <div class="nav-user-profile__links" data-admin--dropdown-target="menu" role="menu">
                         <%= link_to "Overview", admin_overview_path, class: "btn-admin" %>
-                        <%= link_to "Users", admin_overview_path, class: "btn-admin" %>
+                        <%= button_to "Logout", logout_path, method: :delete, class: "btn-admin" %>
                     </div>
                 </div>
             </div>
             <div class="content">
-                <%= yield %>
+                <%= turbo_frame_tag "admin_frame_content", data: { controller: "admin--frame-fade" } do %>
+                    <%= yield %>
+                <% end %>
             </div>
         </div>
     </body>
