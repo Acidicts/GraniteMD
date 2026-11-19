@@ -1,7 +1,7 @@
 # README
 
 A web app inspired by obsidian md, but designed on the web.
-Running on Rails 8.1.4 with ruby 4.0.7
+Running on Rails 8.1.4.1 with ruby 4.0.10
 
 ## System dependencies
 - libvips
