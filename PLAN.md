@@ -5,9 +5,18 @@ Legend: `[x]` done, `[~]` partial, `[ ]` todo.
 ### Hierarchy
 
 - [~] Useful stuff
-    - [~] Email Sending (only password-reset mailer + `ApplicationHelper#send_email` queue via `EmailMailer` done)
-        - [ ] Codes
+    - [~] Email Sending
+        - [x] Welcome Emails
+        - [x] Password resets
         - [ ] Workspace limits
+        - [ ] Admin
+            - [ ] User invite
+            - [ ] User Account Deactivated
+        - [ ] Organisation
+            - [ ] User Invite
+            - [ ] User Assignment (Org can own account or invite a personal)
+                - [ ] Org Disable Account
+                - [ ] Org Limits
         - [ ] Billing
             - [ ] Yearly renewal
             - [ ] Payment Failed
