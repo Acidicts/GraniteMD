@@ -2,7 +2,7 @@ source "https://rubygems.org"
 
 # Pinned so the CI runner (via .ruby-version) and the production image (via the
 # Dockerfile's RUBY_VERSION) cannot drift apart unnoticed.
-ruby "4.0.7"
+ruby "4.0.10"
 
 gem "dotenv"
 
