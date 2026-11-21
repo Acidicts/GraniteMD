@@ -1,0 +1,13 @@
+<% raise ArgumentError, "aria_label is required" unless local_assigns.key?(:aria_label) %>
+<span class="brand-info-icon"
+      data-controller="shared--info-icon"
+      data-action="mouseenter->shared--info-icon#show mouseleave->shared--info-icon#hide focus->shared--info-icon#show blur->shared--info-icon#hide"
+      tabindex="0"
+      aria-label="<%= aria_label %>">
+  <svg class="brand-info-icon__svg" viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="8" cy="8" r="6.5" />
+    <line x1="8" y1="7" x2="8" y2="11" />
+    <circle cx="8" cy="5" r="0.5" fill="currentColor" stroke="none" />
+  </svg>
+  <span class="brand-info-icon__tooltip" data-shared--info-icon-target="tooltip" role="tooltip"><%= aria_label %></span>
+</span>

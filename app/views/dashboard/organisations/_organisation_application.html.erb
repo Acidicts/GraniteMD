@@ -13,6 +13,20 @@
             <%= organisation_application.status.humanize %>
         </span>
       </p>
+      <% if organisation_application.rejected? %>
+        <div class="organisation-application__appeal" data-controller="dashboard--organisations--organisation-application">
+          <button class="btn btn-primary" type="button" data-action="click->dashboard--organisations--organisation-application#toggle" <%= "disabled" if organisation_application.appeal_locked? %>>Appeal<% if organisation_application.appeal_locked? %><%= render "shared/info_icon", aria_label: "Your application has been locked, create a new one or contact support" %><% end %></button>
+          <div class="organisation-application__appeal_form" data-dashboard--organisations--organisation-application-target="form">
+            <%= form_with url: appeal_dashboard_organisations_path, method: :post do |f| %>
+              <%= hidden_field_tag :id, organisation_application.id %>
+              <%= hidden_field_tag :public_id, organisation_application.public_id %>
+              <%= f.label :new_pitch, "Amend Your Pitch" %>
+              <%= f.text_area :new_pitch %>
+              <%= f.submit "Submit appeal", class: "btn btn-secondary" %>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
     </div>
   </div>
 </article>

@@ -64,3 +64,121 @@ blockquote {
     border: 2px solid transparent;
     background-clip: content-box;
 }
+
+/* Info Icon styling from Acidicts/Issued */
+
+/* Info icon with tooltip */
+.brand-info-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  color: var(--brand-text-muted);
+  transition: color 0.2s ease;
+  vertical-align: middle;
+  line-height: 0;
+}
+
+.brand-info-icon:hover,
+.brand-info-icon:focus {
+  color: var(--brand-primary);
+  outline: none;
+}
+
+.button-primary.disabled .brand-info-icon,
+.btn-primary.disabled .brand-info-icon,
+.button-primary:disabled .brand-info-icon,
+.btn-primary:disabled .brand-info-icon {
+  pointer-events: auto;
+}
+
+.brand-info-icon__svg {
+  flex-shrink: 0;
+}
+
+.brand-info-icon__tooltip {
+  display: none;
+  position: absolute;
+  width: max-content;
+  max-width: 240px;
+  padding: 0.5rem 0.75rem;
+  font-family: var(--brand-font);
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--brand-text);
+  background: var(--brand-surface);
+  border: 1px solid var(--brand-border);
+  border-radius: var(--brand-radius-sm);
+  box-shadow: var(--brand-shadow-lg);
+  white-space: normal;
+  text-align: center;
+  pointer-events: none;
+  z-index: 9999;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* Arrow - top pointing (tooltip above trigger) */
+.brand-info-icon__tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--brand-border);
+}
+
+.brand-info-icon__tooltip::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--brand-surface);
+  z-index: 1;
+}
+
+/* Arrow - bottom pointing (tooltip below trigger) */
+.brand-info-icon__tooltip--below::after {
+  top: auto;
+  bottom: 100%;
+  border-top-color: transparent;
+  border-bottom-color: var(--brand-border);
+}
+
+.brand-info-icon__tooltip--below::before {
+  top: auto;
+  bottom: 100%;
+  border-top-color: transparent;
+  border-bottom-color: var(--brand-surface);
+}
+
+@media (prefers-color-scheme: dark) {
+  .brand-info-icon__tooltip {
+    background: var(--brand-surface-alt);
+    color: var(--brand-text);
+    border-color: var(--brand-border);
+  }
+
+  .brand-info-icon__tooltip::after {
+    border-top-color: var(--brand-border);
+  }
+
+  .brand-info-icon__tooltip::before {
+    border-top-color: var(--brand-surface-alt);
+  }
+
+  .brand-info-icon__tooltip--below::after {
+    border-top-color: transparent;
+    border-bottom-color: var(--brand-border);
+  }
+
+  .brand-info-icon__tooltip--below::before {
+    border-top-color: transparent;
+    border-bottom-color: var(--brand-surface-alt);
+  }
+}

@@ -72,7 +72,7 @@
                             data-action="click->admin--dropdown#toggle keydown.enter->admin--dropdown#toggle keydown.space->admin--dropdown#toggle:prevent">
                         <div class="pfp-image">
                             <% if current_user&.pfp_image&.attached? %>
-                                    <%= image_tag current_user.pfp_image, width: 32, height: 32, class: "pfp-image" %>
+                                <%= image_tag current_user.pfp_image, width: 32, height: 32, class: "pfp-image" %>
                             <% elsif current_user %>
                                 <%= profile_svg(width: 32, height: 32, color: "var(--accent)", background: "#00000000") %>
                             <% end %>

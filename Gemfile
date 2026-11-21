@@ -56,7 +56,8 @@ end
 group :development do
   gem "web-console"
   gem "annotaterb"
-  gem "rails_live_reload"
+
+  gem "rails_live_reload", require: false
 
   gem "ruby-lsp", ">= 0.18.0", require: false
   gem "ruby-lsp-rails", require: false

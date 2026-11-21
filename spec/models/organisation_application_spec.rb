@@ -4,13 +4,14 @@ require 'rails_helper'
 #
 # Table name: organisation_applications
 #
-#  id         :bigint           not null, primary key
-#  name       :string
-#  pitch      :text
-#  status     :integer
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  owner_id   :integer
+#  id            :bigint           not null, primary key
+#  appeal_locked :boolean
+#  name          :string
+#  pitch         :text
+#  status        :integer
+#  created_at    :datetime         not null
+#  updated_at    :datetime         not null
+#  owner_id      :integer
 #
 RSpec.describe OrganisationApplication, type: :model do
   describe "factory" do
@@ -67,22 +68,22 @@ RSpec.describe OrganisationApplication, type: :model do
       expect(app.owner).to eq(user)
     end
 
-    it "raises when the owner is gone" do
+    it "returns nil when the owner is gone" do
       app = build(:organisation_application, owner_id: -1)
 
-      expect { app.owner }.to raise_error(ActiveRecord::RecordNotFound)
+      expect(app.owner).to be_nil
     end
   end
 
   describe "#queue_org" do
-    it "schedules the fulfilment job three hours out" do
+    it "schedules the fulfilment job 5 mins out" do
       app = create(:organisation_application, status: :approved)
 
       expect { app.queue_org }
         .to have_enqueued_job(OrganisationApplication::QueueOrgJob).with(app.id).on_queue("default")
 
       job = ActiveJob::Base.queue_adapter.enqueued_jobs.find { |j| j[:job] == OrganisationApplication::QueueOrgJob }
-      expect(job[:at]).to be_within(5).of(3.hours.from_now.to_f)
+      expect(job[:at]).to be_within(2).of(5.minutes.from_now.to_f)
     end
   end
 

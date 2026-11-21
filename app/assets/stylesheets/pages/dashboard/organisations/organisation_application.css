@@ -3,7 +3,7 @@
     color: var(--text);
     border: 1px solid var(--border);
     border-radius: 15px;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .organisation-application__content {
@@ -19,6 +19,7 @@
     flex-direction: column;
     gap: 0.35rem;
     min-width: 0;
+    overflow: hidden;
 }
 
 .organisation-application__content_name > p {
@@ -98,14 +99,42 @@
 }
 
 .organisation-application__actions {
+    position: relative;
     display: flex;
+    flex-direction: column;
     align-items: flex-start;
-    justify-content: flex-end;
+    justify-content: space-between;
     flex-shrink: 0;
+    gap: 12px;
 }
 
 .organisation-application__actions > p {
     margin: 0;
+}
+
+.organisation-application__appeal_form {
+    position: absolute;
+    top: 6rem;
+    left: 0;
+    
+    z-index: 10;
+    overflow: visible;
+    width: fit-content;
+
+    background-color: var(--surface-2);
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    border: var(--border) 2px solid;
+}
+
+.organisation-application__appeal_form label {
+    font-weight: 600;
+}
+
+.organisation-application__appeal_form textarea {
+    color: var(--text);
+    background-color: var(--surface-2);
+    border-radius: 0.5rem;
 }
 
 @media (max-width: 480px) {

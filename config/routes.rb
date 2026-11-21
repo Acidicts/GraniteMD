@@ -76,7 +76,11 @@ Rails.application.routes.draw do
   scope "/dashboard", as: "dashboard", module: "dashboard" do
     get "/workspaces/new_users", to: "workspaces#new_users"
     resources :workspaces, param: :public_id
-    resources :organisations, param: :public_id
+    resources :organisations, param: :public_id do
+      collection do
+        post :appeal
+      end
+    end
     resources :users, only: %i[index edit update]
 
     get "you", to: "users#index"
@@ -99,6 +103,8 @@ Rails.application.routes.draw do
         patch :reject
       end
     end
+
+    resources :users, only: %i[show new create], path: "users"
   end
 
   mount MissionControl::Jobs::Engine, at: "/jobs"
