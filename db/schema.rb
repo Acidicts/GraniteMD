@@ -73,8 +73,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_22_225342) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "pitch"
-    t.boolean "appeal_locked"
+    t.boolean "appeal_locked", default: false, null: false
     t.string "public_id"
+    t.index ["public_id"], name: "index_organisation_applications_on_public_id", unique: true
   end
 
   create_table "organisations", force: :cascade do |t|
@@ -83,7 +84,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_22_225342) do
     t.datetime "updated_at", null: false
     t.string "public_id"
     t.bigint "organisation_application_id"
-    t.integer "owner_id"
+    t.bigint "owner_id"
     t.index ["organisation_application_id"], name: "index_organisations_on_organisation_application_id"
     t.index ["public_id"], name: "index_organisations_on_public_id", unique: true
   end
