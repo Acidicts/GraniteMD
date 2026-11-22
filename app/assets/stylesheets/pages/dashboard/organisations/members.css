@@ -1,0 +1,116 @@
+.workspace__members-actions {
+    display: flex;
+    flex-direction: row;
+
+    justify-content: space-between;
+    width: 100%;
+}
+
+.workspace__members-actions__right-side {
+    display: flex;
+    flex-direction: row;
+}
+
+.paginator-container {
+    margin: auto;
+    padding-right: 1rem;
+}
+
+.search-term-input {
+    background-color: var(--surface-2);
+    padding: 1rem;
+    border: var(--border) 1px solid;
+    border-radius: 1rem;
+    width: 300px;
+    text-decoration: none;
+    color: var(--text);
+}
+
+.paginator-container select {
+    background-color: var(--surface-2);
+    color: var(--text);
+    padding: 0.5rem;
+    border: var(--border) 1px solid;
+    border-radius: 0.5rem;
+}
+
+.paginator-container label {
+    color: var(--text);
+    font-size: 0.8rem;
+}
+
+
+.members {
+    margin-top: 1rem;
+}
+
+.member {
+    display: flex;
+    flex-direction: row;
+
+    margin: 0;
+    background-color: var(--surface-1);
+    width: 100%;
+    padding: 0.5rem;
+
+    transition: all 0.3s ease-out;
+}
+
+.member:nth-child(even):hover {
+    scale: 1.01;
+    background-color: color-mix(in srgb, var(--surface-1) 90%, var(--text));
+}
+
+.member:nth-child(odd):hover {
+    scale: 1.01;
+    background-color: color-mix(in srgb, var(--surface-2) 90%, var(--text));
+}
+    
+.member:first-child {
+    border-radius: 1rem 1rem 0 0;
+}
+
+.member:last-child {
+    border-radius: 0 0 1rem 1rem;
+}
+
+.member:only-child {
+    border-radius: 1rem;
+}
+
+.member:nth-child(odd) {
+    background-color: var(--surface-2);
+}
+
+.member__image-pfp {
+    background-color: var(--surface-3);
+    padding: 0.5rem;
+    border-radius: 1.5rem;
+    
+    width: 2rem;
+    height: 2rem;
+    
+    text-align: center;
+}
+
+.member__image-pfp p {
+    margin: 0.5rem;
+    transform: translateY(-5%);
+    color: var(--accent);
+}
+
+.member__content {
+    margin-left: 1rem;
+}
+
+.member__context-name-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.member__context-name-container .member__context-username {
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+    margin-left: 0.25rem;
+}

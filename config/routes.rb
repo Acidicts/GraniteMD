@@ -80,6 +80,18 @@ Rails.application.routes.draw do
       collection do
         post :appeal
       end
+
+      resources :workspaces, only: %i[index], controller: "organisations/workspaces"
+      resources :members, only: %i[index show], controller: "organisations/members" do
+        collection do
+          get :invite
+          post :invite
+        end
+      end
+      resources :teams, only: %i[index show new edit create update], controller: "organisations/teams"
+      resources :plan, only: %i[index update], controller: "organisations/plan"
+      resources :limits, only: %i[index update], controller: "organisations/limits"
+      resources :settings, only: %i[index update], controller: "organisations/settings"
     end
     resources :users, only: %i[index edit update]
 

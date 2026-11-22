@@ -1,0 +1,133 @@
+.organisation {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.organisation__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: 0.75rem 1rem;
+}
+
+.organisation__header-content {
+    display: flex;
+    flex-direction: column;
+    padding-top: 0;
+    margin-top: 0;
+}
+
+.organisation__title {
+    margin: 0;
+    font-size: 1.75rem;
+    line-height: 1.2;
+}
+
+.organisation__workspace-count {
+    margin: 0.25rem 0 0;
+    font-size: 0.875rem;
+    color: var(--muted);
+}
+
+.organisation__placeholder-image {
+    width: 800px;
+    height: 400px;
+
+    border-radius: 1rem;
+    border: color-mix(in srgb, var(--muted) 10%, var(--surface-1) 90%) 2px solid;
+    background-color: var(--surface-1);
+}
+
+.workspace__grid-actions {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    margin: 0.5rem 0;
+}
+
+.workspace__owner-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+
+    padding: 0.1rem 0.45rem;
+    border-radius: 999px;
+
+    font-size: 0.7rem;
+    line-height: 1.4;
+
+    /* A long username clips inside the pill rather than widening the column. */
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    background-color: var(--surface-1);
+    box-shadow: 0 0 4px var(--muted);
+}
+
+.workspace__owner-pfp-image {
+    display: grid;
+    place-items: center;
+    flex: none;
+
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+
+    background-color: var(--accent);
+    color: var(--on-accent);
+
+    font-size: 0.65rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.workspace__navbar {
+    width: 100%;
+    border-bottom: 1px solid var(--muted);
+    margin-bottom: 1rem;
+}
+
+.workspace__navbar-links {
+    display: inline-grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    width: max-content;
+    gap: 1rem;
+}
+
+.workspace__nav-btn {
+    text-decoration: none;
+    color: var(--muted);
+    transition: color 0.3s ease;
+    text-align: center;
+}
+
+.workspace__nav-btn-selected {
+    color: var(--accent);
+    display: inline-block;
+    position: relative;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-size: 0% 2px;
+    background-position: 0 100%;
+    transition: background-size 0.3s ease;
+    background-size: 100% 2px;
+}
+
+.workspace__nav-btn:hover {
+    color: var(--accent-hover);
+}

@@ -1,0 +1,6 @@
+<%= turbo_frame_tag "workspace_show_content" do %>
+  <%= render "dashboard/organisations/organisations_navbar" %>
+  <div class="workspace__members-actions">
+    <%= link_to "Back to Organisations", dashboard_organisations_path, class: "btn btn-secondary", data: { turbo_frame: "_top" } %>
+  </div>
+<% end %>

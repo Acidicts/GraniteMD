@@ -1,0 +1,22 @@
+<%= turbo_frame_tag "workspace_show_content" do %>
+    <%= render "dashboard/organisations/organisations_navbar" %>
+    <div class="workspace__grid-actions">
+      <%= link_to "Back to Organisations", dashboard_organisations_path, class: "btn btn-secondary", data: { turbo_frame: "_top" } %>
+      <%= link_to "New Workspace", new_dashboard_workspace_path(organisation: @organisation, org_locked: true), class: "btn btn-primary", data: { turbo_frame: "_top" } %>
+    </div>
+    <% if @workspaces.any? %>
+      <div class="workspaces-grid" id="workspaces">
+        <% @workspaces.each do |workspace| %>
+          <%= render "dashboard/workspaces/workspace", workspace: workspace %>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="workspaces__empty">
+        <p class="workspaces__empty-title">No workspaces yet</p>
+        <p class="workspaces__empty-text">This organisation doesn't have any workspaces yet.</p>
+        <%= link_to "Create Workspace", new_dashboard_workspace_path(organisation: @organisation, org_locked: true), class: "btn btn-primary", data: { turbo_frame: "_top" } %>
+      </div>
+      <div class="workspaces-grid" id="workspaces">
+      </div>
+    <% end %>
+<% end %>

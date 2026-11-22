@@ -1,0 +1,23 @@
+<div class="member">
+    <% if member.pfp_image.attached? %>
+        <div class="member__image-pfp">
+            <%= image_tag member.pfp_image.attached? %>
+        </div>
+    <% else %>
+        <div class="member__image-pfp">
+            <p>
+                <%= member.username.strip[0].upcase %>
+            </p>
+        </div>
+    <% end %>
+    <div class="member__content">
+        <div class="member__context-name-container">
+            <span class="member__context-name">
+                <%= [member.first_name, member.last_name].compact_blank.join(" ").presence || member.username %>
+            </span>
+            <span class="member__context-username">
+                <%= "@" + member.username %>
+            </span>
+        </div>
+    </div>
+</div>

@@ -3,6 +3,7 @@
     --surface: #fff;
     --surface-1: #ebe6e4;
     --surface-2: #e0d9d6;
+    --surface-3: #ccc5c1;
     --border: #d8d0cd;
     --text: #2a2525;
     --muted: #6f6665;
@@ -23,6 +24,7 @@
         --surface: #000;
         --surface-1: #211c1c;
         --surface-2: #2a2424;
+        --surface-3: #453c3c;
         --border: #352e2e;
         --text: #ebe6e4;
         --muted: #9a908e;

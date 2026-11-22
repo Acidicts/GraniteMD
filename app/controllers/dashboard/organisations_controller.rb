@@ -85,7 +85,7 @@ class Dashboard::OrganisationsController < DashboardController
   end
 
   def set_organisation
-    @organisation = Organisation.find_by(public_id: params[:public_id])
+    @organisation = Organisation.find_by(public_id: params[:organisation_public_id] || params[:public_id])
     redirect_to dashboard_organisations_path unless @organisation&.users&.include?(current_user)
   end
 

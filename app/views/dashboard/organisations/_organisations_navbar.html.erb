@@ -1,0 +1,10 @@
+<div class="workspace__navbar">
+    <div class="workspace__navbar-links">
+    <%= link_to "Workspace", dashboard_organisation_path(@organisation), class: "workspace__nav-btn #{current_page?(dashboard_organisation_path(@organisation)) ? "workspace__nav-btn-selected" : "animated-underline"}", data: { turbo_frame: "workspace_show_content", turbo_action: "advance" } %>
+    <%= link_to "Members", dashboard_organisation_members_path(@organisation), class: "workspace__nav-btn #{current_page?(dashboard_organisation_members_path(@organisation)) ? "workspace__nav-btn-selected" : "animated-underline"}", data: { turbo_frame: "workspace_show_content", turbo_action: "advance" } %>
+    <%= link_to "Teams", dashboard_organisation_teams_path(@organisation), class: "workspace__nav-btn #{current_page?(dashboard_organisation_teams_path(@organisation)) ? "workspace__nav-btn-selected" : "animated-underline"}", data: { turbo_frame: "workspace_show_content", turbo_action: "advance" } %>
+    <%= link_to "Plan", dashboard_organisation_plan_index_path(@organisation), class: "workspace__nav-btn #{current_page?(dashboard_organisation_plan_index_path(@organisation)) ? "workspace__nav-btn-selected" : "animated-underline"}", data: { turbo_frame: "workspace_show_content", turbo_action: "advance" } %>
+    <%= link_to "Limits", dashboard_organisation_limits_path(@organisation), class: "workspace__nav-btn #{current_page?(dashboard_organisation_limits_path(@organisation)) ? "workspace__nav-btn-selected" : "animated-underline"}", data: { turbo_frame: "workspace_show_content", turbo_action: "advance" } %>
+    <%= link_to "Settings", dashboard_organisation_settings_path(@organisation), class: "workspace__nav-btn #{current_page?(dashboard_organisation_settings_path(@organisation)) ? "workspace__nav-btn-selected" : "animated-underline"}", data: { turbo_frame: "workspace_show_content", turbo_action: "advance" } %>
+    </div>
+</div>

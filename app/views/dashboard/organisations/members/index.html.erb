@@ -1,0 +1,31 @@
+<%= turbo_frame_tag "workspace_show_content" do %>
+    <div class="workspace__members-container"
+        data-controller="dashboard--organisations--organisation-members" 
+        data-dashboard--organisations--organisation-members-path-value="<%= dashboard_organisation_members_path(@organisation) %>">
+        
+        <%= stylesheet_link_tag "pages/dashboard/organisations/members" %>
+
+        <%= render "dashboard/organisations/organisations_navbar" %>
+        
+        <div class="workspace__members-actions">
+            <input class="search-term-input" autocomplete="off" type="text" id="search_term" placeholder="Search by username…" value="<%= params[:search_term].to_s %>" data-dashboard--organisations--organisation-members-target="search_input" data-action="input->dashboard--organisations--organisation-members#search">
+            <div class="workspace__members-actions__right-side">
+                <div class="paginator-container">
+                    <% selected_per_page = params[:paginator].presence || "10" %>
+                    <select id="paginator" name="paginator" data-dashboard--organisations--organisation-members-target="paginator" data-action="change->dashboard--organisations--organisation-members#reload">
+                        <option value="10" <%= "selected" if selected_per_page == "10" %>>10</option>
+                        <option value="20" <%= "selected" if selected_per_page == "20" %>>20</option>
+                        <option value="30" <%= "selected" if selected_per_page == "30" %>>30</option>
+                        <option value="50" <%= "selected" if selected_per_page == "50" %>>50</option>
+                    </select>
+                    <label for="paginator">Per Page</label>
+                </div>
+                <%= link_to "New User", invite_dashboard_organisation_members_path(@organisation), class: "btn btn-primary" %>
+            </div>
+        </div>
+
+        <%= turbo_frame_tag "workspace_show_content-members" do %>
+            <%= render "dashboard/organisations/members/members" %>
+        <% end %>
+    </div>
+<% end %>
