@@ -22,7 +22,8 @@ module Dashboard
         org ||= Organisation.find_by("LOWER(public_id) = ?", ident.downcase)
         @workspace.organisation = org if org && org.users.exists?(current_user.id)
       end
-      @org_locked = ActiveModel::Type::Boolean.new.cast(params[:org_locked]) && @workspace.organisation_id.present?
+      @workspace.organisation = current_user.organisation_locked if !current_user.organisation_locked.nil?
+      @org_locked = (ActiveModel::Type::Boolean.new.cast(params[:org_locked]) && @workspace.organisation_id.present?) || current_user.organisation_locked.present?
     end
 
     def new_users

@@ -2,20 +2,27 @@
 #
 # Table name: users
 #
-#  id              :bigint           not null, primary key
-#  email_address   :string           not null
-#  first_name      :string
-#  last_name       :string
-#  password_digest :string           not null
-#  role            :integer
-#  username        :string
-#  created_at      :datetime         not null
-#  updated_at      :datetime         not null
+#  id                     :bigint           not null, primary key
+#  email_address          :string           not null
+#  first_name             :string
+#  last_name              :string
+#  organisation_locked    :boolean
+#  password_digest        :string           not null
+#  role                   :integer
+#  username               :string
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  organisation_locked_id :bigint
 #
 # Indexes
 #
-#  index_users_on_email_address  (email_address) UNIQUE
-#  index_users_on_username_trgm  (username gin_trgm_ops) USING gin
+#  index_users_on_email_address           (email_address) UNIQUE
+#  index_users_on_organisation_locked_id  (organisation_locked_id)
+#  index_users_on_username_trgm           (username gin_trgm_ops) USING gin
+#
+# Foreign Keys
+#
+#  fk_rails_...  (organisation_locked_id => organisations.id)
 #
 class User < ApplicationRecord
   PASSWORD_RESET_TOKEN_TTL = 15.minutes
@@ -53,6 +60,8 @@ class User < ApplicationRecord
             },
             if: -> { password.present? }
   validates :password_confirmation, presence: true, if: -> { password.present? }
+
+  belongs_to :organisation_locked, class_name: "Organisation", optional: true
 
   attribute :first_name, :string, default: ""
   attribute :last_name, :string, default: ""

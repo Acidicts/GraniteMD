@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_22_210029) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_22_225342) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -73,9 +73,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_22_210029) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "pitch"
-    t.boolean "appeal_locked", default: false, null: false
+    t.boolean "appeal_locked"
     t.string "public_id"
-    t.index ["public_id"], name: "index_organisation_applications_on_public_id", unique: true
   end
 
   create_table "organisations", force: :cascade do |t|
@@ -84,7 +83,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_22_210029) do
     t.datetime "updated_at", null: false
     t.string "public_id"
     t.bigint "organisation_application_id"
-    t.bigint "owner_id"
+    t.integer "owner_id"
     t.index ["organisation_application_id"], name: "index_organisations_on_organisation_application_id"
     t.index ["public_id"], name: "index_organisations_on_public_id", unique: true
   end
@@ -307,7 +306,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_22_210029) do
     t.integer "role"
     t.string "last_name"
     t.string "username"
+    t.bigint "organisation_locked_id"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
+    t.index ["organisation_locked_id"], name: "index_users_on_organisation_locked_id"
     t.index ["username"], name: "index_users_on_username_trgm", opclass: :gin_trgm_ops, using: :gin
   end
 
@@ -358,6 +359,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_22_210029) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "users", "organisations", column: "organisation_locked_id"
   add_foreign_key "users_workspaces", "users"
   add_foreign_key "users_workspaces", "workspaces"
   add_foreign_key "workspaces", "organisations"
