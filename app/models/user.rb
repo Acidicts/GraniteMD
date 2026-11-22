@@ -15,6 +15,7 @@
 # Indexes
 #
 #  index_users_on_email_address  (email_address) UNIQUE
+#  index_users_on_username_trgm  (username gin_trgm_ops) USING gin
 #
 class User < ApplicationRecord
   PASSWORD_RESET_TOKEN_TTL = 15.minutes
@@ -41,6 +42,7 @@ class User < ApplicationRecord
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }
   normalizes :username, with: ->(u) { u.strip.downcase }
+
   validates :username, uniqueness: { case_sensitive: false, message: "Username in Use" }
   validates :email_address, uniqueness: { message: "Email in Use" }
   validates :password,
@@ -64,6 +66,13 @@ class User < ApplicationRecord
 
   attribute :greet_email, :boolean, default: false
   after_create_commit :send_greet_email, if: :greet_email
+
+  scope :fuzzy_search, ->(term) {
+    normalized = term.to_s.strip
+    return all if normalized.blank?
+
+    where("users.username ILIKE ?", "%#{ActiveRecord::Base.sanitize_sql_like(normalized.downcase)}%")
+  }
 
   enum :role, {
     user:       0, # Standard User

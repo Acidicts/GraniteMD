@@ -17,6 +17,7 @@ require 'rails_helper'
 # Indexes
 #
 #  index_users_on_email_address  (email_address) UNIQUE
+#  index_users_on_username_trgm  (username gin_trgm_ops) USING gin
 #
 RSpec.describe User, type: :model do
   describe "validations" do

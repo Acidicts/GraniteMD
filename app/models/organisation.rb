@@ -7,6 +7,7 @@
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
 #  organisation_application_id :bigint
+#  owner_id                    :integer
 #  public_id                   :string
 #
 # Indexes
@@ -22,6 +23,8 @@ class Organisation < ApplicationRecord
   belongs_to :organisation_application, optional: true
   DEFAULT_STORAGE = 50.megabytes
 
+  belongs_to :owner, class_name: "User", foreign_key: "owner_id", optional: true
+
   attribute :name, :string
 
   has_and_belongs_to_many :users
@@ -33,6 +36,11 @@ class Organisation < ApplicationRecord
   validates :public_id, uniqueness: { case_sensitive: false }
 
   before_validation :ensure_public_id, if: -> { public_id.blank? }
+
+  has_one_attached :image do |attachable|
+    attachable.variant :list, resize_to_limit: [ 400, 400 ], format: :webp, saver: { quality: 75, strip: true }
+    attachable.variant :full, resize_to_limit: [ 1200, 1200 ], format: :webp, saver: { quality: 78, strip: true }
+  end
 
   # Short URLs (/dashboard/organisations/:public_id) use the public id,
   # mirroring Workspace#to_param.

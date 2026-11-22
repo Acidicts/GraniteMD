@@ -12,6 +12,7 @@ require 'rails_helper'
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #  owner_id      :integer
+#  public_id     :string
 #
 RSpec.describe OrganisationApplication, type: :model do
   describe "factory" do

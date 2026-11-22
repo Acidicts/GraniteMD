@@ -10,6 +10,7 @@
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #  owner_id      :integer
+#  public_id     :string
 #
 FactoryBot.define do
   factory :organisation_application do

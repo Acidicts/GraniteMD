@@ -9,6 +9,7 @@ require 'rails_helper'
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
 #  organisation_application_id :bigint
+#  owner_id                    :integer
 #  public_id                   :string
 #
 # Indexes

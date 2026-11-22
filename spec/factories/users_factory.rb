@@ -15,6 +15,7 @@
 # Indexes
 #
 #  index_users_on_email_address  (email_address) UNIQUE
+#  index_users_on_username_trgm  (username gin_trgm_ops) USING gin
 #
 FactoryBot.define do
   factory :user do

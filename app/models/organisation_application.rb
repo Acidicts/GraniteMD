@@ -10,6 +10,7 @@
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #  owner_id      :integer
+#  public_id     :string
 #
 class OrganisationApplication < ApplicationRecord
   has_one :organisation
@@ -60,7 +61,7 @@ class OrganisationApplication < ApplicationRecord
 
   def create_org
     ActiveRecord::Base.transaction do
-      organisation = Organisation.new(name: self.name)
+      organisation = Organisation.new(name: self.name, owner: self.owner)
       organisation.users << self.owner
       organisation.save!
       organisation.audits.new(user: nil, action: "created organisation", details: {

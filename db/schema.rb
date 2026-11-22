@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_21_155910) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_22_210029) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_trgm"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -83,6 +84,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_21_155910) do
     t.datetime "updated_at", null: false
     t.string "public_id"
     t.bigint "organisation_application_id"
+    t.bigint "owner_id"
     t.index ["organisation_application_id"], name: "index_organisations_on_organisation_application_id"
     t.index ["public_id"], name: "index_organisations_on_public_id", unique: true
   end
@@ -306,6 +308,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_21_155910) do
     t.string "last_name"
     t.string "username"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
+    t.index ["username"], name: "index_users_on_username_trgm", opclass: :gin_trgm_ops, using: :gin
   end
 
   create_table "users_workspaces", id: false, force: :cascade do |t|
